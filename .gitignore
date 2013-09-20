@@ -1,0 +1,13 @@
+# Ignore all intermediate files in obj
+obj/
+
+# Object files:
+*.o
+
+# Image files:
+*.bin
+*.img
+*.elf
+
+# Backup files of some editors:
+*~
