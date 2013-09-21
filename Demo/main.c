@@ -22,6 +22,9 @@ limitations under the License.
  * @author Jernej Kovacic
  */
 
+
+#include <stddef.h>
+
 #include <FreeRTOS.h>
 #include <task.h>
 
@@ -57,6 +60,13 @@ void vTaskFunction( void *pvParameters )
 
         vTaskDelay( delay / portTICK_RATE_MS );
     }
+
+    /*
+     * If the task implementation ever manages to break out of the
+     * infinite loop above, it must be deleted before reaching the
+     + end of the function!
+     */
+    vTaskDelete(NULL);
 }
 
 /* Parameters for two tasks */
@@ -85,8 +95,10 @@ void main(void)
     vTaskStartScheduler();
 
     /*
-     * vTaskStartScheduler should never return
+     * If all goes well, vTaskStartScheduler should never return
      * but just in case "end up" in an infinite loop
      */
+
+    vPrintMsg("Could not start the scheduler!!!\r\n");
     for ( ; ; );
 }

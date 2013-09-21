@@ -36,7 +36,11 @@ limitations under the License.
 
 
 /* Outputs a msg to the UART0 */
-#define vPrintMsg(msg)         uart_print(0, (msg))
+#define vPrintMsg(msg)         uart_print(0, ( msg ) )
+
+/* Outputs a character to UART0 */
+#define vPrintChar(ch)         uart_printChar(0, ( ch )  )
+
 
 /* Creates a FreeRTOS task and handles possible errors */
 #define assertTaskCreate(code, name, stackDepth, params, priority, taskHandle) \
