@@ -37,14 +37,17 @@ APP_SRC = Demo/
 
 
 # Object files to be linked into an application
-# Due to a large number, the files they are placed into logical groups
+# Due to a large number, the .o files are arranged into logical groups:
+
+# Note, timers.o and croutine.o may be excluded if not necessary
 FREERTOS_OBJS = queue.o list.o tasks.o timers.o croutine.o
 # Only one memory management file must be chosen!
 FREERTOS_MEMMANG_OBJS = heap_1.o
-FREERTOS_PORT_OBJS = port.o portISR.o nostdlib.o
+FREERTOS_PORT_OBJS = port.o portISR.o
 STARTUP_OBJ = startup.o
 DRIVERS_OBJS = timer.o interrupt.o uart.o
-APP_OBJS = init.o main.o
+# Note, nostdlib.o must only be included if stdlib is not linked to the application!
+APP_OBJS = init.o main.o nostdlib.o
 
 # All object files specified above are prefixed the intermediate directory
 OBJS = $(addprefix $(OBJDIR), $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG_OBJS) $(FREERTOS_PORT_OBJS) $(DRIVERS_OBJS) $(APP_OBJS))
@@ -83,7 +86,7 @@ $(OBJDIR) :
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 	$(LD) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@
 
-$(OBJDIR)startup.o : startup.s
+$(OBJDIR)startup.o : $(APP_SRC)startup.s
 	$(AS) $(CPUFLAG) $< -o $@
 
 
@@ -112,9 +115,6 @@ $(OBJDIR)port.o : $(FREERTOS_PORT_SRC)port.c
 
 $(OBJDIR)portISR.o : $(FREERTOS_PORT_SRC)portISR.c
 	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
-
-$(OBJDIR)nostdlib.o : $(FREERTOS_PORT_SRC)nostdlib.c
-	$(CC) -c $(CPUFLAG) $< -o $@
 
 
 # Rules for all MemMang implementations are provided
@@ -151,6 +151,9 @@ $(OBJDIR)main.o : $(APP_SRC)main.c
 
 $(OBJDIR)init.o : $(APP_SRC)init.c $(DEP_BSP)
 	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
+
+$(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
+	$(CC) -c $(CPUFLAG) $< -o $@
 
 
 # Cleanup directives:
