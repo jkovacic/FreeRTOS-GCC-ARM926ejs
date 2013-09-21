@@ -1,3 +1,19 @@
+# Copyright 2013, Jernej Kovacic
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+
 # Version 2013-05.23 of the Sourcery toolchain is used as a build tool.
 # See comments in "setenv.sh" for more details about downloading it
 # and setting the appropriate environment variables.
@@ -57,11 +73,11 @@ LINKER_SCRIPT = $(APP_SRC)qemu.ld
 ELF_IMAGE = $(addprefix $(OBJDIR), image.elf)
 TARGET = image.bin
 
-# Header directories to be passed to $(CC) where necessary
+# Include paths to be passed to $(CC) where necessary
 INC_FREERTOS = $(FREERTOS_SRC)include/
 INC_DRIVERS = $(DRIVERS_SRC)include/
 
-# Complete include directives to be passed to $(CC) where necessary
+# Complete include flags to be passed to $(CC) where necessary
 INC_FLAGS = $(INCLUDEFLAG)$(INC_FREERTOS) $(INCLUDEFLAG)$(APP_SRC) $(INCLUDEFLAG)$(FREERTOS_PORT_SRC)
 INC_FLAG_DRIVERS = $(INCLUDEFLAG)$(INC_DRIVERS)
 
@@ -159,7 +175,7 @@ $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
 # Cleanup directives:
 
 clean_intermediate :
-	rm -rf $(OBJDIR)*
+	rm -rf $(OBJDIR)
 
 clean : clean_intermediate
 	rm -f *.bin
