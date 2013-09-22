@@ -24,6 +24,7 @@ limitations under the License.
 
 
 #include <stddef.h>
+#include <stdint.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -49,7 +50,7 @@ void vTaskFunction( void *pvParameters )
     uint32_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
-    taskName = ( NULL==params ? defaultText : params->text );
+    taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
     delay = ( NULL==params ? defaultDelay : params->delay);
 
     for( ; ; )
@@ -64,7 +65,7 @@ void vTaskFunction( void *pvParameters )
     /*
      * If the task implementation ever manages to break out of the
      * infinite loop above, it must be deleted before reaching the
-     + end of the function!
+     * end of the function!
      */
     vTaskDelete(NULL);
 }
