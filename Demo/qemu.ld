@@ -56,6 +56,7 @@ SECTIONS
     __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address */
     __ld_Svc_Stack_Size = 0x1000; /* Very generous size of the Supervisor mode's stack (4 kB) */
     __ld_Irq_Stack_size = 0x1000; /* Very generous size of the IRQ mode's stack (4 kB) */
+    __ld_Ram_size = 128M;         /* Total capacity of RAM */
 
 
     . = __ld_Vectors_Size;        /* Move the pointer after the "reserved" area for exception vectors */
@@ -74,20 +75,50 @@ SECTIONS
     . = __ld_Init_Addr;          /* Qemu will boot from this address */
     .init :
     {
-        *(.init)
+        __init_begin = .;
+        *(.init)                 /* ARM exception vectors must be placed to startup address */
+        __init_end = .;
     }
+
+    /* The other sections follow: */
     .text :
     {
-        /*startup.o   Exception vectors, specified in startup.o, must be placed to the startup address! */
-        /* followed by the rest of the code... */
+        __text_begin = .;
         *(.text)
+        __text_end = .;
     }
 
     /* followed by other sections... */
-    .rodata : { *(.rodata) }
-    .data : { *(.data) }
-    .bss : { *(.bss) }
-    . = ALIGN(8);                  /* The section size is aligned to the 8-byte boundary */
+    .rodata :
+    {
+        __rodata_begin = .;
+        *(.rodata)
+        __rodata_end = .;
+    }
+
+    .data :
+    {
+        __data_begin = .;
+        *(.data)
+        __data_end = .;
+    }
+
+    .bss :
+    {
+        __bss_begin = .;
+        *(.bss)
+        __bss_end = .;
+    }
+    . = ALIGN(4);                  /* The section size is aligned to the 4-byte boundary */
 
     __ld_FootPrint_End = .;        /* A convenience symbol to determine the actual memory footprint */
+
+    /* The remainder of RAM is reserved for the heap (if malloc is ever used) */
+    .heap :
+    {
+        __heap_begin = .;
+        *(.heap)
+        . = __ld_Ram_size;
+        __heap_end = .;
+    }
 }

@@ -109,6 +109,17 @@ reset_handler:
     LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}
     STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}
 
+    @ Clear the whole BSS section to 0:
+	LDR r0, __bss_begin_addr
+    LDR r1, __bss_end_addr
+    MOV r2, #0
+bss_clear_loop:
+    CMP r0, r1                     @ if (r0<r1) ....
+    STRLTB r2, [r0], #1            @ ...store a byte of r2 (i.r. 0) to location pointed by r0++
+    BLT bss_clear_loop             @ ...and continue the loop
+
+
+    @ Set stack pointers and IRQ/FIQ bits for all supported operating modes
 
     MRS r0, cpsr                           @ copy Program Status Register (CPSR) to r0
 
@@ -149,4 +160,12 @@ reset_handler:
 
 unhandled:
     B .                                    @ infinite loop for unsupported exceptions
+
+@ Addresses of BSS begin and end.
+@ Note that both symbols have been defined in the linker script
+__bss_begin_addr:
+    .word __bss_begin
+__bss_end_addr:
+    .word __bss_end
+
 .end
