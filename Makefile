@@ -138,7 +138,7 @@ $(OBJDIR)port.o : $(FREERTOS_PORT_SRC)port.c
 	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)portISR.o : $(FREERTOS_PORT_SRC)portISR.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 
 # Rules for all MemMang implementations are provided

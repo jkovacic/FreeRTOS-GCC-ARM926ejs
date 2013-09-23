@@ -29,7 +29,7 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include "app.h"
+#include "macros.h"
 
 /* Struct with settings for each task */
 typedef struct _paramStruct

@@ -104,6 +104,9 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 
+#include "timer.h"
+#include "tick_timer_settings.h"
+
 
 /* Constants required to handle critical sections. */
 #define portNO_CRITICAL_NESTING		( ( unsigned long ) 0 )
@@ -168,6 +171,33 @@ void vFreeRTOS_ISR( void )
     _pic_IrqHandler();
     portRESTORE_CONTEXT();
 }
+
+/*-----------------------------------------------------------*/
+
+
+/*
+ * VIC must be configured to call this routine when IRQ4 is triggered by the timer:
+ * It will increase the counter of ticks and possibly switch to another task.
+ */
+void vTickISR( void )
+{
+
+    /* Increment the RTOS tick count, then look for the highest priority
+    task that is ready to run. */
+    __asm volatile
+    (
+        "   bl xTaskIncrementTick   \t\n" \
+        "   cmp r0, #0              \t\n" \
+        "   beq SkipContextSwitch   \t\n" \
+        "   bl vTaskSwitchContext   \t\n" \
+        "SkipContextSwitch:         \t\n"
+    );
+
+    /* Acknowledge the interrupt on timer */
+    timer_clearInterrupt(portTICK_TIMER, portTICK_TIMER_COUNTER);
+
+}
+
 
 /*-----------------------------------------------------------*/
 

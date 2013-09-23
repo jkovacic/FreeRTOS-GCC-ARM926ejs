@@ -95,6 +95,7 @@
 #include "bsp.h"
 #include "interrupt.h"
 #include "timer.h"
+#include "tick_timer_settings.h"
 
 /* Constants required to setup the task context. */
 /* System mode, ARM mode, IRQ enabled, FIQ disabled */
@@ -103,9 +104,7 @@
 #define portINSTRUCTION_SIZE            ( ( portSTACK_TYPE ) 4 )
 #define portNO_CRITICAL_SECTION_NESTING ( ( portSTACK_TYPE ) 0 )
 
-/* Settings for timer, used to measure ticks: */
-#define portTIMER_NR                    ( 0 )
-#define portTIMER_COUNTER_NR            ( 0 )
+
 
 /*-----------------------------------------------------------*/
 
@@ -224,36 +223,15 @@ void vPortEndScheduler( void )
 
 
 /*
- * VIC must be configured to call this routine when IRQ4 is triggered by the timer:
- * It will increase the counter of ticks and possibly switch to another task.
- */
-void vTickISR( void )
-{
-
-    /* Increment the RTOS tick count, then look for the highest priority
-    task that is ready to run. */
-    __asm volatile
-    (
-        "   bl xTaskIncrementTick   \t\n" \
-        "   cmp r0, #0              \t\n" \
-        "   beq SkipContextSwitch   \t\n" \
-        "   bl vTaskSwitchContext   \t\n" \
-        "SkipContextSwitch:         \t\n"
-    );
-
-    /* Acknowledge the interrupt on timer */
-    timer_clearInterrupt(portTIMER_NR, portTIMER_COUNTER_NR);
-
-}
-
-/*
  * Setup the timer 0 and the VIC
  */
 static void prvSetupTimerInterrupt( void )
 {
     unsigned portLONG ulCompareMatch;
     const unsigned portSHORT irqs[BSP_NR_TIMERS] = BSP_TIMER_IRQS;
-    portSHORT irq = irqs[portTIMER_NR];
+    portSHORT irq = irqs[portTICK_TIMER];
+
+    extern void vTickISR(void);
 
     /* Calculate the match value required for our desired tick rate. */
     ulCompareMatch = ( 0 != configTICK_RATE_HZ ?
@@ -268,9 +246,9 @@ static void prvSetupTimerInterrupt( void )
     }
 
     /* Configure the timer 0, counter 0 */
-    timer_init(portTIMER_NR, portTIMER_COUNTER_NR);
-    timer_setLoad(portTIMER_NR, portTIMER_COUNTER_NR, ulCompareMatch);
-    timer_enableInterrupt(portTIMER_NR, portTIMER_COUNTER_NR);
+    timer_init(portTICK_TIMER, portTICK_TIMER_COUNTER);
+    timer_setLoad(portTICK_TIMER, portTICK_TIMER_COUNTER, ulCompareMatch);
+    timer_enableInterrupt(portTICK_TIMER, portTICK_TIMER_COUNTER);
 
     /* Configure the VIC to service IRQ4 (triggered by the timer) properly */
     pic_registerIrq(irq, &vTickISR, PIC_MAX_PRIORITY);
@@ -282,7 +260,7 @@ static void prvSetupTimerInterrupt( void )
      * Start the timer.
      * Note that IRQ mode will only be enabled when the first FreeRTOS task starts.
      */
-    timer_start(portTIMER_NR, portTIMER_COUNTER_NR);
+    timer_start(portTICK_TIMER, portTICK_TIMER_COUNTER);
 
 }
 /*-----------------------------------------------------------*/

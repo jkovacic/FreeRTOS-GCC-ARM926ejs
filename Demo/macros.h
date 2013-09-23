@@ -24,8 +24,8 @@ limitations under the License.
  * @author Jernej Kovacic
  */
 
-#ifndef _APP_H_
-#define _APP_H_
+#ifndef _MACROS_H_
+#define _MACROS_H_
 
 #include <stdint.h>
 
@@ -52,4 +52,4 @@ limitations under the License.
  }
 
 
-#endif  /* _APP_H_ */
+#endif  /* _MACROS_H_ */
