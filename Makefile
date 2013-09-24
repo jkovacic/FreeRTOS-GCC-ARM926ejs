@@ -71,7 +71,7 @@ FREERTOS_PORT_OBJS = port.o portISR.o
 STARTUP_OBJ = startup.o
 DRIVERS_OBJS = timer.o interrupt.o uart.o
 
-APP_OBJS = init.o main.o print.o
+APP_OBJS = init.o main.o print.o receive.o
 # nostdlib.o must be commented out if standard lib is going to be linked!
 APP_OBJS += nostdlib.o
 
@@ -180,6 +180,9 @@ $(OBJDIR)init.o : $(APP_SRC)init.c $(DEP_BSP)
 	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)print.o : $(APP_SRC)print.c
+	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+
+$(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
 	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c

@@ -24,6 +24,7 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <queue.h>
 
+#include "bsp.h"
 #include "uart.h"
 
 /* UART number: */
@@ -45,6 +46,12 @@ static xQueueHandle printQueue;
  */
 portBASE_TYPE printInit(void)
 {
+    /* Check if UART number is valid */
+    if ( PRINT_UART_NR >= BSP_NR_UARTS )
+    {
+        return pdFAIL;
+    }
+
     /* Create and assert a queue for the gate keeper task */
     printQueue = xQueueCreate(PRINT_QUEUE_SIZE, sizeof(char*));
     if ( 0 == printQueue )
@@ -70,7 +77,7 @@ void printGateKeeperTask(void* params)
     for ( ; ; )
     {
         /* The task is blocked until something appears in the queue */
-        xQueueReceive(printQueue, &message, portMAX_DELAY);
+        xQueueReceive(printQueue, (void*) &message, portMAX_DELAY);
         /* Print the message in the queue */
         uart_print(PRINT_UART_NR, message);
     }
@@ -91,7 +98,7 @@ void vPrintMsg(const char* msg)
 {
     if ( NULL != msg )
     {
-        xQueueSendToBack(printQueue, &msg, 0);
+        xQueueSendToBack(printQueue, (void*) &msg, 0);
     }
 }
 

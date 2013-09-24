@@ -48,5 +48,13 @@ void uart_enableRx(uint8_t nr);
 
 void uart_disableRx(uint8_t nr);
 
+void uart_enableRxInterrupt(uint8_t nr);
+
+void uart_disableRxInterrupt(uint8_t nr);
+
+void uart_clearRxInterrupt(uint8_t nr);
+
+unsigned char uart_readChar(uint8_t nr);
+
 
 #endif  /* _UART_H_ */

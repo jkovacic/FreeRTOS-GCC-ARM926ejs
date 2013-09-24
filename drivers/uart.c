@@ -40,7 +40,7 @@ limitations under the License.
 /*
  * Bit masks for the Control Register (UARTCR).
  *
- * For description of each control register's bit, see page 3-15 of DDI0183:
+ * For a detailed description of each control register's bit, see page 3-15 of DDI0183:
  *
  *   0: UARTEN (enable bit):  0 disabled; 1 enabled
  *   1: SIREN
@@ -74,7 +74,7 @@ limitations under the License.
 /*
  * Bit masks for the IMSC (Interrupt Mask Set/Clear) register.
  *
- * For description of each IMSC's bit, see page 3-18 of DDI0183:
+ * For a detailed description of each IMSC's bit, see page 3-18 of DDI0183:
  *    0: nUARTRI modem interrupt mask
  *    1: nUARTCTS modem interrupt mask
  *    2: nUARTDCD modem interrupt mask
@@ -104,7 +104,7 @@ limitations under the License.
 /*
  * Bitmasks for the Flag Register.
  *
- * For description of each flag register's bit, see page 3-8 od the DDI0183.
+ * For a detaled description of each flag register's bit, see page 3-8 od the DDI0183.
  *   0: Clear to send. This bit is the complement of the UART clear to send (nUARTCTS) modem status input.
  *   1: Data set ready. This bit is the complement of the UART data set ready (nUARTDSR) modem status input.
  *   2: Data carrier detect. This bit is the complement of the UART data carrier detect (nUARTDCD) modem status input.
@@ -480,4 +480,96 @@ void uart_enableRx(uint8_t nr)
 void uart_disableRx(uint8_t nr)
 {
     __setCrBit(nr, false, CTL_RXE);
+}
+
+
+/**
+ * Enables the interrupt triggering by the specified UART when a character is received.
+ *
+ * Nothing is done if 'nr' is invalid (equal or greater than 3).
+ *
+ * @param nr - number of the UART (between 0 and 2)
+ */
+void uart_enableRxInterrupt(uint8_t nr)
+{
+    /* Sanity check */
+    if ( nr >= BSP_NR_UARTS )
+    {
+        return;
+    }
+
+    /* Set bit 4 of the IMSC register: */
+    pReg[nr]->UARTIMSC |= INT_RXIM;
+}
+
+
+/**
+ * Disables the interrupt triggering by the specified UART when a character is received.
+ *
+ * Nothing is done if 'nr' is invalid (equal or greater than 3).
+ *
+ * @param nr - number of the UART (between 0 and 2)
+ */
+void uart_disableRxInterrupt(uint8_t nr)
+{
+    /* Sanity check */
+    if ( nr >= BSP_NR_UARTS )
+    {
+        return;
+    }
+
+    /* Clear bit 4 of the IMSC register: */
+    pReg[nr]->UARTIMSC &= ~INT_RXIM;
+}
+
+
+/**
+ * Clears receive interrupt at the specified UART.
+ *
+ * Nothing is done if 'nr' is invalid (equal or greater than 3).
+ *
+ * @param nr - number of the UART (between 0 and 2)
+ */
+void uart_clearRxInterrupt(uint8_t nr)
+{
+    /* Sanity check */
+    if ( nr >= BSP_NR_UARTS )
+    {
+        return;
+    }
+
+    /*
+     * The register is write only, so usage of the |= operator is not permitted.
+     * Anyway, zero-bits have no effect on their corresponding interrupts so it
+     * is perfectly OK simply to write the appropriate bitmask to the register.
+     */
+    pReg[nr]->UARTICR = INT_RXIM;
+}
+
+
+/**
+ * Reads a character that was received by the specified UART.
+ * The function may block until a character appears in the UART's receive buffer.
+ * It is recommended that the function is called, when the caller is sure that a
+ * character has actually been received, e.g. by notificiation via an interrupt.
+ *
+ * A zero is returned immediately if 'nr' is invalid (equal or greater than 3).
+ *
+ * @param nr - number of the UART (between 0 and 2)
+ *
+ * @return character receieved at the UART
+ */
+unsigned char uart_readChar(uint8_t nr)
+{
+    /* Sanity check */
+    if ( nr >= BSP_NR_UARTS )
+    {
+        return (unsigned char) 0;
+    }
+
+    /* Wait until the receiving FIFO is not empty */
+    while ( pReg[nr]->UARTFR & FR_RXFE );
+
+    /* UART DR is a 32-bit register and only the least siginificant byte must be returned: */
+    return (unsigned char) (pReg[nr]->UARTDR & 0x000000FF);
 }

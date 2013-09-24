@@ -17,15 +17,13 @@ limitations under the License.
 
 /**
  * @file
- * A header file that should be included into every application's source file.
- * It provides some handy definitions, e.g. for outputting messages
- * to a UART or for creating FreeRTOS tasks with proper error handling.
+ * Declaration of functions that handle printing via a UART.
  *
  * @author Jernej Kovacic
  */
 
-#ifndef _APP_INCLUDE_H_
-#define _APP_INCLUDE_H_
+#ifndef _PRINT_H_
+#define _PRINT_H_
 
 
 portBASE_TYPE printInit(void);
@@ -41,5 +39,4 @@ void vDirectPrintMsg(const char* msg);
 void vDirectPrintCh(char ch);
 
 
-
-#endif  /* _APP_INCLUDE_H_ */
+#endif  /* _PRINT_H_ */

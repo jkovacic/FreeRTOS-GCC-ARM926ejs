@@ -29,7 +29,8 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include "app_include.h"
+#include "print.h"
+#include "receive.h"
 
 
 /* Struct with settings for each task */
@@ -110,10 +111,21 @@ void main(void)
         FreeRTOS_Error("Initialization of print failed\r\n");
     }
 
+    /* Init of receiver related tasks: */
+    if ( pdFAIL == recvInit() )
+    {
+        FreeRTOS_Error("Initialization of receiver failed\r\n");
+    }
+
     /* Create a print gate keeper task: */
     if ( pdPASS != xTaskCreate(printGateKeeperTask, "gk", 128, NULL, 1, NULL) )
     {
         FreeRTOS_Error("Could not create a print gate keeper task\r\n");
+    }
+
+    if ( pdPASS != xTaskCreate(recvTask, "recv", 128, NULL, 1, NULL) )
+    {
+        FreeRTOS_Error("Could not create a receiver task\r\n");
     }
 
     /* And finally create two tasks: */
