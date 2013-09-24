@@ -139,12 +139,12 @@ extern volatile unsigned portLONG ulCriticalNesting;                    \
     /* The critical nesting depth is the first item on the stack. */    \
     /* Load it into the ulCriticalNesting variable. */                  \
     "LDR        R0, =ulCriticalNesting                          \n\t"   \
-    "LDMFD	LR!, {R1}                                           \n\t"   \
+    "LDMFD  LR!, {R1}                                           \n\t"   \
     "STR    R1, [R0]                                            \n\t"   \
                                                                         \
-	/* Get the SPSR from the stack. */                                  \
+    /* Get the SPSR from the stack. */                                  \
     "LDMFD  LR!, {R0}                                           \n\t"   \
-    "MSR        SPSR, R0                                        \n\t"   \
+    "MSR    SPSR, R0                                            \n\t"   \
                                                                         \
     /* Restore all system mode registers for the task. */               \
     "LDMFD  LR, {R0-R14}^                                       \n\t"   \

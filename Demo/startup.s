@@ -30,21 +30,21 @@ limitations under the License.
  * http://www.embedded.com/design/mcus-processors-and-socs/4026075/Building-Bare-Metal-ARM-Systems-with-GNU-Part-2
  */
 
-/* Constants that define various operating modes */
-.set  PSR_MASK,    0x0000001F       /* CSPR bits that define operating mode  */
+@ Constants that define various operating modes
+.equ  PSR_MASK,    0x0000001F       @ CSPR bits that define operating mode
 
-.equ  MODE_USR,    0x00000010       /* User Mode */
-.equ  MODE_FIQ,    0x00000011       /* FIQ Mode */
-.equ  MODE_IRQ,    0x00000012       /* IRQ Mode */
-.equ  MODE_SVC,    0x00000013       /* Supervisor Mode */
-.equ  MODE_ABT,    0x00000017       /* Abort Mode */
-.equ  MODE_UND,    0x0000001B       /* Undefined Mode */
-.equ  MODE_SYS,    0x0000001F       /* System Mode */
+.equ  MODE_USR,    0x00000010       @ User Mode
+.equ  MODE_FIQ,    0x00000011       @ FIQ Mode
+.equ  MODE_IRQ,    0x00000012       @ IRQ Mode
+.equ  MODE_SVC,    0x00000013       @ Supervisor Mode
+.equ  MODE_ABT,    0x00000017       @ Abort Mode
+.equ  MODE_UND,    0x0000001B       @ Undefined Mode
+.equ  MODE_SYS,    0x0000001F       @ System Mode
 
-.equ FIQ_BIT,      0x00000040       /* FIQ exception enable/disable bit */
-.equ IRQ_BIT,      0x00000080       /* IRQ exception enable/disable bit */
+.equ FIQ_BIT,      0x00000040       @ FIQ exception enable/disable bit
+.equ IRQ_BIT,      0x00000080       @ IRQ exception enable/disable bit
 
-.equ EXCEPTION_VECT,   0x00000000   /* Start of exception vectors */
+.equ EXCEPTION_VECT,   0x00000000   @ Start of exception vectors
 
 
 .section .init
