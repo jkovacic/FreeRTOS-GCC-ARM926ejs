@@ -61,8 +61,11 @@ FREERTOS_OBJS = queue.o list.o tasks.o
 #FREERTOS_OBJS += timers.o
 #FREERTOS_OBJS += croutine.o
 
-# Only one memory management file must be chosen!
+# Only one memory management .o file must be uncommented!
 FREERTOS_MEMMANG_OBJS = heap_1.o
+#FREERTOS_MEMMANG_OBJS = heap_2.o
+#FREERTOS_MEMMANG_OBJS = heap_3.o
+#FREERTOS_MEMMANG_OBJS = heap_4.o
 
 FREERTOS_PORT_OBJS = port.o portISR.o
 STARTUP_OBJ = startup.o
