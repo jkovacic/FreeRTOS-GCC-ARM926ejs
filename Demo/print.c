@@ -23,7 +23,6 @@ limitations under the License.
 
 #include <FreeRTOS.h>
 #include <queue.h>
-#include <semphr.h>
 
 #include "uart.h"
 
@@ -35,11 +34,6 @@ limitations under the License.
 /* Messages to be printed will be pushed to this queue */
 static xQueueHandle printQueue;
 
-/* A mutex that prevents corruption of a character buffer */
-static xSemaphoreHandle printChBufMutex;
-
-/* When individual characters are printed they must be copied to this simple buffer */
-static char printChBuf[2];
 
 
 /**
@@ -51,18 +45,6 @@ static char printChBuf[2];
  */
 portBASE_TYPE printInit(void)
 {
-    /* This is not really necessary... */
-    printChBuf[0] = 'A';
-    /* however the second character must be assigned a string terminator */
-    printChBuf[1] = '\0';
-
-    /* Create and assert a mutex for the single character printing buffer */
-    printChBufMutex = xSemaphoreCreateMutex();
-    if ( NULL == printChBufMutex )
-    {
-        return pdFAIL;
-    }
-
     /* Create and assert a queue for the gate keeper task */
     printQueue = xQueueCreate(PRINT_QUEUE_SIZE, sizeof(char*));
     if ( 0 == printQueue )
@@ -111,38 +93,6 @@ void vPrintMsg(const char* msg)
     {
         xQueueSendToBack(printQueue, &msg, 0);
     }
-}
-
-
-/**
- * Prints a character in a thread safe manner - even if the calling task preempts
- * another printing task, its message will not be corrupted. Additionally, if another
- * taskj attempts to print a character, the buffer will not be corrupted.
- *
- * @note This function may only be called when the FreeRTOS scheduler is running!
- *
- * @param ch - a character to be printed
- */
-void vPrintChar(char ch)
-{
-    /*
-     * If several tasks call this function "simultaneously", the buffer may get
-     * corrupted. To prevent this, use a mutex and prevent simultaneous
-     * modifications of the buffer.
-     */
-    xSemaphoreTake(printChBufMutex, portMAX_DELAY);
-
-    /*
-     * Put 'ch' to the first character of the buffer,
-     * note that the seconfd character is '\0'.
-     */
-    printChBuf[0] = ch;
-
-    /* Now the buffer may be sent to the printing queue */
-    xQueueSendToBack(printQueue, printChBuf, 0);
-
-    /* release the mutex */
-    xSemaphoreGive(printChBufMutex);
 }
 
 
