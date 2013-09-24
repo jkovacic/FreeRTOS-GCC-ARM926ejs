@@ -29,7 +29,8 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include "macros.h"
+#include "app_include.h"
+
 
 /* Struct with settings for each task */
 typedef struct _paramStruct
@@ -78,6 +79,20 @@ static const paramStruct tParam[2] =
 };
 
 
+/*
+ * A convenience function that is called when a FreeRTOS API call fails
+ * and a programcannot continue. It prints a messgae (if provided) and
+ * ends in an infinite loop.
+ */
+static void FreeRTOS_Error(const char* msg)
+{
+    if ( NULL != msg )
+    {
+        vDirectPrintMsg(msg);
+    }
+
+    for ( ; ; );
+}
 
 /* Startup function that creates and runs two FreeRTOS tasks */
 void main(void)
@@ -87,19 +102,41 @@ void main(void)
      * When vTaskStartScheduler launches the first task, it will switch
      * to System mode and enable interrupt exceptions.
      */
-    vPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
+    vDirectPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
 
-    assertTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0], 3, NULL);
-    assertTaskCreate(vTaskFunction, "task2", 128, (void*) &tParam[1], 2, NULL);
+    /* Init of print related tasks: */
+    if ( pdFAIL == printInit() )
+    {
+        FreeRTOS_Error("Initialization of print failed\r\n");
+    }
+
+    /* Create a print gate keeper task: */
+    if ( pdPASS != xTaskCreate(printGateKeeperTask, "gk", 128, NULL, 1, NULL) )
+    {
+        FreeRTOS_Error("Could not create a print gate keeper task\r\n");
+    }
+
+    /* And finally create two tasks: */
+    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0], 3, NULL) )
+    {
+        FreeRTOS_Error("Could not create task1\r\n");
+    }
+
+    if ( pdPASS != xTaskCreate(vTaskFunction, "task2", 128, (void*) &tParam[1], 2, NULL) )
+    {
+        FreeRTOS_Error("Could not create task2\r\n");
+    }
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
 
     /*
-     * If all goes well, vTaskStartScheduler should never return
-     * but just in case "end up" in an infinite loop
+     * If all goes well, vTaskStartScheduler should never return.
+     * If it does return, typically not enough heap memory is reserved.
      */
 
-    vPrintMsg("Could not start the scheduler!!!\r\n");
+    FreeRTOS_Error("Could not start the scheduler!!!\r\n");
+
+    /* just in case if an infinite loop is somehow omitted in FreeRTOS_Error */
     for ( ; ; );
 }

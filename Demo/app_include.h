@@ -24,32 +24,22 @@ limitations under the License.
  * @author Jernej Kovacic
  */
 
-#ifndef _MACROS_H_
-#define _MACROS_H_
-
-#include <stdint.h>
-
-#include <FreeRTOS.h>
-#include <task.h>
-
-#include "../drivers/include/uart.h"
+#ifndef _APP_INCLUDE_H_
+#define _APP_INCLUDE_H_
 
 
-/* Outputs a msg to the UART0 */
-#define vPrintMsg(msg)         uart_print(0, ( msg ) )
+portBASE_TYPE printInit(void);
 
-/* Outputs a character to UART0 */
-#define vPrintChar(ch)         uart_printChar(0, ( ch )  )
+void printGateKeeperTask(void* params);
 
+void vPrintMsg(const char* msg);
 
-/* Creates a FreeRTOS task and handles possible errors */
-#define assertTaskCreate(code, name, stackDepth, params, priority, taskHandle) \
- if ( pdPASS!=xTaskCreate( (code), (name), (stackDepth), (params), (priority), (taskHandle) ) ) \
- { \
-     vPrintMsg("Could not create '"); \
-     vPrintMsg(name); \
-     vPrintMsg("'\r\n"); \
- }
+void vPrintChar(char ch);
+
+void vDirectPrintMsg(const char* msg);
+
+void vDirectPrintCh(char ch);
 
 
-#endif  /* _MACROS_H_ */
+
+#endif  /* _APP_INCLUDE_H_ */
