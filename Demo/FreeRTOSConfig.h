@@ -94,7 +94,7 @@
 #define configIDLE_SHOULD_YIELD           1
 #define configUSE_APPLICATION_TASK_TAG    1
 
-#define configUSE_MUTEXES                 1
+#define configUSE_MUTEXES                 0
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES             0

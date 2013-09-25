@@ -31,9 +31,12 @@ limitations under the License.
 
 #include "print.h"
 
-#define RECV_UART_NR          ( 0 )
 
 #define RECV_QUEUE_SIZE       ( 5 )
+
+
+/* UART number: */
+static portSHORT recvUartNr = (unsigned portSHORT) -1;
 
 /* A que to received characters, not processed yet */
 static xQueueHandle recvQueue;
@@ -56,11 +59,16 @@ static void recvIsrHandler(void)
     char ch;
 
     /* Get the received character from the UART */
-    ch = uart_readChar(RECV_UART_NR);
-    /* Push it to the queue */
+    ch = uart_readChar(recvUartNr);
+
+    /*
+     * Push it to the queue.
+     * Note, since this is not a FreeRTOS task,
+     * a *FromISR implementation of the command must be called!
+     */
     xQueueSendToBackFromISR(recvQueue, (void*) &ch, 0);
     /* And acknowledge the interrupt on the UART controller */
-    uart_clearRxInterrupt(RECV_UART_NR);
+    uart_clearRxInterrupt(recvUartNr);
 }
 
 
@@ -68,19 +76,25 @@ static void recvIsrHandler(void)
  * Initializes all receive related tasks and synchronization primitives.
  * This function must be called before anything is attempted to be received!
  *
+ * @param uart_nr - number of the UART
+ *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-portBASE_TYPE recvInit(void)
+portSHORT recvInit(unsigned portSHORT uart_nr)
 {
     /* Obtain the UART's IRQ from BSP */
-    const portSHORT uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
-    const portSHORT irq = ( RECV_UART_NR<BSP_NR_UARTS ? uartIrqs[RECV_UART_NR] : -1 );
+    const unsigned portSHORT uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
+    const unsigned portSHORT irq = ( uart_nr<BSP_NR_UARTS ?
+                                     uartIrqs[uart_nr] :
+                                     (unsigned portSHORT) -1 );
 
     /* Check if UART number is valid */
-    if ( RECV_UART_NR >= BSP_NR_UARTS )
+    if ( uart_nr >= BSP_NR_UARTS )
     {
         return pdFAIL;
     }
+
+    recvUartNr = uart_nr;
 
     /* Create ans assert a queue for received characters */
     recvQueue = xQueueCreate(RECV_QUEUE_SIZE, sizeof(char));
@@ -99,8 +113,8 @@ portBASE_TYPE recvInit(void)
     pic_enableInterrupt(irq);
 
     /* Configure the UART to receive data and trigger interrupts on receive */
-    uart_enableRx(RECV_UART_NR);
-    uart_enableRxInterrupt(RECV_UART_NR);
+    uart_enableRx(recvUartNr);
+    uart_enableRxInterrupt(recvUartNr);
 
     return pdPASS;
 }

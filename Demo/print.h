@@ -25,8 +25,10 @@ limitations under the License.
 #ifndef _PRINT_H_
 #define _PRINT_H_
 
+#include <FreeRTOS.h>
 
-portBASE_TYPE printInit(void);
+
+portSHORT printInit(unsigned portSHORT uart_nr);
 
 void printGateKeeperTask(void* params);
 

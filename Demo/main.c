@@ -33,6 +33,11 @@ limitations under the License.
 #include "receive.h"
 
 
+/* Uart(s) to print to and/or to receive from */
+#define PRINT_UART_NR          ( 0 )
+#define RECV_UART_NR           ( 0 )
+
+
 /* Struct with settings for each task */
 typedef struct _paramStruct
 {
@@ -106,13 +111,13 @@ void main(void)
     vDirectPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
 
     /* Init of print related tasks: */
-    if ( pdFAIL == printInit() )
+    if ( pdFAIL == printInit(PRINT_UART_NR) )
     {
         FreeRTOS_Error("Initialization of print failed\r\n");
     }
 
     /* Init of receiver related tasks: */
-    if ( pdFAIL == recvInit() )
+    if ( pdFAIL == recvInit(RECV_UART_NR) )
     {
         FreeRTOS_Error("Initialization of receiver failed\r\n");
     }

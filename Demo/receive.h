@@ -25,8 +25,9 @@ limitations under the License.
 #ifndef _RECEIVE_H_
 #define _RECEIVE_H_
 
+#include <FreeRTOS.h>
 
-portBASE_TYPE recvInit(void);
+portSHORT recvInit(unsigned portSHORT uart_nr);
 
 void recvTask(void* params);
 

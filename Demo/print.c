@@ -27,10 +27,12 @@ limitations under the License.
 #include "bsp.h"
 #include "uart.h"
 
-/* UART number: */
-#define PRINT_UART_NR       ( 0 )
 
 #define PRINT_QUEUE_SIZE    ( 5 )
+
+
+/* UART number: */
+static unsigned portSHORT printUartNr = (unsigned portSHORT) -1;
 
 /* Messages to be printed will be pushed to this queue */
 static xQueueHandle printQueue;
@@ -42,15 +44,19 @@ static xQueueHandle printQueue;
  * This function must be called before anything is attempted to be printed
  * via vPrintMsg or vPrintChar!
  *
+ * @param uart_nr - number of the UART
+ *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-portBASE_TYPE printInit(void)
+portSHORT printInit(unsigned portSHORT uart_nr)
 {
     /* Check if UART number is valid */
-    if ( PRINT_UART_NR >= BSP_NR_UARTS )
+    if ( uart_nr >= BSP_NR_UARTS )
     {
         return pdFAIL;
     }
+
+    printUartNr = uart_nr;
 
     /* Create and assert a queue for the gate keeper task */
     printQueue = xQueueCreate(PRINT_QUEUE_SIZE, sizeof(char*));
@@ -58,6 +64,9 @@ portBASE_TYPE printInit(void)
     {
         return pdFAIL;
     }
+
+    /* Enable thwe UART for transmission */
+    uart_enableTx(printUartNr);
 
     return pdPASS;
 }
@@ -79,7 +88,7 @@ void printGateKeeperTask(void* params)
         /* The task is blocked until something appears in the queue */
         xQueueReceive(printQueue, (void*) &message, portMAX_DELAY);
         /* Print the message in the queue */
-        uart_print(PRINT_UART_NR, message);
+        uart_print(printUartNr, message);
     }
 }
 
@@ -117,7 +126,7 @@ void vDirectPrintMsg(const char* msg)
 {
     if ( NULL != msg )
     {
-        uart_print(PRINT_UART_NR, msg);
+        uart_print(printUartNr, msg);
     }
 }
 
@@ -132,5 +141,5 @@ void vDirectPrintMsg(const char* msg)
  */
 void vDirectPrintCh(char ch)
 {
-    uart_printChar(PRINT_UART_NR, ch);
+    uart_printChar(printUartNr, ch);
 }
