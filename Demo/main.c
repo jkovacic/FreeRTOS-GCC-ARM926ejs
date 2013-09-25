@@ -103,18 +103,18 @@ static void FreeRTOS_Error(const char* msg)
 /* Startup function that creates and runs two FreeRTOS tasks */
 void main(void)
 {
+    /* Init of print related tasks: */
+    if ( pdFAIL == printInit(PRINT_UART_NR) )
+    {
+        FreeRTOS_Error("Initialization of print failed\r\n");
+    }
+
     /*
      * Make sure (instartup.s) that main is entered in Supervisor mode.
      * When vTaskStartScheduler launches the first task, it will switch
      * to System mode and enable interrupt exceptions.
      */
     vDirectPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
-
-    /* Init of print related tasks: */
-    if ( pdFAIL == printInit(PRINT_UART_NR) )
-    {
-        FreeRTOS_Error("Initialization of print failed\r\n");
-    }
 
     /* Init of receiver related tasks: */
     if ( pdFAIL == recvInit(RECV_UART_NR) )
