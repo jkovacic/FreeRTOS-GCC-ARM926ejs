@@ -43,7 +43,7 @@ limitations under the License.
 
 
 /* Number of counters per timer: */
-#define NR_COUNTERS      2
+#define NR_COUNTERS      ( 2 )
 
 
 /*
@@ -61,13 +61,13 @@ limitations under the License.
  *   0: one shot enable bit (0: wrapping, 1: one shot)
  */
 
-#define CTL_ENABLE          0x00000080
-#define CTL_MODE            0x00000040
-#define CTL_INTR            0x00000020
-#define CTL_PRESCALE_1      0x00000008
-#define CTL_PRESCALE_2      0x00000004
-#define CTL_CTRLEN          0x00000002
-#define CTL_ONESHOT         0x00000001
+#define CTL_ENABLE          ( 0x00000080 )
+#define CTL_MODE            ( 0x00000040 )
+#define CTL_INTR            ( 0x00000020 )
+#define CTL_PRESCALE_1      ( 0x00000008 )
+#define CTL_PRESCALE_2      ( 0x00000004 )
+#define CTL_CTRLEN          ( 0x00000002 )
+#define CTL_ONESHOT         ( 0x00000001 )
 
 
 /*
@@ -107,14 +107,14 @@ typedef struct _ARM926EJS_TIMER_REGS
 /*
  * Pointers to all timer registers' base addresses:
  */
-#define GEN_CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
+#define CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
 
 static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS]=
                          {
-                             BSP_TIMER_BASE_ADDRESSES(GEN_CAST_ADDR)
+                             BSP_TIMER_BASE_ADDRESSES(CAST_ADDR)
                          };
 
-#undef GEN_CAST_ADDR
+#undef CAST_ADDR
 
 /**
  * Initializes the specified timer's counter controller.

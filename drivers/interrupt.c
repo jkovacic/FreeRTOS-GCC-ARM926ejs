@@ -124,12 +124,12 @@ typedef struct _ARM926EJS_SIC_REGS
 #endif /* if 0 */
 
 
-#define UL1                    0x00000001
-#define BM_IRQ_PART            0x0000001F
-#define BM_VECT_ENABLE_BIT     0x00000020
+#define UL1                    ( 0x00000001 )
+#define BM_IRQ_PART            ( 0x0000001F )
+#define BM_VECT_ENABLE_BIT     ( 0x00000020 )
 
-#define NR_VECTORS      16
-#define NR_INTERRUPTS   32
+#define NR_VECTORS      ( 16 )
+#define NR_INTERRUPTS   ( 32 )
 
 
 static volatile ARM926EJS_PIC_REGS* const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_PIC_BASE_ADDRESS);

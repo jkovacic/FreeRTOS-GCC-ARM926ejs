@@ -59,10 +59,10 @@ limitations under the License.
 
 
 /* Base address of the Primary Interrupt Controller (see page 4-44 of the DUI0225D): */
-#define BSP_PIC_BASE_ADDRESS        0x10140000
+#define BSP_PIC_BASE_ADDRESS        ( 0x10140000 )
 
 /* Base address of the Secondary Interrupt Controller (see page 4-44 of the DUI0225D): */
-#define BSP_SIC_BASE_ADDRESS        0x10003000
+#define BSP_SIC_BASE_ADDRESS        ( 0x10003000 )
 
 
 
@@ -72,14 +72,14 @@ limitations under the License.
  * (see page 4-68 of the DUI0225D):
  */
 
-#define BSP_NR_UARTS        3
+#define BSP_NR_UARTS        ( 3 )
 
 #define BSP_UART_BASE_ADDRESSES(CAST) \
-    CAST(0x101F1000) \
-    CAST(0x101F2000) \
-    CAST(0x101F3000)
+    CAST( (0x101F1000) ) \
+    CAST( (0x101F2000) ) \
+    CAST( (0x101F3000) )
 
-#define BSP_UART_IRQS       { 12, 13, 14 }
+#define BSP_UART_IRQS       { ( 12 ), ( 13 ), ( 14 ) }
 
 
 
@@ -89,11 +89,11 @@ limitations under the License.
  * (see pp. 4-21  and 4-67 of DUI0225D):
  */
 
-#define BSP_NR_TIMERS       2
+#define BSP_NR_TIMERS       ( 2 )
 
 #define BSP_TIMER_BASE_ADDRESSES(CAST) \
-    CAST(0x101E2000) \
-    CAST(0x101E3000)
+    CAST( (0x101E2000) ) \
+    CAST( (0x101E3000) )
 
 #define BSP_TIMER_IRQS      { 4, 5 }
 
@@ -103,9 +103,9 @@ limitations under the License.
  * Base address and IRQ of the built-in real time clock (RTC) controller
  * (see page 4-60 of the DUI0225D):
  */
-#define BSP_RTC_BASE_ADDRESS        0x101E8000
+#define BSP_RTC_BASE_ADDRESS        ( 0x101E8000 )
 
-#define BSP_RTC_IRQ                 10
+#define BSP_RTC_IRQ                 ( 10 )
 
 
 
@@ -113,9 +113,9 @@ limitations under the License.
  * Base address and IRQ of the built-in watchdog controller
  * (see page 4-72 of the DUI0225D):
  */
-#define BSP_WATCHDOG_BASE_ADDRESS   0x101E1000
+#define BSP_WATCHDOG_BASE_ADDRESS   ( 0x101E1000 )
 
-#define BSP_WATCHDOG_IRQ            0
+#define BSP_WATCHDOG_IRQ            ( 0 )
 
 
 
@@ -124,7 +124,7 @@ limitations under the License.
  * See pp.4-46 to 4-48 of the DUI0225D.
  */
 
-#define BSP_SOFTWARE_IRQ            1
+#define BSP_SOFTWARE_IRQ            ( 1 )
 
 
 #endif   /* _BSP_H_ */

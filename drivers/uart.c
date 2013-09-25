@@ -57,18 +57,18 @@ limitations under the License.
  *  15: CTSEn (CTS hardware flow control enable)
  *  16-31: reserved (do not modify)
  */
-#define CTL_UARTEN     0x00000001
-#define CTL_SIREN      0x00000002
-#define CTL_SIRLP      0x00000004
-#define CTL_LBE        0x00000080
-#define CTL_TXE        0x00000100
-#define CTL_RXE        0x00000200
-#define CTL_DTR        0x00000400
-#define CTL_RTS        0x00000800
-#define CTL_OUT1       0x00001000
-#define CTL_OUT2       0x00002000
-#define CTL_RTSEn      0x00004000
-#define CTL_CTSEn      0x00008000
+#define CTL_UARTEN     ( 0x00000001 )
+#define CTL_SIREN      ( 0x00000002 )
+#define CTL_SIRLP      ( 0x00000004 )
+#define CTL_LBE        ( 0x00000080 )
+#define CTL_TXE        ( 0x00000100 )
+#define CTL_RXE        ( 0x00000200 )
+#define CTL_DTR        ( 0x00000400 )
+#define CTL_RTS        ( 0x00000800 )
+#define CTL_OUT1       ( 0x00001000 )
+#define CTL_OUT2       ( 0x00002000 )
+#define CTL_RTSEn      ( 0x00004000 )
+#define CTL_CTSEn      ( 0x00008000 )
 
 
 /*
@@ -88,17 +88,17 @@ limitations under the License.
  *   10: Overrun error interrupt mask
  * 11-31: reserved, do not modify
  */
-#define INT_RIMIM      0x00000001
-#define INT_CTSMIM     0x00000002
-#define INT_DCDMIM     0x00000004
-#define INT_DSRMIM     0x00000008
-#define INT_RXIM       0x00000010
-#define INT_TXIM       0x00000020
-#define INT_RTIM       0x00000040
-#define INT_FEIM       0x00000080
-#define INT_PEIM       0x00000100
-#define INT_BEIM       0x00000200
-#define INT_OEIM       0x00000400
+#define INT_RIMIM      ( 0x00000001 )
+#define INT_CTSMIM     ( 0x00000002 )
+#define INT_DCDMIM     ( 0x00000004 )
+#define INT_DSRMIM     ( 0x00000008 )
+#define INT_RXIM       ( 0x00000010 )
+#define INT_TXIM       ( 0x00000020 )
+#define INT_RTIM       ( 0x00000040 )
+#define INT_FEIM       ( 0x00000080 )
+#define INT_PEIM       ( 0x00000100 )
+#define INT_BEIM       ( 0x00000200 )
+#define INT_OEIM       ( 0x00000400 )
 
 
 /*
@@ -116,15 +116,15 @@ limitations under the License.
  *   8: Ring indicator. This bit is the complement of the UART ring indicator (nUARTRI) modem status input.
  * 9-31: reserved, do not modify
  */
-#define FR_CTS         0x00000001
-#define FR_DSR         0x00000002
-#define FR_DCD         0x00000004
-#define FR_BUSY        0x00000008
-#define FR_RXFE        0x00000010
-#define FR_TXFF        0x00000020
-#define FR_RXFF        0x00000040
-#define FR_TXFE        0x00000080
-#define FR_RI          0x00000100
+#define FR_CTS         ( 0x00000001 )
+#define FR_DSR         ( 0x00000002 )
+#define FR_DCD         ( 0x00000004 )
+#define FR_BUSY        ( 0x00000008 )
+#define FR_RXFE        ( 0x00000010 )
+#define FR_TXFF        ( 0x00000020 )
+#define FR_RXFF        ( 0x00000040 )
+#define FR_TXFE        ( 0x00000080 )
+#define FR_RI          ( 0x00000100 )
 
 
 /*
@@ -167,14 +167,14 @@ typedef struct _ARM926EJS_UART_REGS
 #define UARTECR       UARTRSR
 
 
-#define GEN_CAST_ADDR(ADDR)    (ARM926EJS_UART_REGS*) (ADDR),
+#define CAST_ADDR(ADDR)    (ARM926EJS_UART_REGS*) (ADDR),
 
 static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS]=
                          {
-                             BSP_UART_BASE_ADDRESSES(GEN_CAST_ADDR)
+                             BSP_UART_BASE_ADDRESSES(CAST_ADDR)
                          };
 
-#undef GEN_CAST_ADDR
+#undef CAST_ADDR
 
 
 /**
