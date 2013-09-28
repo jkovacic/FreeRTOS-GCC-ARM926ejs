@@ -90,6 +90,9 @@ void printGateKeeperTask(void* params)
         /* Print the message in the queue */
         uart_print(printUartNr, message);
     }
+
+    /* if it ever breaks out of the infinite loop... */
+    vTaskDelete(NULL);
 }
 
 

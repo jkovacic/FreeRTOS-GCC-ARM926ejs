@@ -151,4 +151,7 @@ void recvTask(void* params)
         /* Print the string buffer */
         vPrintMsg(msgBuf);
     }
+
+    /* if it ever breaks out of the infinite loop... */
+    vTaskDelete(NULL);
 }
