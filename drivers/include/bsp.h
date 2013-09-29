@@ -95,7 +95,7 @@ limitations under the License.
     CAST( (0x101E2000) ) \
     CAST( (0x101E3000) )
 
-#define BSP_TIMER_IRQS      { 4, 5 }
+#define BSP_TIMER_IRQS      { ( 4 ), ( 5 ) }
 
 
 
