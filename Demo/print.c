@@ -28,7 +28,7 @@ limitations under the License.
 #include "uart.h"
 
 
-#define PRINT_QUEUE_SIZE    ( 5 )
+#define PRINT_QUEUE_SIZE    ( 10 )
 
 
 /* UART number: */

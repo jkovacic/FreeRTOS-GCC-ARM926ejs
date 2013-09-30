@@ -24,6 +24,7 @@ limitations under the License.
 
 #include <FreeRTOS.h>
 #include <queue.h>
+#include <string.h>
 
 #include "bsp.h"
 #include "uart.h"
@@ -32,22 +33,46 @@ limitations under the License.
 #include "print.h"
 
 
-#define RECV_QUEUE_SIZE       ( 5 )
-
-
-/* UART number: */
-static portSHORT recvUartNr = (unsigned portSHORT) -1;
-
-/* A que to received characters, not processed yet */
-static xQueueHandle recvQueue;
+/*
+ * Hardcoded definitions of a "circular" buffer that stores strings to be printed.
+ * TODO
+ * The settings could be defined in a separate header file (e.g. settings.h),
+ * however, the current functionality is just a temporary "solution".
+ */
 
 /*
- * A temporary buffer for a text that will be printed
- * TODO this is just a temporary "solution"
+ * Size of a buffer holding received characters, that have not been processed yet.
+ * Its optimal size depends on typing speed.
  */
-static char msgBuf[] = "You pressed 'A'\r\n";
-/* Postion within the buffer where the typed character will be placed. I know, not pretty...*/
+#define RECV_QUEUE_SIZE       ( 10 )
+
+/*
+ * A string that will be printed when a character has been received.
+ * Note: 'A' will be replaced by the actual character.
+ */
+#define RECV_MSG  "You pressed 'A'\r\n"
+
+/* Size of the "circular" buffer, i.e. number ofstrings */
+#define RECV_BUFFER_SIZE      ( 10 )
+
+/* Length of RECV_MESG, including 2 characters for "\r\n" and an additional one for '\0' */
+#define RECV_STRING_LEN       ( 18 )
+
+/* Allocated "circular" buffer */
+static char msgBuf[ RECV_BUFFER_SIZE ][ RECV_STRING_LEN ];
+
+/* Position of the currently available slot in the buffer */
+static unsigned portSHORT bufCntr = 0;
+
+/* Postion within the buffer where the received character will be placed. */
 #define BUF_POS               ( 13 )
+
+/* UART number: */
+static unsigned portSHORT recvUartNr = (unsigned portSHORT) -1;
+
+/* A queue for received characters, not processed yet */
+static xQueueHandle recvQueue;
+
 
 
 /*
@@ -88,6 +113,17 @@ portSHORT recvInit(unsigned portSHORT uart_nr)
                                      uartIrqs[uart_nr] :
                                      (unsigned portSHORT) -1 );
 
+    const char msg[] = RECV_MSG;
+    unsigned portSHORT i;
+
+    /* Initialize the "circular" buffer */
+    for ( i=0; i<RECV_BUFFER_SIZE; ++i )
+    {
+        strcpy(msgBuf[i], msg);
+    }  /* for i */
+
+    bufCntr = 0;
+
     /* Check if UART number is valid */
     if ( uart_nr >= BSP_NR_UARTS )
     {
@@ -96,7 +132,7 @@ portSHORT recvInit(unsigned portSHORT uart_nr)
 
     recvUartNr = uart_nr;
 
-    /* Create ans assert a queue for received characters */
+    /* Create and assert a queue for received characters */
     recvQueue = xQueueCreate(RECV_QUEUE_SIZE, sizeof(char));
     if ( 0 == recvQueue )
     {
@@ -136,20 +172,15 @@ void recvTask(void* params)
         /* The task is blocked until something appears in the queue */
         xQueueReceive(recvQueue, (void*) &ch, portMAX_DELAY);
 
-        /*
-         * The received character is written into the designated position
-         * of the buffer string.
-         * TODO this is an ugly "solution" and not thread safe! If more characters
-         * appear in the queue before  previous ones are printed, the buffer text will be
-         * overwritten and a message with the newest character will be displayed multiple
-         * times. However, the only purpose of this task is to test the receiver's
-         * functionality and another processing of input data will be introduced ASAP.
-         * Till then make sure, you do not type too quickly.
-         */
-        msgBuf[BUF_POS] = ch;
+        /* Update the current element of the buffer... */
+        msgBuf[bufCntr][BUF_POS] = ch;
 
-        /* Print the string buffer */
-        vPrintMsg(msgBuf);
+        /* Send the buffer's element tothe print queue... */
+        vPrintMsg(msgBuf[bufCntr]);
+
+        /* And update the "pointer" of the "circular" buffer. */
+        ++bufCntr;
+        bufCntr %= RECV_BUFFER_SIZE;
     }
 
     /* if it ever breaks out of the infinite loop... */

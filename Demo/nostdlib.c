@@ -108,7 +108,7 @@ endf:
  * @param source - pointer to the source of data to be copied
  * @param num - number of bytes to copy
  *
- * @return 'destination' is returned
+ * @return 'destination' is returned or NULL if any paramater equals NULL
  */
 void* memcpy(void* destination, const void* source, size_t num )
 {
@@ -166,6 +166,44 @@ void* memcpy(void* destination, const void* source, size_t num )
             *destptr-- = *srcptr--;
         }
     }
+
+    return destination;
+}
+
+/**
+ * Copy string.
+ *
+ * Copies the C string pointed by 'source' into the array pointed by
+ * 'destination', including the terminating null character (and stopping
+ * at that point).
+ *
+ * To avoid overflows, the size of the array pointed by destination shall be
+ * long enough to contain the same C string as source (including the
+ * terminating null character), and should not overlap in memory with source.
+ *
+ * @param destination - pointer to the destination array where the content is to be copied
+ * @param source - C string to be copied
+ *
+ * @return 'destination' is returned or NULL if any paramter equals NULL
+ */
+char* strcpy (char* destination, const char* source)
+{
+    const char* srcptr = source;
+    char* destptr = destination;
+
+    /* sanity check */
+    if ( NULL==destination || NULL==source )
+    {
+        return NULL;
+    }
+
+    while ( '\0' != *srcptr )
+    {
+        *destptr++ = *srcptr++;
+    }
+
+    /* Do not forget to append a '\0' at the end of destination! */
+    *destptr = '\0';
 
     return destination;
 }
