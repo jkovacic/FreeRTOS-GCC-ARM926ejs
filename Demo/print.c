@@ -27,8 +27,40 @@ limitations under the License.
 #include "bsp.h"
 #include "uart.h"
 
+/*
+ * Buffer settings.
+ * Note: optimal settings depend on an application, e.g. how frequently
+ * it attempts to print strings and/or individula characters.
+ *
+ * TODO: some settings should be defined in a separate header (e.g. settings.h)
+ * and included into this file.
+ */
 
-#define PRINT_QUEUE_SIZE    ( 10 )
+/* A queue with pointers to strings that will be printed */
+#define PRINT_QUEUE_SIZE        ( 10 )
+
+/*
+ * A string buffer is necessary for printing individual characters:
+ * (1) The gate keeper tasks accepts pointers to strings only. Hence a character will
+ *     be placed into a short string, its first character will be the actual character,
+ *     followed by '\0'.
+ * (2) Corruptions must be prevented when several tasks call vPrintChar simultaneously.
+ *     To accomplish this, the buffer will consist of several strings, the optimal number
+ *     depends on the application.
+ */
+
+/* Number of 2-byte strings in a character printing buffer */
+#define CHR_PRINT_BUF_SIZE      ( 5 )
+
+/* Length of one buffer string, one byte for the character, the other one for '\0' */
+#define CHR_BUF_STRING_LEN      ( 2 )
+
+/* Allocate the buffer for printing individual chracters */
+static char printChBuf[ CHR_PRINT_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
+
+/* Position of the currently available "slot" in the buffer */
+static unsigned portSHORT chBufCntr = 0;
+
 
 
 /* UART number: */
@@ -50,6 +82,19 @@ static xQueueHandle printQueue;
  */
 portSHORT printInit(unsigned portSHORT uart_nr)
 {
+    unsigned portSHORT i;
+
+    /*
+     * Initialize the character print buffer.
+     * It is sufficient to set each string's second character to '\0'.
+     */
+    for ( i=0; i<CHR_PRINT_BUF_SIZE; ++i )
+    {
+        printChBuf[i][1] = '\0';
+    }
+
+    chBufCntr = 0;
+
     /* Check if UART number is valid */
     if ( uart_nr >= BSP_NR_UARTS )
     {
@@ -112,6 +157,40 @@ void vPrintMsg(const char* msg)
     {
         xQueueSendToBack(printQueue, (void*) &msg, 0);
     }
+}
+
+
+/**
+ * Prints a character in a thread safe manner - even if the calling task preempts
+ * another printing task, its message will not be corrupted. Additionally, if another
+ * task attempts to print a character, the buffer will not be corrupted.
+ *
+ * @note This function may only be called when the FreeRTOS scheduler is running!
+ *
+ * @param ch - a character to be printed
+ */
+void vPrintChar(char ch)
+{
+    /*
+     * If several tasks call this function "simultaneously", the buffer may get
+     * corrupted. To prevent this, the buffer contains several strings
+     */
+
+    /*
+     * Put 'ch' to the first character of the current buffer string,
+     * note that the seconfd character has been initialized to '\0'.
+     */
+    printChBuf[chBufCntr][0] = ch;
+
+    /* Now the current buffer string may be sent to the printing queue */
+    xQueueSendToBack(printQueue, (void*) printChBuf[chBufCntr], 0);
+
+    /*
+     * Updtae chBufCntr and make sure it always
+     * remains between 0 and CHR_PRINT_BUF_SIZE-1
+     */
+    ++chBufCntr;
+    chBufCntr %= CHR_PRINT_BUF_SIZE;
 }
 
 
