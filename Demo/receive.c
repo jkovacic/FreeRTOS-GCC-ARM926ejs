@@ -21,11 +21,12 @@ limitations under the License.
  * @author Jernej Kovacic
  */
 
+#include <string.h>
 
 #include <FreeRTOS.h>
 #include <queue.h>
-#include <string.h>
 
+#include "app_config.h"
 #include "bsp.h"
 #include "uart.h"
 #include "interrupt.h"
@@ -34,26 +35,11 @@ limitations under the License.
 
 
 /*
- * Hardcoded definitions of a "circular" buffer that stores strings to be printed.
- * TODO
- * The settings could be defined in a separate header file (e.g. settings.h),
- * however, the current functionality is just a temporary "solution".
- */
-
-/*
- * Size of a buffer holding received characters, that have not been processed yet.
- * Its optimal size depends on typing speed.
- */
-#define RECV_QUEUE_SIZE       ( 10 )
-
-/*
  * A string that will be printed when a character has been received.
  * Note: 'A' will be replaced by the actual character.
  */
 #define RECV_MSG  "You pressed 'A'\r\n"
 
-/* Size of the "circular" buffer, i.e. number ofstrings */
-#define RECV_BUFFER_SIZE      ( 10 )
 
 /* Length of RECV_MESG, including 2 characters for "\r\n" and an additional one for '\0' */
 #define RECV_STRING_LEN       ( 18 )

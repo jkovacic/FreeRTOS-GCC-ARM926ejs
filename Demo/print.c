@@ -24,20 +24,11 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <queue.h>
 
+#include "app_config.h"
 #include "bsp.h"
 #include "uart.h"
 
-/*
- * Buffer settings.
- * Note: optimal settings depend on an application, e.g. how frequently
- * it attempts to print strings and/or individula characters.
- *
- * TODO: some settings should be defined in a separate header (e.g. settings.h)
- * and included into this file.
- */
 
-/* A queue with pointers to strings that will be printed */
-#define PRINT_QUEUE_SIZE        ( 10 )
 
 /*
  * A string buffer is necessary for printing individual characters:
@@ -49,14 +40,13 @@ limitations under the License.
  *     depends on the application.
  */
 
-/* Number of 2-byte strings in a character printing buffer */
-#define CHR_PRINT_BUF_SIZE      ( 5 )
+/* The number of actual strings for the buffer has been defined in "app_config.h" */
 
 /* Length of one buffer string, one byte for the character, the other one for '\0' */
 #define CHR_BUF_STRING_LEN      ( 2 )
 
 /* Allocate the buffer for printing individual chracters */
-static char printChBuf[ CHR_PRINT_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
+static char printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
 static unsigned portSHORT chBufCntr = 0;
@@ -88,7 +78,7 @@ portSHORT printInit(unsigned portSHORT uart_nr)
      * Initialize the character print buffer.
      * It is sufficient to set each string's second character to '\0'.
      */
-    for ( i=0; i<CHR_PRINT_BUF_SIZE; ++i )
+    for ( i=0; i<PRINT_CHR_BUF_SIZE; ++i )
     {
         printChBuf[i][1] = '\0';
     }
@@ -190,7 +180,7 @@ void vPrintChar(char ch)
      * remains between 0 and CHR_PRINT_BUF_SIZE-1
      */
     ++chBufCntr;
-    chBufCntr %= CHR_PRINT_BUF_SIZE;
+    chBufCntr %= PRINT_CHR_BUF_SIZE;
 }
 
 
