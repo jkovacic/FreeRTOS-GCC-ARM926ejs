@@ -173,7 +173,7 @@ void vPrintChar(char ch)
     printChBuf[chBufCntr][0] = ch;
 
     /* Now the current buffer string may be sent to the printing queue */
-    xQueueSendToBack(printQueue, (void*) printChBuf[chBufCntr], 0);
+    vPrintMsg(printChBuf[chBufCntr]);
 
     /*
      * Updtae chBufCntr and make sure it always
