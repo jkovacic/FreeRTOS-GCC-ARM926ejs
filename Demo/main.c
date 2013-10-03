@@ -28,13 +28,10 @@ limitations under the License.
 #include <FreeRTOS.h>
 #include <task.h>
 
+#include "app_config.h"
 #include "print.h"
 #include "receive.h"
 
-
-/* Uart(s) to print to and/or to receive from */
-#define PRINT_UART_NR          ( 0 )
-#define RECV_UART_NR           ( 0 )
 
 
 /* Struct with settings for each task */
@@ -163,23 +160,26 @@ void main(void)
     }
 
     /* Create a print gate keeper task: */
-    if ( pdPASS != xTaskCreate(printGateKeeperTask, "gk", 128, NULL, 1, NULL) )
+    if ( pdPASS != xTaskCreate(printGateKeeperTask, "gk", 128, NULL,
+                               PRIOR_PRINT_GATEKEEPR, NULL) )
     {
         FreeRTOS_Error("Could not create a print gate keeper task\r\n");
     }
 
-    if ( pdPASS != xTaskCreate(recvTask, "recv", 128, NULL, 1, NULL) )
+    if ( pdPASS != xTaskCreate(recvTask, "recv", 128, NULL, PRIOR_RECEIVER, NULL) )
     {
         FreeRTOS_Error("Could not create a receiver task\r\n");
     }
 
     /* And finally create two tasks: */
-    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0], 3, NULL) )
+    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0],
+                               PRIOR_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task1\r\n");
     }
 
-    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void*) &tParam[1], 2, NULL) )
+    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void*) &tParam[1],
+                               PRIOR_FIX_FREQ_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task2\r\n");
     }

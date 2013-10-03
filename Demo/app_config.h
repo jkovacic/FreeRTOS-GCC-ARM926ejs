@@ -29,21 +29,40 @@ limitations under the License.
 #define _APP_CONFIG_H_
 
 
+/* Settings for main.c */
+
+/* Uart(s) to print to and/or to receive from */
+#define PRINT_UART_NR                    ( 0 )
+#define RECV_UART_NR                     ( 0 )
+
+/*
+ * Priorities of certain tasks.
+ * Note: priorities should not be greater than configMAX_PRIORITIES - 1,
+ * defined in FreeRTOSConfig.h (its default value equals 5).
+ * If any priority is greater than this value, xTasCreate will
+ * silently reduce it.
+ */
+#define PRIOR_PERIODIC                   ( 2 )
+#define PRIOR_FIX_FREQ_PERIODIC          ( 3 )
+#define PRIOR_PRINT_GATEKEEPR            ( 1 )
+#define PRIOR_RECEIVER                   ( 1 )
+
+
 /* Settings for print.c */
 
 /* Size of the queue with pointers to strings that will be printed */
-#define PRINT_QUEUE_SIZE        ( 10 )
+#define PRINT_QUEUE_SIZE                 ( 10 )
 
 /* Number of string buffers to print individual characters */
-#define PRINT_CHR_BUF_SIZE      ( 5 )
+#define PRINT_CHR_BUF_SIZE               ( 5 )
 
 
 /* Settings for receive.c */
 
 /* Size of the queue holding received characters, that have not been processed yet. */
-#define RECV_QUEUE_SIZE          ( 10 )
+#define RECV_QUEUE_SIZE                  ( 10 )
 
 /* Number of string buffers necessary to print received characters */
-#define RECV_BUFFER_SIZE         ( 10 )
+#define RECV_BUFFER_SIZE                 ( 10 )
 
 #endif  /* _APP_CONFIG_H_ */
