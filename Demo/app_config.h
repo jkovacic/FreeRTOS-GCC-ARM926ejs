@@ -62,7 +62,14 @@ limitations under the License.
 /* Size of the queue holding received characters, that have not been processed yet. */
 #define RECV_QUEUE_SIZE                  ( 10 )
 
-/* Number of string buffers necessary to print received characters */
-#define RECV_BUFFER_SIZE                 ( 10 )
+/* Number of string buffers necessary to print received strings */
+#define RECV_BUFFER_SIZE                 ( 3 )
+
+/*
+ * Number of characters in a buffer.
+ * Note: this limit does not include '\0' and additional extra characters, necessary
+ * to print the string properly.
+ */
+#define RECV_BUFFER_LEN                  ( 50 )
 
 #endif  /* _APP_CONFIG_H_ */

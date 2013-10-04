@@ -147,7 +147,8 @@ void main(void)
     }
 
     /*
-     * Make sure (instartup.s) that main is entered in Supervisor mode.
+     * I M P O R T A N T :
+     * Make sure (in startup.s) that main is entered in Supervisor mode.
      * When vTaskStartScheduler launches the first task, it will switch
      * to System mode and enable interrupt exceptions.
      */
@@ -183,6 +184,9 @@ void main(void)
     {
         FreeRTOS_Error("Could not create task2\r\n");
     }
+
+    vDirectPrintMsg("A text may be entered using a keyboard.\r\n");
+    vDirectPrintMsg("It will be displayed when 'Enter' is pressed.\r\n\r\n");
 
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
