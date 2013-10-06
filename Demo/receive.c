@@ -53,7 +53,7 @@ limitations under the License.
 #define RECV_TOTAL_BUFFER_LEN        ( MSG_OFFSET + RECV_BUFFER_LEN + 3 + 1 )
 
 /* Allocated "circular" buffer */
-static char buf[ RECV_BUFFER_SIZE ][ RECV_TOTAL_BUFFER_LEN ];
+static portCHAR buf[ RECV_BUFFER_SIZE ][ RECV_TOTAL_BUFFER_LEN ];
 
 /* Position of the currently available slot in the buffer */
 static unsigned portSHORT bufCntr = 0;
@@ -107,7 +107,7 @@ portSHORT recvInit(unsigned portSHORT uart_nr)
     recvUartNr = uart_nr;
 
     /* Create and assert a queue for received characters */
-    recvQueue = xQueueCreate(RECV_QUEUE_SIZE, sizeof(char));
+    recvQueue = xQueueCreate(RECV_QUEUE_SIZE, sizeof(portCHAR));
     if ( 0 == recvQueue )
     {
         return pdFAIL;
@@ -136,7 +136,7 @@ portSHORT recvInit(unsigned portSHORT uart_nr)
  */
 static void recvIsrHandler(void)
 {
-    char ch;
+    portCHAR ch;
 
     /* Get the received character from the UART */
     ch = uart_readChar(recvUartNr);
@@ -162,7 +162,7 @@ static void recvIsrHandler(void)
  */
 void recvTask(void* params)
 {
-    char ch;
+    portCHAR ch;
 
     for ( ; ; )
     {

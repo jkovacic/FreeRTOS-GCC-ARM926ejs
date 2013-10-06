@@ -32,13 +32,13 @@ portSHORT printInit(unsigned portSHORT uart_nr);
 
 void printGateKeeperTask(void* params);
 
-void vPrintMsg(const char* msg);
+void vPrintMsg(const portCHAR* msg);
 
-void vPrintChar(char ch);
+void vPrintChar(portCHAR ch);
 
-void vDirectPrintMsg(const char* msg);
+void vDirectPrintMsg(const portCHAR* msg);
 
-void vDirectPrintCh(char ch);
+void vDirectPrintCh(portCHAR ch);
 
 
 #endif  /* _PRINT_H_ */

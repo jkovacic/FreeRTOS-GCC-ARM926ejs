@@ -37,19 +37,19 @@ limitations under the License.
 /* Struct with settings for each task */
 typedef struct _paramStruct
 {
-    char* text;                      /* text to be printed by the task */
+    portCHAR* text;                      /* text to be printed by the task */
     unsigned portBASE_TYPE delay;    /* delay in miliseconds */
 } paramStruct;
 
 /* Default parameters if no parameter struct is available */
-static const char defaultText[] = "<NO TEXT>\r\n";
+static const portCHAR defaultText[] = "<NO TEXT>\r\n";
 static const unsigned portBASE_TYPE defaultDelay = 1000;
 
 
 /* Task function - may be instantiated in multiple tasks */
 void vTaskFunction( void *pvParameters )
 {
-    const char* taskName;
+    const portCHAR* taskName;
     unsigned portBASE_TYPE delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
@@ -77,7 +77,7 @@ void vTaskFunction( void *pvParameters )
 /* Fixed frequency periodic task function - may be instantiated in multiple tasks */
 void vPeriodicTaskFunction(void* pvParameters)
 {
-    const char* taskName;
+    const portCHAR* taskName;
     unsigned portBASE_TYPE delay;
     paramStruct* params = (paramStruct*) pvParameters;
     portTickType lastWakeTime;
@@ -127,7 +127,7 @@ static const paramStruct tParam[2] =
  * and a programcannot continue. It prints a messgae (if provided) and
  * ends in an infinite loop.
  */
-static void FreeRTOS_Error(const char* msg)
+static void FreeRTOS_Error(const portCHAR* msg)
 {
     if ( NULL != msg )
     {

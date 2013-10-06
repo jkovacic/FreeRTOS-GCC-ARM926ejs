@@ -46,7 +46,7 @@ limitations under the License.
 #define CHR_BUF_STRING_LEN      ( 2 )
 
 /* Allocate the buffer for printing individual chracters */
-static char printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
+static portCHAR printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
 static unsigned portSHORT chBufCntr = 0;
@@ -94,7 +94,7 @@ portSHORT printInit(unsigned portSHORT uart_nr)
     printUartNr = uart_nr;
 
     /* Create and assert a queue for the gate keeper task */
-    printQueue = xQueueCreate(PRINT_QUEUE_SIZE, sizeof(char*));
+    printQueue = xQueueCreate(PRINT_QUEUE_SIZE, sizeof(portCHAR*));
     if ( 0 == printQueue )
     {
         return pdFAIL;
@@ -116,7 +116,7 @@ portSHORT printInit(unsigned portSHORT uart_nr)
  */
 void printGateKeeperTask(void* params)
 {
-    char* message;
+    portCHAR* message;
 
     for ( ; ; )
     {
@@ -141,7 +141,7 @@ void printGateKeeperTask(void* params)
  *
  * @param msg - a message to be printed
  */
-void vPrintMsg(const char* msg)
+void vPrintMsg(const portCHAR* msg)
 {
     if ( NULL != msg )
     {
@@ -159,7 +159,7 @@ void vPrintMsg(const char* msg)
  *
  * @param ch - a character to be printed
  */
-void vPrintChar(char ch)
+void vPrintChar(portCHAR ch)
 {
     /*
      * If several tasks call this function "simultaneously", the buffer may get
@@ -194,7 +194,7 @@ void vPrintChar(char ch)
  *
  * @param msg - a message to be printed
  */
-void vDirectPrintMsg(const char* msg)
+void vDirectPrintMsg(const portCHAR* msg)
 {
     if ( NULL != msg )
     {
@@ -211,7 +211,7 @@ void vDirectPrintMsg(const char* msg)
  *
  * @param ch - a character to be printed
  */
-void vDirectPrintCh(char ch)
+void vDirectPrintCh(portCHAR ch)
 {
     uart_printChar(printUartNr, ch);
 }
