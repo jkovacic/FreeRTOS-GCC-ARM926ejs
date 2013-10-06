@@ -227,17 +227,18 @@ void vPortEndScheduler( void )
  */
 static void prvSetupTimerInterrupt( void )
 {
+    /*
+     * If timer settings are inappropriate (portTICK_TIMER>=BSP_NR_TIMERS), this
+     * file will not compile. Thus an invalid timer's IRQ (something read from
+     * a "random" location) will be prevented.
+     */
+#if portTICK_TIMER >= BSP_NR_TIMERS
+#error Invalid timer selected!
+#endif
+
     unsigned portLONG ulCompareMatch;
     const unsigned portSHORT irqs[BSP_NR_TIMERS] = BSP_TIMER_IRQS;
-    /*
-     * If settings are inappropriate (portTICK_TIMER>=BSP_NR_TIMERS), an invalid
-     * timer IRQ will be attempted to be set and no tick will be ever generated.
-     * This can be noticed immediately, hence it is considered a better "solution"
-     * than attempting to configure an IRQ number, read from a "random" location.
-     */
-    const unsigned portSHORT irq = ( portTICK_TIMER < BSP_NR_TIMERS ?
-                                     irqs[portTICK_TIMER] :
-                                     (unsigned portSHORT) -1 );
+    const unsigned portSHORT irq = irqs[portTICK_TIMER];
 
     extern void vTickISR(void);
 
