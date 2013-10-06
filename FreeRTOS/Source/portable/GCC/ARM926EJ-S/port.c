@@ -229,7 +229,15 @@ static void prvSetupTimerInterrupt( void )
 {
     unsigned portLONG ulCompareMatch;
     const unsigned portSHORT irqs[BSP_NR_TIMERS] = BSP_TIMER_IRQS;
-    portSHORT irq = irqs[portTICK_TIMER];
+    /*
+     * If settings are inappropriate (portTICK_TIMER>=BSP_NR_TIMERS), an invalid
+     * timer IRQ will be attempted to be set and no tick will be ever generated.
+     * This can be noticed immediately, hence it is considered a better "solution"
+     * than attempting to configure an IRQ number, read from a "random" location.
+     */
+    const unsigned portSHORT irq = ( portTICK_TIMER < BSP_NR_TIMERS ?
+                                     irqs[portTICK_TIMER] :
+                                     (unsigned portSHORT) -1 );
 
     extern void vTickISR(void);
 

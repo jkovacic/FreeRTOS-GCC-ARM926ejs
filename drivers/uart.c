@@ -570,6 +570,12 @@ unsigned char uart_readChar(uint8_t nr)
     /* Wait until the receiving FIFO is not empty */
     while ( pReg[nr]->UARTFR & FR_RXFE );
 
-    /* UART DR is a 32-bit register and only the least siginificant byte must be returned: */
-    return (unsigned char) (pReg[nr]->UARTDR & 0x000000FF);
+    /*
+     * UART DR is a 32-bit register and only the least siginificant byte must be returned.
+     * Casting its address to unsigned char* effectively turns the word into an array
+     * of (four) 8-bit characters. Now, dereferencing the first character of this array affects
+     * only the desired character itself, not the whole word.
+     */
+
+    return *( (unsigned char*) &(pReg[nr]->UARTDR) );
 }
