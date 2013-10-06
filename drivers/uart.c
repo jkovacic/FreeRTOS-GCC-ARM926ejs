@@ -559,12 +559,12 @@ void uart_clearRxInterrupt(uint8_t nr)
  *
  * @return character receieved at the UART
  */
-unsigned char uart_readChar(uint8_t nr)
+char uart_readChar(uint8_t nr)
 {
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
-        return (unsigned char) 0;
+        return (char) 0;
     }
 
     /* Wait until the receiving FIFO is not empty */
@@ -572,10 +572,10 @@ unsigned char uart_readChar(uint8_t nr)
 
     /*
      * UART DR is a 32-bit register and only the least siginificant byte must be returned.
-     * Casting its address to unsigned char* effectively turns the word into an array
+     * Casting its address to char* effectively turns the word into an array
      * of (four) 8-bit characters. Now, dereferencing the first character of this array affects
      * only the desired character itself, not the whole word.
      */
 
-    return *( (unsigned char*) &(pReg[nr]->UARTDR) );
+    return *( (char*) &(pReg[nr]->UARTDR) );
 }
