@@ -125,11 +125,13 @@ typedef struct _ARM926EJS_SIC_REGS
 
 
 #define UL1                    ( 0x00000001 )
+#define UL0                    ( 0x00000000 )
+#define ULFF                   ( 0xFFFFFFFF )
 #define BM_IRQ_PART            ( 0x0000001F )
 #define BM_VECT_ENABLE_BIT     ( 0x00000020 )
 
-#define NR_VECTORS      ( 16 )
-#define NR_INTERRUPTS   ( 32 )
+#define NR_VECTORS             ( 16 )
+#define NR_INTERRUPTS          ( 32 )
 
 
 static volatile ARM926EJS_PIC_REGS* const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_PIC_BASE_ADDRESS);
@@ -282,7 +284,7 @@ void _pic_IrqHandler(void)
      * Writes an arbitrary value to the Vector Address Register. This indicates to the
      * priority hardware that the interrupt has been serviced.
      */
-    pPicReg->VICVECTADDR = 0xFFFFFFFF;
+    pPicReg->VICVECTADDR = ULFF;
 
 }
 
@@ -299,13 +301,13 @@ void pic_init(void)
     uint8_t i;
 
     /* All interrupt request lines generate IRQ interrupts: */
-    pPicReg->VICINTSELECT = 0x00000000;
+    pPicReg->VICINTSELECT = UL0;
 
     /* Disable all interrupt request lines: */
-    pPicReg->VICINTENCLEAR = 0xFFFFFFFF;
+    pPicReg->VICINTENCLEAR = ULFF;
 
     /* Clear all software generated interrupts: */
-    pPicReg->VICSOFTINTCLEAR = 0xFFFFFFFF;
+    pPicReg->VICSOFTINTCLEAR = ULFF;
 
     /* Reset the default vector address: */
     pPicReg->VICDEFVECTADDR = (uint32_t) &__defaultVectorIsr;
@@ -321,7 +323,7 @@ void pic_init(void)
         if ( i<NR_VECTORS )
         {
             /* clear its control register */
-            pPicReg->VICVECTCNTLn[i] = 0x00000000;
+            pPicReg->VICVECTCNTLn[i] = UL0;
             /* and clear its ISR address to a dummy function */
             pPicReg->VICVECTADDRn[i] = (uint32_t) &__irq_dummyISR;
         }
@@ -386,7 +388,7 @@ void pic_disableAllInterrupts(void)
      * See description of VICINTENCLEAR, page 3-7 of DDI0181.
      * All 32 bits of this register are set to 1.
      */
-    pPicReg->VICINTENCLEAR = 0xFFFFFFFF;
+    pPicReg->VICINTENCLEAR = ULFF;
 }
 
 
@@ -449,7 +451,7 @@ void pic_setInterruptType(uint8_t irq, int8_t toIrq)
          * The interrupt's type is set via VICINTSELECT. See description
          * of the register at page 3-7 of DDI0181.
          */
-        if ( toIrq )
+        if ( 0 != toIrq )
         {
             /* Set the corresponding bit to 0 by bitwise and'ing bitmask's zero complement */
             pPicReg->VICINTSELECT &= ~(UL1 << irq);
@@ -504,11 +506,11 @@ void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr)
  * @return position of the IRQ handling entry within an internal table, a negative value if registration was unsuccessful
  */
 int8_t pic_registerIrq(
-                              uint8_t irq,
-                              pVectoredIsrPrototype addr,
-                              uint8_t priority )
+                        uint8_t irq,
+                        pVectoredIsrPrototype addr,
+                        uint8_t priority )
 {
-    const prior = priority & 0x7F;
+    const prior = priority & PIC_MAX_PRIORITY;
     int8_t irqPos = -1;
     int8_t prPos = -1;
     int8_t i;
@@ -564,7 +566,7 @@ int8_t pic_registerIrq(
                 else
                 {
                     /* if i^th line is "empty", clear the appropriate vector registers */
-                    pPicReg->VICVECTCNTLn[i] = 0x00000000;
+                    pPicReg->VICVECTCNTLn[i] = UL0;
                     pPicReg->VICVECTADDRn[i] = (uint32_t) &__irq_dummyISR;
                 }
             }  /* if i < NR_VECTORS */
@@ -592,7 +594,7 @@ int8_t pic_registerIrq(
                 else
                 {
                     /* if i^th line is "empty", clear the appropriate vector registers */
-                    pPicReg->VICVECTCNTLn[i] = 0x00000000;
+                    pPicReg->VICVECTCNTLn[i] = UL0;
                     pPicReg->VICVECTADDRn[i] = (uint32_t) &__irq_dummyISR;
                 }
             }  /* if i < NR_VECTORS */
@@ -614,7 +616,7 @@ int8_t pic_registerIrq(
         }
         else
         {
-            pPicReg->VICVECTCNTLn[prPos] = 0x00000000;
+            pPicReg->VICVECTCNTLn[prPos] = UL0;
             pPicReg->VICVECTADDRn[prPos] = (uint32_t) &__irq_dummyISR;
         }
     }
@@ -678,7 +680,7 @@ void pic_unregisterIrq(uint8_t irq)
             else
             {
                 /* if pos^th line is "empty", clear the appropriate vector registers */
-                pPicReg->VICVECTCNTLn[pos] = 0x00000000;
+                pPicReg->VICVECTCNTLn[pos] = UL0;
                 pPicReg->VICVECTADDRn[pos] = (uint32_t) &__irq_dummyISR;
             }
         }
@@ -709,7 +711,7 @@ void pic_unregisterAllIrqs(void)
         /* Clear all vector's VICVECTCNTLn and VICVECTADDRn registers: */
         if ( i<NR_VECTORS )
         {
-            pPicReg->VICVECTCNTLn[i] = 0x00000000;
+            pPicReg->VICVECTCNTLn[i] = UL0;
             pPicReg->VICVECTADDRn[i] = (uint32_t) &__irq_dummyISR;
         }
     }

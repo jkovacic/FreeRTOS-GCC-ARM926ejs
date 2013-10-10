@@ -38,10 +38,6 @@ limitations under the License.
 typedef void (*pVectoredIsrPrototype)(void);
 
 
-//void irq_enableIrqMode(void);
-
-//void irq_disableIrqMode(void);
-
 void pic_init(void);
 
 void pic_enableInterrupt(uint8_t irq);
@@ -59,9 +55,9 @@ void pic_setInterruptType(uint8_t irq, int8_t toIrq);
 void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr);
 
 int8_t pic_registerIrq(
-                               uint8_t irq,
-                               pVectoredIsrPrototype addr,
-                               uint8_t priority );
+                        uint8_t irq,
+                        pVectoredIsrPrototype addr,
+                        uint8_t priority );
 
 void pic_unregisterIrq(uint8_t irq);
 
