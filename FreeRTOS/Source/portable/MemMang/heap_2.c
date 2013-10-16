@@ -1,5 +1,6 @@
 /*
-    FreeRTOS V7.5.2 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V7.5.3 - Copyright (C) 2013 Real Time Engineers Ltd. 
+    All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
@@ -214,6 +215,8 @@ void *pvReturn = NULL;
 				xFreeBytesRemaining -= pxBlock->xBlockSize;
 			}
 		}
+		
+		traceMALLOC( pvReturn, xWantedSize );
 	}
 	xTaskResumeAll();
 
@@ -251,6 +254,7 @@ xBlockLink *pxLink;
 			/* Add this block to the list of free blocks. */
 			prvInsertBlockIntoFreeList( ( ( xBlockLink * ) pxLink ) );
 			xFreeBytesRemaining += pxLink->xBlockSize;
+			traceFREE( pv, pxLink->xBlockSize );
 		}
 		xTaskResumeAll();
 	}

@@ -10,7 +10,7 @@
  */
 
 /*
-    FreeRTOS V7.5.2 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V7.5.3 - Copyright (C) 2013 Real Time Engineers Ltd.
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
@@ -239,7 +239,7 @@ extern void vTaskSwitchContext( void );
             "MRS    R0, CPSR        \n\t"   /* Get CPSR.                    */  \
             "ORR    R0, R0, #0xC0   \n\t"   /* Disable IRQ, FIQ.            */  \
             "MSR    CPSR, R0        \n\t"   /* Write back modified value.   */  \
-            "LDMIA  SP!, {R0}           " ) /* Pop R0.                       */
+            "LDMIA  SP!, {R0}           " ) /* Pop R0.                      */
 
     /*
      * NOTE:
