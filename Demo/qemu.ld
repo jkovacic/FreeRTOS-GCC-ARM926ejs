@@ -68,7 +68,7 @@ SECTIONS
     . = . + __ld_Irq_Stack_size; /* Allocate memory for IRQ mode's stack */
     irq_stack_top = .;           /* Initial stack pointer for the IRQ mode */
 
-    /* Approx. 50 kB remains for the User mode's stack: */
+    /* Approx. 50 kB remains for the System mode's stack: */
     . = __ld_Init_Addr - 4;      /* Allocate memory for System mode's stack */
     stack_top = .;               /* It starts just in front of the startup address */
 

@@ -110,7 +110,7 @@ reset_handler:
     STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}
 
     @ Clear the whole BSS section to 0:
-	LDR r0, __bss_begin_addr
+    LDR r0, __bss_begin_addr
     LDR r1, __bss_end_addr
     MOV r2, #0
 bss_clear_loop:
