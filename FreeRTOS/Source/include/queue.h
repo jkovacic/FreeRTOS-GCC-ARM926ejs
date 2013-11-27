@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.5.3 - Copyright (C) 2013 Real Time Engineers Ltd. 
+    FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd. 
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -714,7 +714,7 @@ signed portBASE_TYPE xQueueGenericSend( xQueueHandle xQueue, const void * const 
  * \defgroup xQueuePeekFromISR xQueuePeekFromISR
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueuePeekFromISR( xQueueHandle xQueue, const void * const pvBuffer ) PRIVILEGED_FUNCTION;
+signed portBASE_TYPE xQueuePeekFromISR( xQueueHandle xQueue, void * const pvBuffer ) PRIVILEGED_FUNCTION;
 
 /**
  * queue. h
@@ -906,7 +906,7 @@ signed portBASE_TYPE xQueuePeekFromISR( xQueueHandle xQueue, const void * const 
  * \defgroup xQueueReceive xQueueReceive
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueGenericReceive( xQueueHandle xQueue, const void * const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeek ) PRIVILEGED_FUNCTION;
+signed portBASE_TYPE xQueueGenericReceive( xQueueHandle xQueue, void * const pvBuffer, portTickType xTicksToWait, portBASE_TYPE xJustPeek ) PRIVILEGED_FUNCTION;
 
 /**
  * queue. h
@@ -1246,7 +1246,7 @@ unsigned long ulVarToSend, ulValReceived;
 	if( xHigherPriorityTaskWoken )
 	{
 		// Actual macro used here is port specific.
-		taskYIELD_FROM_ISR ();
+		portYIELD_FROM_ISR ();
 	}
  }
  </pre>
@@ -1421,7 +1421,7 @@ signed portBASE_TYPE xQueueGenericSendFromISR( xQueueHandle xQueue, const void *
  * \defgroup xQueueReceiveFromISR xQueueReceiveFromISR
  * \ingroup QueueManagement
  */
-signed portBASE_TYPE xQueueReceiveFromISR( xQueueHandle xQueue, const void * const pvBuffer, signed portBASE_TYPE *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
+signed portBASE_TYPE xQueueReceiveFromISR( xQueueHandle xQueue, void * const pvBuffer, signed portBASE_TYPE *pxHigherPriorityTaskWoken ) PRIVILEGED_FUNCTION;
 
 /*
  * Utilities to query queues that are safe to use from an ISR.  These utilities
@@ -1473,7 +1473,7 @@ signed portBASE_TYPE xQueueCRReceive( xQueueHandle xQueue, void *pvBuffer, portT
  * these functions directly.
  */
 xQueueHandle xQueueCreateMutex( unsigned char ucQueueType ) PRIVILEGED_FUNCTION;
-xQueueHandle xQueueCreateCountingSemaphore( unsigned portBASE_TYPE uxCountValue, unsigned portBASE_TYPE uxInitialCount ) PRIVILEGED_FUNCTION;
+xQueueHandle xQueueCreateCountingSemaphore( unsigned portBASE_TYPE uxMaxCount, unsigned portBASE_TYPE uxInitialCount ) PRIVILEGED_FUNCTION;
 void* xQueueGetMutexHolder( xQueueHandle xSemaphore ) PRIVILEGED_FUNCTION;
 
 /*
