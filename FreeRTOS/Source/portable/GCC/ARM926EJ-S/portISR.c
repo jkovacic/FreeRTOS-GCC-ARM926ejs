@@ -187,10 +187,10 @@ void vTickISR( void )
     task that is ready to run. */
     __asm volatile
     (
-        "   bl xTaskIncrementTick   \t\n" \
-        "   cmp r0, #0              \t\n" \
-        "   beq SkipContextSwitch   \t\n" \
-        "   bl vTaskSwitchContext   \t\n" \
+        "   BL xTaskIncrementTick   \t\n" \
+        "   CMP r0, #0              \t\n" \
+        "   BEQ SkipContextSwitch   \t\n" \
+        "   BL vTaskSwitchContext   \t\n" \
         "SkipContextSwitch:         \t\n"
     );
 

@@ -167,7 +167,7 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
     pReg[timerNr]->CNTR[counterNr].CONTROL &=
             ( ~CTL_ENABLE & ~CTL_INTR & ~CTL_PRESCALE_1 & ~CTL_PRESCALE_2 & ~CTL_ONESHOT );
 
-    /* reserved bits remained unmodifed */
+    /* reserved bits remained unmodified */
 }
 
 

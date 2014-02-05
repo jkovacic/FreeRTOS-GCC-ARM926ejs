@@ -46,7 +46,7 @@ limitations under the License.
      /* Disable IRQ triggering (may be reenabled after ISRs are properly set) */
      irq_disableIrqMode();
 
-     /* Init the vectore interrupt controller */
+     /* Init the vectored interrupt controller */
      pic_init();
 
      /* Init all counters of all available timers */

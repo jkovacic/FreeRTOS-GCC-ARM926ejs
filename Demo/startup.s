@@ -102,8 +102,8 @@ reset_handler:
     LDR r0, =vectors_start                 @ Store the source pointer
     MOV r1, #EXCEPTION_VECT                @ Store the destination pointer.
     @  Copy the branching instructions from vectors start to registers r2-r9 and then to destination
-    LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Load multiple values from indexed address.           ; Auto-increment R0
-    STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Store multiple values from the indexed address.      ; Auto-increment R1
+    LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Load multiple values from indexed address; auto-increment R0
+    STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Store multiple values from the indexed address; auto-increment R1
 
     @  Also copy correct addresses of exception handlers
     LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}

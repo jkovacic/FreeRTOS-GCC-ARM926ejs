@@ -48,7 +48,7 @@ limitations under the License.
 #define MSG_OFFSET          ( 14 )
 /*
  * Total length of a string buffer:
- * MSG_OFFSET + RECV_BUFFER_SIZE + additinal 4 characters for "\"\r\n\0"
+ * MSG_OFFSET + RECV_BUFFER_SIZE + additional 4 characters for "\"\r\n\0"
  */
 #define RECV_TOTAL_BUFFER_LEN        ( MSG_OFFSET + RECV_BUFFER_LEN + 3 + 1 )
 
@@ -205,7 +205,7 @@ void recvTask(void* params)
             case 'Y' :
             case 'Z' :
 
-            /* Lowercace letters 'a'..'z': */
+            /* Lowercase letters 'a'..'z': */
             case 'a' :
             case 'b' :
             case 'c' :

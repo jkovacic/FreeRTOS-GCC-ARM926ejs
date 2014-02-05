@@ -11,3 +11,8 @@ obj/
 
 # Backup files of some editors:
 *~
+
+# Eclipse files:
+.project
+.cproject
+.settings/

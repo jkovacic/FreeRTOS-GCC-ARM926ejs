@@ -34,7 +34,7 @@ limitations under the License.
 
 /*
  * At the moment, this header file is maintained  manually.
- * Ideally, one day it will be generated automaticaly by scripts that
+ * Ideally, one day it will be generated automatically by scripts that
  * read data from BSP (board support package) databases.
  */
 
@@ -45,7 +45,7 @@ limitations under the License.
  * as values within curly brackets (e.g. "{ 3, 5, 8}"). That way it is simple to initialize
  * a statically declared array in source files where IRQs are necessary.
  * However, arrays of base addresses are a bit more tricky as addresses should be casted to
- * appropriate pointers types when assigned to pointers. This can be achieved using so caled
+ * appropriate pointers types when assigned to pointers. This can be achieved using so called
  * "for-each macros". Within a macro definition, all addresses are enumerated as arguments to
  * another macro, e.g. CAST. Macros that are replaced by "CAST" are then defined in source files
  * when they are actually casted. For more details about this trick, see:

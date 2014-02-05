@@ -104,7 +104,7 @@ limitations under the License.
 /*
  * Bitmasks for the Flag Register.
  *
- * For a detaled description of each flag register's bit, see page 3-8 od the DDI0183.
+ * For a detailed description of each flag register's bit, see page 3-8 of the DDI0183.
  *   0: Clear to send. This bit is the complement of the UART clear to send (nUARTCTS) modem status input.
  *   1: Data set ready. This bit is the complement of the UART data set ready (nUARTDSR) modem status input.
  *   2: Data carrier detect. This bit is the complement of the UART data carrier detect (nUARTDCD) modem status input.
@@ -303,7 +303,7 @@ void uart_printChar(uint8_t nr, char ch)
 
 
 /**
- * Outputs a string to the sepcified UART.
+ * Outputs a string to the specified UART.
  *
  * "<NULL>" is transmitted if 'str' is equal to NULL.
  *
@@ -315,7 +315,7 @@ void uart_printChar(uint8_t nr, char ch)
 void uart_print(uint8_t nr, const char* str)
 {
     /*
-      if NULL is passed, avoid possible problems with deferencing of NULL
+      if NULL is passed, avoid possible problems with dereferencing of NULL
       and print this string:
      */
     const char* null_str = "<NULL>\r\n";
@@ -403,7 +403,7 @@ static inline void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
 
     /*
      * As suggested on page 3-16 of the DDI0183, the UART should be disabled
-     * prior to any modificiation of the Control Register
+     * prior to any modification of the Control Register
      */
     pReg[nr]->UARTCR &= ~CTL_UARTEN;
 
@@ -551,13 +551,13 @@ void uart_clearRxInterrupt(uint8_t nr)
  * Reads a character that was received by the specified UART.
  * The function may block until a character appears in the UART's receive buffer.
  * It is recommended that the function is called, when the caller is sure that a
- * character has actually been received, e.g. by notificiation via an interrupt.
+ * character has actually been received, e.g. by notification via an interrupt.
  *
  * A zero is returned immediately if 'nr' is invalid (equal or greater than 3).
  *
  * @param nr - number of the UART (between 0 and 2)
  *
- * @return character receieved at the UART
+ * @return character received at the UART
  */
 char uart_readChar(uint8_t nr)
 {
@@ -571,7 +571,7 @@ char uart_readChar(uint8_t nr)
     while ( pReg[nr]->UARTFR & FR_RXFE );
 
     /*
-     * UART DR is a 32-bit register and only the least siginificant byte must be returned.
+     * UART DR is a 32-bit register and only the least significant byte must be returned.
      * Casting its address to char* effectively turns the word into an array
      * of (four) 8-bit characters. Now, dereferencing the first character of this array affects
      * only the desired character itself, not the whole word.

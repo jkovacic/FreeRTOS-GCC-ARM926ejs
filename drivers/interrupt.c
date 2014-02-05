@@ -143,7 +143,7 @@ static volatile ARM926EJS_PIC_REGS* const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_P
  * A table with IRQs serviced by each VICVECTADDRn.
  * If a table's field is negative, its corresponding VICVECTADDRn presumably
  * does not serve any IRQ. In this case, the corresponding VICVECTCNTLn is
- * supposed to be set ot 0 and its VICVECTADDRn should be set to __irq_dummyISR.
+ * supposed to be set to 0 and its VICVECTADDRn should be set to __irq_dummyISR.
  */
 typedef struct _isrVectRecord
 {
@@ -157,7 +157,7 @@ static isrVectRecord __irqVect[NR_INTERRUPTS];
 
 
 /**
- * Enable CPU's IRQ mode that handles IRQ interrupr requests.
+ * Enable CPU's IRQ mode that handles IRQ interrupt requests.
  */
 void irq_enableIrqMode(void)
 {
@@ -167,9 +167,9 @@ void irq_enableIrqMode(void)
      * The CSPR can only be accessed using assembler.
      */
 
-    __asm volatile("MRS r0, cpsr"); /* Read in the CPSR register. */
-    __asm volatile("BIC r0, r0, #0x80"); /* Clear bit 8, (0x80) -- Causes IRQs to be enabled. */
-    __asm volatile("MSR cpsr_c, r0"); /* Write it back to the CPSR register */
+    __asm volatile("MRS r0, cpsr");        /* Read in the CPSR register. */
+    __asm volatile("BIC r0, r0, #0x80");   /* Clear bit 8, (0x80) -- Causes IRQs to be enabled. */
+    __asm volatile("MSR cpsr_c, r0");      /* Write it back to the CPSR register */
 }
 
 
@@ -184,9 +184,9 @@ void irq_disableIrqMode(void)
      * The CSPR can only be accessed using assembler.
      */
 
-    __asm volatile("MRS r0, cpsr"); /* Read in the CPSR register. */
-    __asm volatile("ORR r0, r0, #0xC0"); /* Disable IRQ and FIQ exceptions. */
-    __asm volatile("MSR cpsr_c, r0"); /* Write it back to the CPSR register. */
+    __asm volatile("MRS r0, cpsr");       /* Read in the CPSR register. */
+    __asm volatile("ORR r0, r0, #0xC0");  /* Disable IRQ and FIQ exceptions. */
+    __asm volatile("MSR cpsr_c, r0");     /* Write it back to the CPSR register. */
 }
 
 
@@ -204,7 +204,7 @@ static void __irq_dummyISR(void)
 {
     /*
      * An "empty" function.
-     * As this is a test aplication, it emits a warning to the UART0.
+     * As this is a test application, it emits a warning to the UART0.
      */
      uart_print(0, "<WARNING, A DUMMY ISR ROUTINE!!!>\r\n");
 }
@@ -213,7 +213,7 @@ static void __irq_dummyISR(void)
 /*
  * Default handler of vectored IRQs. Typically the address of this function should be
  * set as a default value to pPicReg->VICDEFVECTADDR. It handles IRQs whose ISRs are note
- * entered into vectored registers. It is very similar to nen vectored handling of IRQs.
+ * entered into vectored registers. It is very similar to non vectored handling of IRQs.
  */
 static void __defaultVectorIsr(void)
 {
@@ -229,7 +229,7 @@ static void __defaultVectorIsr(void)
     {
         if ( __irqVect[cntr].irq>=0 &&
              __irqVect[cntr].irq<NR_INTERRUPTS &&
-             pPicReg->VICINTENABLE & (UL1 << __irqVect[cntr].irq) )
+             ( pPicReg->VICINTENABLE & (UL1 << __irqVect[cntr].irq) ) )
         {
             ( *__irqVect[cntr].isr )();
             break;  /* out of for cntr */
@@ -290,7 +290,7 @@ void _pic_IrqHandler(void)
 
 
 /**
- * Initializes the primary interrupt controler to default settings.
+ * Initializes the primary interrupt controller to default settings.
  *
  * All interrupt request lines are set to generate IRQ interrupts and all
  * interrupt request lines are disabled by default. Additionally, all vector
@@ -470,7 +470,7 @@ void pic_setInterruptType(uint8_t irq, int8_t toIrq)
  *
  * Nothing is done, if 'addr' is invalid, i.e. NULL
  *
- * @param addr - address od the default ISR
+ * @param addr - address of the default ISR
  */
 void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr)
 {
@@ -491,7 +491,7 @@ void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr)
  * Entries are internally sorted in descending order by priority.
  * Entries with the same priority are additionally sorted by the time of registration
  * (entries registered earlier are ranked higher).
- * If 'irq' has already been registered, its internal entry will be overriden with
+ * If 'irq' has already been registered, its internal entry will be overridden with
  * new values and resorted by priority.
  * The first 16 entries, sorted by priority, are automatically entered into appropriate vector
  * registers of the primary interrupt controller.
@@ -576,7 +576,7 @@ int8_t pic_registerIrq(
     /* if prPos is greater than irqPos, move all intermediate entries one line up... */
     if ( prPos > irqPos )
     {
-        /* however this does not include the entry at prPos, whose priority is less than prior!!!*/
+        /* however this does not include the entry at prPos, whose priority is less than prior!!! */
         --prPos;
 
         for ( i=irqPos; i<prPos; ++i )
@@ -726,7 +726,7 @@ void pic_unregisterAllIrqs(void)
  *
  * @note It is strongly recommended that only IRQs of disabled peripherals
  * (or at least peripherals with disabled interrupt triggering) are passed
- * to this function. It is strongly recommended to use IRQ 1, resrved for
+ * to this function. It is strongly recommended to use IRQ 1, reserved for
  * software generated interrupts.
  *
  * @param irq - interrupt number (must be smaller than 32)

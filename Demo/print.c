@@ -45,7 +45,7 @@ limitations under the License.
 /* Length of one buffer string, one byte for the character, the other one for '\0' */
 #define CHR_BUF_STRING_LEN      ( 2 )
 
-/* Allocate the buffer for printing individual chracters */
+/* Allocate the buffer for printing individual characters */
 static portCHAR printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
@@ -100,7 +100,7 @@ portSHORT printInit(unsigned portSHORT uart_nr)
         return pdFAIL;
     }
 
-    /* Enable thwe UART for transmission */
+    /* Enable the UART for transmission */
     uart_enableTx(printUartNr);
 
     return pdPASS;
@@ -168,7 +168,7 @@ void vPrintChar(portCHAR ch)
 
     /*
      * Put 'ch' to the first character of the current buffer string,
-     * note that the seconfd character has been initialized to '\0'.
+     * note that the second character has been initialized to '\0'.
      */
     printChBuf[chBufCntr][0] = ch;
 
@@ -176,7 +176,7 @@ void vPrintChar(portCHAR ch)
     vPrintMsg(printChBuf[chBufCntr]);
 
     /*
-     * Updtae chBufCntr and make sure it always
+     * Update chBufCntr and make sure it always
      * remains between 0 and CHR_PRINT_BUF_SIZE-1
      */
     ++chBufCntr;

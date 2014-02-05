@@ -108,7 +108,7 @@ endf:
  * @param source - pointer to the source of data to be copied
  * @param num - number of bytes to copy
  *
- * @return 'destination' is returned or NULL if any paramater equals NULL
+ * @return 'destination' is returned or NULL if any parameter equals NULL
  */
 void* memcpy(void* destination, const void* source, size_t num )
 {
@@ -184,7 +184,7 @@ void* memcpy(void* destination, const void* source, size_t num )
  * @param destination - pointer to the destination array where the content is to be copied
  * @param source - C string to be copied
  *
- * @return 'destination' is returned or NULL if any paramter equals NULL
+ * @return 'destination' is returned or NULL if any parameter equals NULL
  */
 char* strcpy (char* destination, const char* source)
 {

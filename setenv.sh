@@ -22,7 +22,7 @@
 # Only IA32 version of the toolchain is provided. In order to work properly on 
 # x64 systems, 'ia32-libs' must also be installed.
 
-# Version 2003-05.23 of "Sourcery CodeBench Lite Edition for ARM EABI" 
+# Version 2013-05.23 of "Sourcery CodeBench Lite Edition for ARM EABI" 
 # (now owned by Mentor Graphics) is used as the toolchain. It can be downloaded from
 # http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/arm-eabi
 # (a free registration is necessary to download). I downloaded the advanced package

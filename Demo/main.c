@@ -37,8 +37,8 @@ limitations under the License.
 /* Struct with settings for each task */
 typedef struct _paramStruct
 {
-    portCHAR* text;                      /* text to be printed by the task */
-    unsigned portBASE_TYPE delay;    /* delay in miliseconds */
+    portCHAR* text;                  /* text to be printed by the task */
+    unsigned portBASE_TYPE delay;    /* delay in milliseconds */
 } paramStruct;
 
 /* Default parameters if no parameter struct is available */
@@ -98,7 +98,7 @@ void vPeriodicTaskFunction(void* pvParameters)
         vPrintMsg(taskName);
 
         /*
-         * The task will unblock exactly after 'delay' miliseconds (actually
+         * The task will unblock exactly after 'delay' milliseconds (actually
          * after the appropriate number of ticks), relative from the moment
          * it was last unblocked.
          */
@@ -124,7 +124,7 @@ static const paramStruct tParam[2] =
 
 /*
  * A convenience function that is called when a FreeRTOS API call fails
- * and a programcannot continue. It prints a messgae (if provided) and
+ * and a program cannot continue. It prints a message (if provided) and
  * ends in an infinite loop.
  */
 static void FreeRTOS_Error(const portCHAR* msg)
