@@ -38,19 +38,19 @@ limitations under the License.
 typedef struct _paramStruct
 {
     portCHAR* text;                  /* text to be printed by the task */
-    unsigned portBASE_TYPE delay;    /* delay in milliseconds */
+    UBaseType_t  delay;              /* delay in milliseconds */
 } paramStruct;
 
 /* Default parameters if no parameter struct is available */
 static const portCHAR defaultText[] = "<NO TEXT>\r\n";
-static const unsigned portBASE_TYPE defaultDelay = 1000;
+static const UBaseType_t defaultDelay = 1000;
 
 
 /* Task function - may be instantiated in multiple tasks */
 void vTaskFunction( void *pvParameters )
 {
     const portCHAR* taskName;
-    unsigned portBASE_TYPE delay;
+    UBaseType_t  delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
     taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
@@ -78,9 +78,9 @@ void vTaskFunction( void *pvParameters )
 void vPeriodicTaskFunction(void* pvParameters)
 {
     const portCHAR* taskName;
-    unsigned portBASE_TYPE delay;
+    UBaseType_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
-    portTickType lastWakeTime;
+    TickType_t lastWakeTime;
 
     taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
     delay = ( NULL==params ? defaultDelay : params->delay);

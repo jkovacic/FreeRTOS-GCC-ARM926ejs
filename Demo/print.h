@@ -28,7 +28,7 @@ limitations under the License.
 #include <FreeRTOS.h>
 
 
-portSHORT printInit(unsigned portSHORT uart_nr);
+int16_t printInit(uint16_t uart_nr);
 
 void printGateKeeperTask(void* params);
 

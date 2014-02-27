@@ -5,14 +5,14 @@
  *
  * IRQ exception handling routine (vFreeRTOS_ISR) was added. Functions that
  * enable interrupt handling (vPortEnableInterruptsFromThumb and vPortExitCritical)
- * were modifed so they do not enable FIQ interrupts that are currently not supported.
+ * were modified so they do not enable FIQ interrupts that are currently not supported.
  * Additionally all "annoying" tabs have been replaced by spaces.
  *
  * The original file is available under the following license:
  */
 
 /*
-    FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V8.0.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -110,7 +110,7 @@
 
 
 /* Constants required to handle critical sections. */
-#define portNO_CRITICAL_NESTING		( ( unsigned long ) 0 )
+#define portNO_CRITICAL_NESTING		( ( uint32_t) 0 )
 volatile unsigned long ulCriticalNesting = 9999UL;
 
 /*-----------------------------------------------------------*/

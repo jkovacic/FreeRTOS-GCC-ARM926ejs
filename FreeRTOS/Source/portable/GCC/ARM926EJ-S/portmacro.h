@@ -10,7 +10,7 @@
  */
 
 /*
-    FreeRTOS V7.6.0 - Copyright (C) 2013 Real Time Engineers Ltd.
+    FreeRTOS V8.0.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -97,21 +97,25 @@ extern "C" {
 #define portDOUBLE      double
 #define portLONG        long
 #define portSHORT       short
-#define portSTACK_TYPE  unsigned portLONG
+#define portSTACK_TYPE  uint32_t
 #define portBASE_TYPE   portLONG
 
+typedef portSTACK_TYPE StackType_t;
+typedef long BaseType_t;
+typedef unsigned long UBaseType_t;
+
 #if( configUSE_16_BIT_TICKS == 1 )
-    typedef unsigned portSHORT portTickType;
-    #define portMAX_DELAY ( portTickType ) 0xffff
+    typedef uint16_t TickType_t;
+    #define portMAX_DELAY ( TickType_t ) 0xffff
 #else
-    typedef unsigned portLONG portTickType;
-    #define portMAX_DELAY ( portTickType ) 0xffffffff
+    typedef uint32_t TickType_t;
+    #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
 #endif
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH            ( -1 )
-#define portTICK_RATE_MS            ( ( portTickType ) 1000 / configTICK_RATE_HZ )
+#define portTICK_PERIOD_MS          ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT          8
 #define portNOP()                   __asm volatile ( "NOP" );
 /*-----------------------------------------------------------*/
@@ -129,7 +133,7 @@ extern "C" {
 #define portRESTORE_CONTEXT()                                           \
 {                                                                       \
 extern volatile void * volatile pxCurrentTCB;                           \
-extern volatile unsigned portLONG ulCriticalNesting;                    \
+extern volatile uint32_t ulCriticalNesting;                    \
                                                                         \
     /* Set the LR to the task stack. */                                 \
     __asm volatile (                                                    \
@@ -166,7 +170,7 @@ extern volatile unsigned portLONG ulCriticalNesting;                    \
 #define portSAVE_CONTEXT()                                              \
 {                                                                       \
 extern volatile void * volatile pxCurrentTCB;                           \
-extern volatile unsigned portLONG ulCriticalNesting;                    \
+extern volatile uint32_t ulCriticalNesting;                    \
                                                                         \
     /* Push R0 as we are going to use the register. */                  \
     __asm volatile (                                                    \

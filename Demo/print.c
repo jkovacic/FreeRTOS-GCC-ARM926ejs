@@ -49,15 +49,15 @@ limitations under the License.
 static portCHAR printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
-static unsigned portSHORT chBufCntr = 0;
+static uint16_t chBufCntr = 0;
 
 
 
 /* UART number: */
-static unsigned portSHORT printUartNr = (unsigned portSHORT) -1;
+static uint8_t printUartNr = (uint8_t) -1;
 
 /* Messages to be printed will be pushed to this queue */
-static xQueueHandle printQueue;
+static QueueHandle_t printQueue;
 
 
 
@@ -70,9 +70,9 @@ static xQueueHandle printQueue;
  *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-portSHORT printInit(unsigned portSHORT uart_nr)
+int16_t printInit(uint8_t uart_nr)
 {
-    unsigned portSHORT i;
+    uint16_t i;
 
     /*
      * Initialize the character print buffer.

@@ -56,10 +56,11 @@ APP_SRC = Demo/
 # Due to a large number, the .o files are arranged into logical groups:
 
 FREERTOS_OBJS = queue.o list.o tasks.o
-# The following two o. files are only necessary if
+# The following o. files are only necessary if
 # certain options are enabled in FreeRTOSConfig.h
 #FREERTOS_OBJS += timers.o
 #FREERTOS_OBJS += croutine.o
+#FREERTOS_OBJS += event_groups.o
 
 # Only one memory management .o file must be uncommented!
 FREERTOS_MEMMANG_OBJS = heap_1.o
@@ -132,6 +133,9 @@ $(OBJDIR)timers.o : $(FREERTOS_SRC)timers.c
 	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)croutine.o : $(FREERTOS_SRC)croutine.c
+	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+
+$(OBJDIR)event_groups.o : $(FREERTOS_SRC)event_groups.c
 	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
 
 

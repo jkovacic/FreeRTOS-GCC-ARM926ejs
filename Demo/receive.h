@@ -27,7 +27,7 @@ limitations under the License.
 
 #include <FreeRTOS.h>
 
-portSHORT recvInit(unsigned portSHORT uart_nr);
+int16_t recvInit(uint8_t uart_nr);
 
 void recvTask(void* params);
 

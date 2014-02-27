@@ -56,16 +56,16 @@ limitations under the License.
 static portCHAR buf[ RECV_BUFFER_SIZE ][ RECV_TOTAL_BUFFER_LEN ];
 
 /* Position of the currently available slot in the buffer */
-static unsigned portSHORT bufCntr = 0;
+static uint16_t bufCntr = 0;
 
 /* Position of the current character within the buffer */
-static unsigned  portSHORT bufPos = 0;
+static uint16_t bufPos = 0;
 
 /* UART number: */
-static unsigned portSHORT recvUartNr = (unsigned portSHORT) -1;
+static uint8_t recvUartNr = ( uint8_t ) -1;
 
 /* A queue for received characters, not processed yet */
-static xQueueHandle recvQueue;
+static QueueHandle_t recvQueue;
 
 
 /* forward declaration of an ISR handler: */
@@ -80,14 +80,14 @@ static void recvIsrHandler(void);
  *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-portSHORT recvInit(unsigned portSHORT uart_nr)
+int16_t recvInit(uint8_t uart_nr)
 {
     /* Obtain the UART's IRQ from BSP */
-    const unsigned portSHORT uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
-    const unsigned portSHORT irq = ( uart_nr<BSP_NR_UARTS ?
-                                     uartIrqs[uart_nr] :
-                                     (unsigned portSHORT) -1 );
-    unsigned portSHORT i;
+    const uint8_t uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
+    const uint8_t irq = ( uart_nr<BSP_NR_UARTS ?
+                             uartIrqs[uart_nr] :
+                             (uint8_t) -1 );
+    uint16_t i;
 
     for ( i=0; i<RECV_BUFFER_SIZE; ++i )
     {
