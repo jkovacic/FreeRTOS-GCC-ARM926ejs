@@ -25,6 +25,7 @@ limitations under the License.
 
 #include <FreeRTOS.h>
 #include <queue.h>
+#include <task.h>
 
 #include "app_config.h"
 #include "bsp.h"
@@ -306,4 +307,7 @@ void recvTask(void* params)
 
     /* if it ever breaks out of the infinite loop... */
     vTaskDelete(NULL);
+
+    /* suppress a warning since 'params' is ignored */
+    (void) params;
 }

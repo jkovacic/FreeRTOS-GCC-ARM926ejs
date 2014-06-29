@@ -33,6 +33,16 @@ limitations under the License.
 #include "receive.h"
 
 
+/*
+ * This diagnostic pragma will suppress the -Wmain warning,
+ * raised when main() does not return an int
+ * (which is perfectly OK in bare metal programming!).
+ *
+ * More details about the GCC diagnostic pragmas:
+ * https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+ */
+#pragma GCC diagnostic ignored "-Wmain"
+
 
 /* Struct with settings for each task */
 typedef struct _paramStruct

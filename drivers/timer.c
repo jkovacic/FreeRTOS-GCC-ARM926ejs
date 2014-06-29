@@ -98,7 +98,7 @@ typedef struct _ARM926EJS_TIMER_REGS
     const uint32_t Reserved1[944];            /* Reserved for future expansion, should not be modified */
     uint32_t ITCR;                            /* Integration Test Control Register */
     uint32_t ITOP;                            /* Integration Test Output Set Register, write only */
-    const Reserved2[54];                      /* Reserved for future expansion, should not be modified */
+    const uint32_t Reserved2[54];             /* Reserved for future expansion, should not be modified */
     const uint32_t PERIPHID[4];               /* Timer Peripheral ID, read only */
     const uint32_t CELLID[4];                 /* PrimeCell ID, read only */
 } ARM926EJS_TIMER_REGS;

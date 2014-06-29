@@ -70,7 +70,7 @@ void* memset(void* ptr, int value, size_t num )
      * If destination block exceeds the range of 'size_t',
      * decrease 'num' accordingly.
      */
-    if ( num > ((unsigned char*) SIZE_T_MAX - p) )
+    if ( num > (size_t) ((unsigned char*) SIZE_T_MAX - p) )
     {
         n = (unsigned char*) SIZE_T_MAX - p;
         /* TODO or maybe just goto endf???? */
@@ -132,8 +132,8 @@ void* memcpy(void* destination, const void* source, size_t num )
      * If any block exceeds the range of 'size_t',
      * decrease 'num' accordingly.
      */
-    if ( num>((unsigned char*) SIZE_T_MAX-destptr) ||
-         num>((unsigned char*) SIZE_T_MAX-srcptr) )
+    if ( num > (size_t) ((unsigned char*) SIZE_T_MAX-destptr) ||
+         num > (size_t) ((unsigned char*) SIZE_T_MAX-srcptr) )
     {
         n = minval((unsigned char*) SIZE_T_MAX-destptr,
                    (unsigned char*) SIZE_T_MAX-srcptr);

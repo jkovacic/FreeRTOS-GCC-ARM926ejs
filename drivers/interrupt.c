@@ -510,7 +510,7 @@ int8_t pic_registerIrq(
                         pVectoredIsrPrototype addr,
                         uint8_t priority )
 {
-    const prior = priority & PIC_MAX_PRIORITY;
+    const uint8_t prior = priority & PIC_MAX_PRIORITY;
     int8_t irqPos = -1;
     int8_t prPos = -1;
     int8_t i;
@@ -609,16 +609,8 @@ int8_t pic_registerIrq(
     /* if prPos<16 also update the appropriate vector registers */
     if ( prPos < NR_VECTORS )
     {
-        if ( irq >= 0 )
-        {
-            pPicReg->VICVECTCNTLn[prPos] = irq | BM_VECT_ENABLE_BIT;
-            pPicReg->VICVECTADDRn[prPos] = (uint32_t) addr;
-        }
-        else
-        {
-            pPicReg->VICVECTCNTLn[prPos] = UL0;
-            pPicReg->VICVECTADDRn[prPos] = (uint32_t) &__irq_dummyISR;
-        }
+        pPicReg->VICVECTCNTLn[prPos] = irq | BM_VECT_ENABLE_BIT;
+        pPicReg->VICVECTADDRn[prPos] = (uint32_t) addr;
     }
 
     return prPos;

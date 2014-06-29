@@ -32,7 +32,7 @@ AR = $(TOOLCHAIN)ar
 
 INCLUDEFLAG = -I
 CPUFLAG = -mcpu=arm926ej-s
-WFLAG = 
+WFLAG = -Wall -Wextra -Werror
 CFLAGS = $(CPUFLAG) $(WFLAG)
 
 # Additional C compiler flags to produce debugging symbols

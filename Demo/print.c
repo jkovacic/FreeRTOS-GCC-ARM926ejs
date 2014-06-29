@@ -22,6 +22,7 @@ limitations under the License.
  */
 
 #include <FreeRTOS.h>
+#include <task.h>
 #include <queue.h>
 
 #include "app_config.h"
@@ -128,6 +129,9 @@ void printGateKeeperTask(void* params)
 
     /* if it ever breaks out of the infinite loop... */
     vTaskDelete(NULL);
+
+    /* suppress a warning since 'params' is ignored */
+    (void) params;
 }
 
 

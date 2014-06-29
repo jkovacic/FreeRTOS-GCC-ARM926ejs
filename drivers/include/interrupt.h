@@ -37,6 +37,9 @@ limitations under the License.
  */
 typedef void (*pVectoredIsrPrototype)(void);
 
+void irq_enableIrqMode(void);
+
+void irq_disableIrqMode(void);
 
 void pic_init(void);
 
