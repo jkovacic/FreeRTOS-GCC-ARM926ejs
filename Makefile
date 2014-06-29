@@ -13,6 +13,10 @@
 # limitations under the License.
 
 
+#
+# Type "make help" for more details.
+#
+
 
 # Version 2013-05.23 of the Sourcery toolchain is used as a build tool.
 # See comments in "setenv.sh" for more details about downloading it
@@ -28,6 +32,11 @@ AR = $(TOOLCHAIN)ar
 
 INCLUDEFLAG = -I
 CPUFLAG = -mcpu=arm926ej-s
+WFLAG = 
+CFLAGS = $(CPUFLAG) $(WFLAG)
+
+# Additional C compiler flags to produce debugging symbols
+DEB_FLAG = -g -DDEBUG
 
 
 # Compiler/target path in FreeRTOS/Source/portable
@@ -82,7 +91,7 @@ OBJS = $(addprefix $(OBJDIR), $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG
 
 # Definition of the linker script and final targets
 LINKER_SCRIPT = $(addprefix $(APP_SRC), qemu.ld)
-ELF_IMAGE = $(addprefix $(OBJDIR), image.elf)
+ELF_IMAGE = image.elf
 TARGET = image.bin
 
 # Include paths to be passed to $(CC) where necessary
@@ -114,6 +123,16 @@ $(OBJDIR) :
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 	$(LD) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@
 
+debug : _debug_flags all
+
+debug_rebuild : _debug_flags rebuild
+
+_debug_flags :
+	$(eval CFLAGS += $(DEB_FLAG))
+
+
+# Startup code, implemented in assembler
+
 $(OBJDIR)startup.o : $(APP_SRC)startup.s
 	$(AS) $(CPUFLAG) $< -o $@
 
@@ -121,85 +140,103 @@ $(OBJDIR)startup.o : $(APP_SRC)startup.s
 # FreeRTOS core
 
 $(OBJDIR)queue.o : $(FREERTOS_SRC)queue.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)list.o : $(FREERTOS_SRC)list.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)tasks.o : $(FREERTOS_SRC)tasks.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)timers.o : $(FREERTOS_SRC)timers.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)croutine.o : $(FREERTOS_SRC)croutine.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)event_groups.o : $(FREERTOS_SRC)event_groups.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
 
 $(OBJDIR)port.o : $(FREERTOS_PORT_SRC)port.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)portISR.o : $(FREERTOS_PORT_SRC)portISR.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
 
 $(OBJDIR)heap_1.o : $(FREERTOS_MEMMANG_SRC)heap_1.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)heap_2.o : $(FREERTOS_MEMMANG_SRC)heap_2.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)heap_3.o : $(FREERTOS_MEMMANG_SRC)heap_3.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)heap_4.o : $(FREERTOS_MEMMANG_SRC)heap_4.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 
 # Drivers
 
 $(OBJDIR)timer.o : $(DRIVERS_SRC)timer.c $(DEP_BSP)
-	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)interrupt.o : $(DRIVERS_SRC)interrupt.c $(DEP_BSP)
-	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)uart.o : $(DRIVERS_SRC)uart.c $(DEP_BSP)
-	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 # Demo application
 
 $(OBJDIR)main.o : $(APP_SRC)main.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
 $(OBJDIR)init.o : $(APP_SRC)init.c $(DEP_BSP)
-	$(CC) -c $(CPUFLAG) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)print.o : $(APP_SRC)print.c
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
-	$(CC) -c $(CPUFLAG) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
 
 $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
-	$(CC) -c $(CPUFLAG) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 
 # Cleanup directives:
 
-clean_intermediate :
-	rm -rf $(OBJDIR)
+clean_obj :
+	$(RM) -r $(OBJDIR)
+
+clean_intermediate : clean_obj
+	$(RM) *.elf
+	$(RM) *.img
 
 clean : clean_intermediate
-	rm -f *.bin
-	rm -f *.img
+	$(RM) *.bin
 
-.PHONY : all rebuild clean clean_intermediate
+# Short help instructions:
+
+help :
+	@echo
+	@echo Valid targets:
+	@echo - all: builds missing dependencies and creates the target image \'$(TARGET)\'.
+	@echo - rebuild: rebuilds all dependencies and creates the target image \'$(TARGET)\'.
+	@echo - debug: same as \'all\', also includes debugging symbols to \'$(ELF_IMAGE)\'.
+	@echo - debug_rebuild: same as \'rebuild\', also includes debugging symbols to \'$(ELF_IMAGE)\'.
+	@echo - clean_obj: deletes all object files, only keeps \'$(ELF_IMAGE)\' and \'$(TARGET)\'.
+	@echo - clean_intermediate: deletes all intermediate binaries, only keeps the target image \'$(TARGET)\'.
+	@echo - clean: deletes all intermediate binaries, incl. the target image \'$(TARGET)\'.
+	@echo - help: displays these help instructions.
+	@echo
+
+.PHONY : all rebuild clean clean_obj clean_intermediate debug debug_rebuild _debug_flags help
