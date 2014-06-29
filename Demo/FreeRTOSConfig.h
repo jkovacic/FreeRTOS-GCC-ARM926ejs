@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.0.0 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd. 
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -24,10 +24,10 @@
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
 
-    >>! NOTE: The modification to the GPL is included to allow you to distribute
-    >>! a combined work that includes FreeRTOS without being obliged to provide
-    >>! the source code for proprietary components outside of the FreeRTOS
-    >>! kernel.
+    >>!   NOTE: The modification to the GPL is included to allow you to     !<<
+    >>!   distribute a combined work that includes FreeRTOS without being   !<<
+    >>!   obliged to provide the source code for proprietary components     !<<
+    >>!   outside of the FreeRTOS kernel.                                   !<<
 
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -82,10 +82,10 @@
 #define configUSE_IDLE_HOOK               0
 #define configUSE_TICK_HOOK               0
 /* Timers' clock frequency is 1 MHz: */
-#define configCPU_CLOCK_HZ                ( ( unsigned portLONG ) 1000000 )
-#define configTICK_RATE_HZ                ( ( portTickType ) 1000 )
-#define configMAX_PRIORITIES              ( ( unsigned portBASE_TYPE ) 5 )
-#define configMINIMAL_STACK_SIZE          ( ( unsigned portSHORT ) 128 )
+#define configCPU_CLOCK_HZ                ( ( UBaseType_t) 1000000 )
+#define configTICK_RATE_HZ                ( ( TickType_t ) 1000 )
+#define configMAX_PRIORITIES              ( ( UBaseType_t ) 5 )
+#define configMINIMAL_STACK_SIZE          ( ( portSTACK_TYPE ) 128 )
 #define configTOTAL_HEAP_SIZE             ( ( size_t ) ( 20480 ) )
 #define configMAX_TASK_NAME_LEN           ( 16 )
 #define configUSE_TRACE_FACILITY          0
