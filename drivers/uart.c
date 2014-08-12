@@ -34,6 +34,7 @@ limitations under the License.
 #include <stddef.h>
 #include <stdbool.h>
 
+#include "regutil.h"
 #include "bsp.h"
 
 
@@ -206,10 +207,10 @@ void uart_init(uint8_t nr)
      * Whatever the current state, as suggested on page 3-16 of the DDI0183, the UART
      * should be disabled first:
      */
-    pReg[nr]->UARTCR &= ~CTL_UARTEN;
+    HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 
     /* Set Control Register's TXE to 1: */
-    pReg[nr]->UARTCR |= CTL_TXE;
+    HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_TXE );
 
     /*
      * Set all other bits (except UARTEN) of the Control Register to 0:
@@ -224,20 +225,20 @@ void uart_init(uint8_t nr)
      * - RTSEn
      * - CTSEn
      */
-     pReg[nr]->UARTCR &= ( ~CTL_SIREN & ~CTL_SIRLP & ~CTL_LBE & ~CTL_RXE & ~CTL_DTR );
-     pReg[nr]->UARTCR &= ( ~CTL_RTS & ~CTL_OUT1 & ~CTL_OUT2 & ~CTL_RTSEn & ~CTL_CTSEn );
+    HWREG_CLEAR_BITS( pReg[nr]->UARTCR, (CTL_SIREN | CTL_SIRLP | CTL_LBE | CTL_RXE | CTL_DTR) );
+    HWREG_CLEAR_BITS( pReg[nr]->UARTCR, ( CTL_RTS | CTL_OUT1 | CTL_OUT2 | CTL_RTSEn | CTL_CTSEn ) );
 
 
-     /* By default, all interrupts are masked out (i.e. cleared to 0): */
-     pReg[nr]->UARTIMSC &= ( ~INT_RIMIM & ~INT_CTSMIM & ~INT_DCDMIM & ~INT_DSRMIM & ~INT_RXIM & ~INT_TXIM );
-     pReg[nr]->UARTIMSC &= ( ~INT_RTIM & ~INT_FEIM & ~INT_PEIM & ~INT_BEIM & ~INT_OEIM );
+    /* By default, all interrupts are masked out (i.e. cleared to 0): */
+    HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, ( INT_RIMIM | INT_CTSMIM | INT_DCDMIM | INT_DSRMIM | INT_RXIM | INT_TXIM ) );
+    HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, ( INT_RTIM | INT_FEIM | INT_PEIM | INT_BEIM | INT_OEIM ) );
 
-     /* TODO: line control... */
+    /* TODO: line control... */
 
-     /* Finally enable the UART: */
-     pReg[nr]->UARTCR |= CTL_UARTEN;
+    /* Finally enable the UART: */
+    HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 
-     /* reserved bits remained unmodified */
+    /* reserved bits remained unmodified */
 }
 
 
@@ -265,7 +266,7 @@ static inline void __printCh(uint8_t nr, char ch)
     * In this case, wait until some "waiting" characters have been transmitted and
     * the TXFF is set to 0, indicating the Transmit FIFO can accept additional characters.
     */
-   while ( pReg[nr]->UARTFR & FR_TXFF );
+   while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_TXFF ) );
 
    /*
     * The Data Register is a 32-bit word, however only the least significant 8 bits
@@ -355,7 +356,7 @@ void uart_enableUart(uint8_t nr)
         return;
     }
 
-    pReg[nr]->UARTCR |= CTL_UARTEN;
+    HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
 
 
@@ -374,7 +375,7 @@ void uart_disableUart(uint8_t nr)
         return;
     }
 
-    pReg[nr]->UARTCR &= ~CTL_UARTEN;
+    HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
 
 
@@ -399,30 +400,30 @@ static inline void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
     }
 
     /* Store UART's enable status (UARTEN) */
-    enabled = pReg[nr]->UARTCR & CTL_UARTEN;
+    enabled = HWREG_READ_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 
     /*
      * As suggested on page 3-16 of the DDI0183, the UART should be disabled
      * prior to any modification of the Control Register
      */
-    pReg[nr]->UARTCR &= ~CTL_UARTEN;
+    HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 
     /* Depending on 'set'... */
     if (set)
     {
         /* Set bitmask's bits to 1 using bitwise OR */
-        pReg[nr]->UARTCR |= bitmask;
+        HWREG_SET_BITS( pReg[nr]->UARTCR, bitmask );
     }
     else
     {
         /* Clear bitmask's bits to 0 using bitwise AND */
-        pReg[nr]->UARTCR &= ~bitmask;
+        HWREG_CLEAR_BITS( pReg[nr]->UARTCR, bitmask );
     }
 
     /* Reenable the UART if it was been enabled before */
     if (enabled)
     {
-        pReg[nr]->UARTCR |= CTL_UARTEN;
+        HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
     }
 }
 
@@ -499,7 +500,7 @@ void uart_enableRxInterrupt(uint8_t nr)
     }
 
     /* Set bit 4 of the IMSC register: */
-    pReg[nr]->UARTIMSC |= INT_RXIM;
+    HWREG_SET_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
 }
 
 
@@ -519,7 +520,7 @@ void uart_disableRxInterrupt(uint8_t nr)
     }
 
     /* Clear bit 4 of the IMSC register: */
-    pReg[nr]->UARTIMSC &= ~INT_RXIM;
+    HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
 }
 
 
@@ -568,7 +569,7 @@ char uart_readChar(uint8_t nr)
     }
 
     /* Wait until the receiving FIFO is not empty */
-    while ( pReg[nr]->UARTFR & FR_RXFE );
+    while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_RXFE ) );
 
     /*
      * UART DR is a 32-bit register and only the least significant byte must be returned.

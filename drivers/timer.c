@@ -39,6 +39,7 @@ limitations under the License.
 #include <stdint.h>
 #include <stddef.h>
 
+#include "regutil.h"
 #include "bsp.h"
 
 
@@ -154,7 +155,7 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
      * - counter length (32-bit)
      */
 
-    pReg[timerNr]->CNTR[counterNr].CONTROL |= ( CTL_MODE | CTL_CTRLEN );
+    HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, ( CTL_MODE | CTL_CTRLEN ) );
 
     /*
      * The following bits are will be to 0:
@@ -164,8 +165,8 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
      * - oneshot bit (wrapping mode)
      */
 
-    pReg[timerNr]->CNTR[counterNr].CONTROL &=
-            ( ~CTL_ENABLE & ~CTL_INTR & ~CTL_PRESCALE_1 & ~CTL_PRESCALE_2 & ~CTL_ONESHOT );
+    HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL,
+    		( CTL_ENABLE | CTL_INTR | CTL_PRESCALE_1 | CTL_PRESCALE_2 | CTL_ONESHOT ) );
 
     /* reserved bits remained unmodified */
 }
@@ -189,7 +190,7 @@ void timer_start(uint8_t timerNr, uint8_t counterNr)
     }
 
     /* Set bit 7 of the Control Register to 1, do not modify other bits */
-    pReg[timerNr]->CNTR[counterNr].CONTROL |= CTL_ENABLE;
+    HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
 }
 
 
@@ -211,7 +212,7 @@ void timer_stop(uint8_t timerNr, uint8_t counterNr)
     }
 
     /* Set bit 7 of the Control Register to 0, do not modify other bits */
-    pReg[timerNr]->CNTR[counterNr].CONTROL &= ~CTL_ENABLE;
+    HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
 }
 
 
@@ -239,7 +240,7 @@ int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
     }
 
     /* just check the enable bit of the timer's Control Register */
-    return ( 0==(pReg[timerNr]->CNTR[counterNr].CONTROL & CTL_ENABLE) ? 0 : 1 );
+    return ( 0!=HWREG_READ_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE ) );
 }
 
 
@@ -261,7 +262,7 @@ void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
     }
 
     /* Set bit 5 of the Control Register to 1, do not modify other bits */
-    pReg[timerNr]->CNTR[counterNr].CONTROL |= CTL_INTR;
+    HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
 }
 
 
@@ -283,7 +284,7 @@ void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
     }
 
     /* Set bit 5 of the Control Register to 0, do not modify other bits */
-    pReg[timerNr]->CNTR[counterNr].CONTROL &= ~CTL_INTR;
+    HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
 }
 
 

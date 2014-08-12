@@ -44,6 +44,7 @@ limitations under the License.
 #include <stdint.h>
 #include <stddef.h>
 
+#include "regutil.h"
 #include "bsp.h"
 
 /* For public definitions of types: */
@@ -124,7 +125,6 @@ typedef struct _ARM926EJS_SIC_REGS
 #endif /* if 0 */
 
 
-#define UL1                    ( 0x00000001 )
 #define UL0                    ( 0x00000000 )
 #define ULFF                   ( 0xFFFFFFFF )
 #define BM_IRQ_PART            ( 0x0000001F )
@@ -227,9 +227,9 @@ static void __defaultVectorIsr(void)
      */
     for ( cntr=NR_VECTORS; cntr<NR_INTERRUPTS; ++cntr )
     {
-        if ( __irqVect[cntr].irq>=0 &&
-             __irqVect[cntr].irq<NR_INTERRUPTS &&
-             ( pPicReg->VICINTENABLE & (UL1 << __irqVect[cntr].irq) ) )
+        if ( __irqVect[cntr].irq >= 0 &&
+             __irqVect[cntr].irq < NR_INTERRUPTS &&
+             0 != HWREG_READ_SINGLE_BIT(pPicReg->VICINTENABLE, __irqVect[cntr].irq ) )
         {
             ( *__irqVect[cntr].isr )();
             break;  /* out of for cntr */
@@ -346,7 +346,7 @@ void pic_enableInterrupt(uint8_t irq)
     if ( irq < NR_INTERRUPTS )
     {
         /* See description of VICINTENABLE, page 3-7 of DDI0181: */
-        pPicReg->VICINTENABLE |= ( UL1 << irq );
+        HWREG_SET_SINGLE_BIT(pPicReg->VICINTENABLE, irq);
 
         /* Only the bit for the requested interrupt source is modified. */
     }
@@ -374,7 +374,7 @@ void pic_disableInterrupt(uint8_t irq)
          *
          * For more details, see description of VICINTENCLEAR on page 3-7 of DDI0181.
          */
-        pPicReg->VICINTENCLEAR = ( UL1 << irq );
+        pPicReg->VICINTENCLEAR = HWREG_SINGLE_BIT_MASK(irq);
     }
 }
 
@@ -405,7 +405,7 @@ int8_t pic_isInterruptEnabled(uint8_t irq)
 {
     /* See description of VICINTENCLEAR, page 3-7 of DDI0181: */
 
-    return ( irq<NR_INTERRUPTS && (pPicReg->VICINTENABLE & (UL1<<irq)) ? 1 : 0 );
+    return ( irq<NR_INTERRUPTS && (0!=HWREG_READ_SINGLE_BIT(pPicReg->VICINTENABLE, irq)) );
 }
 
 
@@ -427,7 +427,7 @@ int8_t pic_getInterruptType(uint8_t irq)
      * otherwise it is IRQ.
      */
 
-    return ( irq<NR_INTERRUPTS && 0==(pPicReg->VICINTSELECT & UL1<<irq) ? 1 : 0 );
+	return ( irq<NR_INTERRUPTS && 0==HWREG_READ_SINGLE_BIT(pPicReg->VICINTSELECT, irq) );
 }
 
 
@@ -454,12 +454,12 @@ void pic_setInterruptType(uint8_t irq, int8_t toIrq)
         if ( 0 != toIrq )
         {
             /* Set the corresponding bit to 0 by bitwise and'ing bitmask's zero complement */
-            pPicReg->VICINTSELECT &= ~(UL1 << irq);
+            HWREG_CLEAR_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
         }
         else
         {
             /* Set the corresponding bit to 1 by bitwise or'ing the bitmask */
-            pPicReg->VICINTSELECT |= (UL1 << irq);
+            HWREG_SET_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
         }
     }
 }
@@ -737,7 +737,7 @@ int8_t pic_setSwInterruptNr(uint8_t irq)
      * See description of the register on page 3-8 of DDI0181.
      */
 
-    pPicReg->VICSOFTINT |= ( UL1 << irq );
+    HWREG_SET_SINGLE_BIT( pPicReg->VICSOFTINT, irq );
 
     return irq;
 }
@@ -771,13 +771,13 @@ int8_t pic_clearSwInterruptNr(uint8_t irq)
      * See description of the register on page 3-8 of DDI0181.
      */
 
-     bitmask = UL1 << irq;
+     bitmask = HWREG_SINGLE_BIT_MASK(irq);
 
      /*
       * Before the interrupt is cleared it is checked whether it is active.
       * TODO: should VICIRQSTATUS and VICFIQSTATUS be check instead of VICRAWINTR?
       */
-     if ( pPicReg->VICRAWINTR & bitmask )
+     if ( 0 != HWREG_READ_BITS( pPicReg->VICRAWINTR, bitmask ) )
      {
          /* The interrupt is active, clear it
           * * The register is write only and should not be read. Only 1-bits clear
