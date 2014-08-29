@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd. 
+    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -123,5 +123,12 @@ priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY     15
+
+/*
+ * From version 8.1.0, the default setting for this is 1.
+ * As this is not supported for this processor (yet),
+ * set it back to 0 .
+ */
+#define configUSE_PORT_OPTIMISED_TASK_SELECTION   0
 
 #endif /* FREERTOS_CONFIG_H */

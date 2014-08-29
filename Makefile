@@ -182,6 +182,9 @@ $(OBJDIR)heap_3.o : $(FREERTOS_MEMMANG_SRC)heap_3.c
 $(OBJDIR)heap_4.o : $(FREERTOS_MEMMANG_SRC)heap_4.c
 	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
 
+$(OBJDIR)heap_5.o : $(FREERTOS_MEMMANG_SRC)heap_5.c
+	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+
 
 # Drivers
 

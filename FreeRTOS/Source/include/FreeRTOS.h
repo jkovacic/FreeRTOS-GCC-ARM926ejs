@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -90,16 +90,16 @@
 extern "C" {
 #endif
 
-/* Basic FreeRTOS definitions. */
-#include "projdefs.h"
-
 /* Application specific configuration options. */
 #include "FreeRTOSConfig.h"
+
+/* Basic FreeRTOS definitions. */
+#include "projdefs.h"
 
 /* configUSE_PORT_OPTIMISED_TASK_SELECTION must be defined before portable.h
 is included as it is used by the port layer. */
 #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
-	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
+	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 #endif
 
 /* Definitions specific to the port being used. */
@@ -609,7 +609,7 @@ is included as it is used by the port layer. */
 
 #ifndef tracePEND_FUNC_CALL_FROM_ISR
 	#define tracePEND_FUNC_CALL_FROM_ISR(xFunctionToPend, pvParameter1, ulParameter2, ret)
-#endif 
+#endif
 
 #ifndef traceQUEUE_REGISTRY_ADD
 	#define traceQUEUE_REGISTRY_ADD(xQueue, pcQueueName)
@@ -715,6 +715,10 @@ is included as it is used by the port layer. */
 
 #ifndef mtCOVERAGE_TEST_MARKER
 	#define mtCOVERAGE_TEST_MARKER()
+#endif
+
+#ifndef portASSERT_IF_IN_ISR
+	#define portASSERT_IF_IN_ISR()
 #endif
 
 /* Definitions to allow backward compatibility with FreeRTOS versions prior to

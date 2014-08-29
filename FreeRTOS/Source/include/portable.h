@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -322,7 +322,7 @@ to find the path to the correct portmacro.h file. */
 #endif
 
 #if portBYTE_ALIGNMENT == 8
-	#define portBYTE_ALIGNMENT_MASK ( 0x0007 )
+	#define portBYTE_ALIGNMENT_MASK ( 0x0007U )
 #endif
 
 #if portBYTE_ALIGNMENT == 4
@@ -362,6 +362,27 @@ extern "C" {
 #else
 	StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters ) PRIVILEGED_FUNCTION;
 #endif
+
+/* Used by heap_5.c. */
+typedef struct HeapRegion
+{
+	uint8_t *pucStartAddress;
+	size_t xSizeInBytes;
+} HeapRegion_t;
+
+/* 
+ * Used to define multiple heap regions for use by heap_5.c.  This function
+ * must be called before any calls to pvPortMalloc() - not creating a task,
+ * queue, semaphore, mutex, software timer, event group, etc. will result in
+ * pvPortMalloc being called.
+ *
+ * pxHeapRegions passes in an array of HeapRegion_t structures - each of which
+ * defines a region of memory that can be used as the heap.  The array is 
+ * terminated by a HeapRegions_t structure that has a size of 0.  The region 
+ * with the lowest start address must appear first in the array.
+ */
+void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions );
+
 
 /*
  * Map to the memory management routines required for the port.

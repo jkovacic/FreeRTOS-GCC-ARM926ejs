@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.0.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -71,6 +71,9 @@
  * file to ensure the type is known before portable.h is included.
  */
 typedef void (*TaskFunction_t)( void * );
+
+/* Converts a time in milliseconds to a time in ticks. */
+#define pdMS_TO_TICKS( xTimeInMs ) ( ( ( TickType_t ) xTimeInMs * configTICK_RATE_HZ ) / ( TickType_t ) 1000 )
 
 #define pdFALSE			( ( BaseType_t ) 0 )
 #define pdTRUE			( ( BaseType_t ) 1 )
