@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.1 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -81,10 +81,10 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V8.1.0"
+#define tskKERNEL_VERSION_NUMBER "V8.1.1"
 #define tskKERNEL_VERSION_MAJOR 8
 #define tskKERNEL_VERSION_MINOR 1
-#define tskKERNEL_VERSION_BUILD 0
+#define tskKERNEL_VERSION_BUILD 1
 
 /**
  * task. h
@@ -1554,12 +1554,9 @@ eSleepModeStatus eTaskConfirmSleepModeStatus( void ) PRIVILEGED_FUNCTION;
 
 /*
  * For internal use only.  Increment the mutex held count when a mutex is
- * taken and decrement the mutex held count when the mutex is given back
- * respectively.  The mutex held count is used to know when it is safe to
- * disinherit a priority.
+ * taken and return the handle of the task that has taken the mutex.
  */
-void vTaskIncrementMutexHeldCount( void );
-void vTaskDecrementMutexHeldCount( void );
+void *pvTaskIncrementMutexHeldCount( void );
 
 #ifdef __cplusplus
 }

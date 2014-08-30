@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.1.0 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.1 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -144,7 +144,7 @@ const TickType_t xValueOfInsertion = pxNewListItem->xItemValue;
 			   see http://www.freertos.org/Stacks-and-stack-overflow-checking.html
 			2) Incorrect interrupt priority assignment, especially on Cortex-M3
 			   parts where numerically high priority values denote low actual
-			   interrupt priories, which can seem counter intuitive.  See
+			   interrupt priorities, which can seem counter intuitive.  See
 			   configMAX_SYSCALL_INTERRUPT_PRIORITY on http://www.freertos.org/a00110.html
 			3) Calling an API function from within a critical section or when
 			   the scheduler is suspended, or calling an API function that does
