@@ -591,7 +591,7 @@ TickType_t xTimeNow;
 		{
 			/* Negative commands are pended function calls rather than timer
 			commands. */
-			if( xMessage.xMessageID < 0 )
+			if( xMessage.xMessageID < ( BaseType_t ) 0 )
 			{
 				const CallbackParameters_t * const pxCallback = &( xMessage.u.xCallbackParameters );
 
