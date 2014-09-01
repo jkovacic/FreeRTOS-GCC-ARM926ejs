@@ -48,16 +48,16 @@ if [ "$IMAGE_FILE" = '' ]; then
 fi
 
 # NOTE:
-# The version of Qemu (1.0), delivered with my distribution of Linux, does not emulate the
-# PL190 (vector interrupt controller) properly. For that reason I have built a more recent
-# version of Qemu (1.6) and "installed" it into my home directory under ~/qemu.
-# This directory is not in my PATH, so I provide the full path in QEMUBIN.
-#
-# If this bug is already fixed in your version of Qemu, you may simply uncomment the 
-# first definition of QEMUBIN and comment out the second one. Otherwise just adjust the
-# second definition according to your setup.
+# Qemu version 1.3 or newer is required as previous versions of Qemu do not
+# emulate the the PL190 (vector interrupt controller) properly. Most
+# Linux distributions should include quite a recent version of Qemu.
+# If this is not the case (e.g. if you use Debian), you should build
+# a more recent version of Qemu yourself (it is sufficient to build only
+# the ARM emulator) and modify the QEMUBIN variable below to the full path
+# to your binary "qemu-system-arm". The commneted example below assumes you
+# have "installed" it to your home directory under ~/qemu.
 
-#QEMUBIN=qemu-system-arm
-QEMUBIN=~/qemu/bin/qemu-system-arm
+QEMUBIN=qemu-system-arm
+#QEMUBIN=~/qemu/bin/qemu-system-arm
 
 $QEMUBIN -M versatilepb -nographic -m 128 -kernel $IMAGE_FILE $QEMU_GDB_ARG
