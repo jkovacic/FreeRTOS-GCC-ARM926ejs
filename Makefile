@@ -18,7 +18,7 @@
 #
 
 
-# Version 2013-05.23 of the Sourcery toolchain is used as a build tool.
+# Version 2014-05.28 of the Sourcery toolchain is used as a build tool.
 # See comments in "setenv.sh" for more details about downloading it
 # and setting the appropriate environment variables.
 
