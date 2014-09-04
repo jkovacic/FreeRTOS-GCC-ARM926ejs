@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.1.1 - Copyright (C) 2014 Real Time Engineers Ltd.
+    FreeRTOS V8.1.2 - Copyright (C) 2014 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -1000,7 +1000,7 @@ TCB_t * pxNewTCB;
 		}
 
 		return eReturn;
-	}
+	} /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
 
 #endif /* INCLUDE_eTaskGetState */
 /*-----------------------------------------------------------*/
@@ -1728,7 +1728,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void )
 
 #if ( INCLUDE_pcTaskGetTaskName == 1 )
 
-	char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery )
+	char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 	{
 	TCB_t *pxTCB;
 
