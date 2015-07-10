@@ -30,6 +30,9 @@ LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
 AR = $(TOOLCHAIN)ar
 
+# GCC flags
+CFLAG = -c
+OFLAG = -o
 INCLUDEFLAG = -I
 CPUFLAG = -mcpu=arm926ej-s
 WFLAG = -Wall -Wextra -Werror
@@ -122,7 +125,7 @@ $(OBJDIR) :
 	mkdir -p $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
-	$(LD) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@
+	$(LD) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
 
 debug : _debug_flags all
 
@@ -135,85 +138,85 @@ _debug_flags :
 # Startup code, implemented in assembler
 
 $(OBJDIR)startup.o : $(APP_SRC)startup.s
-	$(AS) $(CPUFLAG) $< -o $@
+	$(AS) $(CPUFLAG) $< $(OFLAG) $@
 
 
 # FreeRTOS core
 
 $(OBJDIR)queue.o : $(FREERTOS_SRC)queue.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)list.o : $(FREERTOS_SRC)list.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)tasks.o : $(FREERTOS_SRC)tasks.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)timers.o : $(FREERTOS_SRC)timers.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)croutine.o : $(FREERTOS_SRC)croutine.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)event_groups.o : $(FREERTOS_SRC)event_groups.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
 
 $(OBJDIR)port.o : $(FREERTOS_PORT_SRC)port.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)portISR.o : $(FREERTOS_PORT_SRC)portISR.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
 
 $(OBJDIR)heap_1.o : $(FREERTOS_MEMMANG_SRC)heap_1.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)heap_2.o : $(FREERTOS_MEMMANG_SRC)heap_2.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)heap_3.o : $(FREERTOS_MEMMANG_SRC)heap_3.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)heap_4.o : $(FREERTOS_MEMMANG_SRC)heap_4.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)heap_5.o : $(FREERTOS_MEMMANG_SRC)heap_5.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 
 # Drivers
 
 $(OBJDIR)timer.o : $(DRIVERS_SRC)timer.c $(DEP_BSP)
-	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)interrupt.o : $(DRIVERS_SRC)interrupt.c $(DEP_BSP)
-	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)uart.o : $(DRIVERS_SRC)uart.c $(DEP_BSP)
-	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Demo application
 
 $(OBJDIR)main.o : $(APP_SRC)main.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)init.o : $(APP_SRC)init.c $(DEP_BSP)
-	$(CC) -c $(CFLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)print.o : $(APP_SRC)print.c
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
-	$(CC) -c $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
-	$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) $(CFLAG) $(CFLAGS) $< $(OFLAG) $@
 
 
 # Cleanup directives:
