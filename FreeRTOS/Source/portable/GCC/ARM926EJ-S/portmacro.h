@@ -10,7 +10,7 @@
  */
 
 /*
-    FreeRTOS V8.2.1 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -77,6 +77,7 @@
 
     1 tab == 4 spaces!
 */
+
 
 #ifndef PORTMACRO_H
 #define PORTMACRO_H

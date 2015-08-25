@@ -2,7 +2,7 @@
 [FreeRTOS](http://www.freertos.org/) ported to [ARM Versatile Platform Baseboard](http://infocenter.arm.com/help/topic/com.arm.doc.dui0225d/DUI0225D_versatile_application_baseboard_arm926ej_s_ug.pdf),
 based on the ARM926EJ-S CPU.
 
-The current version is based on FreeRTOS 8.2.1. The port will be regularly
+The current version is based on FreeRTOS 8.2.2. The port will be regularly
 updated with newer versions of FreeRTOS when they are released.
 
 The port is still at an early development stage and includes only very basic
@@ -40,7 +40,7 @@ The demo application will run infinitely so it must be stopped manually by
 "killing" the instance of Qemu (an "equivalent" to switching off the board).
 A convenience Bash script _stop\_qemu.sh_ (it must be run in another shell)
 is provided to automate the process. Note that it may not work properly if
-several instances of _qemu-system-arm_ are running.
+multiple instances of _qemu-system-arm_ are running.
 
 For more details, see extensive comments in both scripts.
 

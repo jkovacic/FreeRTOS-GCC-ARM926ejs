@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.1 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -615,6 +615,38 @@ extern "C" {
 
 #ifndef traceQUEUE_REGISTRY_ADD
 	#define traceQUEUE_REGISTRY_ADD(xQueue, pcQueueName)
+#endif
+
+#ifndef traceTASK_NOTIFY_TAKE_BLOCK
+	#define traceTASK_NOTIFY_TAKE_BLOCK()
+#endif
+
+#ifndef traceTASK_NOTIFY_TAKE
+	#define traceTASK_NOTIFY_TAKE()
+#endif
+
+#ifndef traceTASK_NOTIFY_WAIT_BLOCK
+	#define traceTASK_NOTIFY_WAIT_BLOCK()
+#endif
+
+#ifndef traceTASK_NOTIFY_WAIT
+	#define traceTASK_NOTIFY_WAIT()
+#endif
+
+#ifndef traceTASK_NOTIFY
+	#define traceTASK_NOTIFY()
+#endif
+
+#ifndef traceTASK_NOTIFY_FROM_ISR
+	#define traceTASK_NOTIFY_FROM_ISR()
+#endif
+
+#ifndef traceTASK_NOTIFY_GIVE_FROM_ISR
+	#define traceTASK_NOTIFY_GIVE_FROM_ISR()
+#endif
+
+#ifndef traceTASK_DELAY_SUSPEND
+	#define traceTASK_DELAY_SUSPEND( pxCurrentTCB )
 #endif
 
 #ifndef configGENERATE_RUN_TIME_STATS
