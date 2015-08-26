@@ -5,7 +5,7 @@
 #
 # This script sets PATH and C_INCLUDE_PATH. If you intend to link
 # the toolchain's libraries (e.g. libgcc.a), other variables
-# (e.g. LIBRARY_PATH) must be set a s well.
+# (e.g. LIBRARY_PATH) must be set as well.
 #
 # Make sure, you set the environment variables appropriately for your
 # setup. Typically, setting TOOLCHAIN only should be enough.
