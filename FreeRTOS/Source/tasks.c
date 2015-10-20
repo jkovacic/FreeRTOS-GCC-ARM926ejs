@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -8,7 +8,7 @@
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+    Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
 
     ***************************************************************************
     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
@@ -247,7 +247,7 @@ PRIVILEGED_DATA static volatile UBaseType_t uxPendedTicks 			= ( UBaseType_t ) 0
 PRIVILEGED_DATA static volatile BaseType_t xYieldPending 			= pdFALSE;
 PRIVILEGED_DATA static volatile BaseType_t xNumOfOverflows 			= ( BaseType_t ) 0;
 PRIVILEGED_DATA static UBaseType_t uxTaskNumber 					= ( UBaseType_t ) 0U;
-PRIVILEGED_DATA static volatile TickType_t xNextTaskUnblockTime		= ( TickType_t ) 0U; /* Initialised to portMAX_DELAY; before the scheduler starts. */
+PRIVILEGED_DATA static volatile TickType_t xNextTaskUnblockTime		= ( TickType_t ) 0U; /* Initialised to portMAX_DELAY before the scheduler starts. */
 
 /* Context switches are held pending while the scheduler is suspended.  Also,
 interrupts must not manipulate the xGenericListItem of a TCB, or any of the
@@ -2241,8 +2241,7 @@ void vTaskSwitchContext( void )
 		#endif /* configGENERATE_RUN_TIME_STATS */
 
 		/* Check for stack overflow, if configured. */
-		taskFIRST_CHECK_FOR_STACK_OVERFLOW();
-		taskSECOND_CHECK_FOR_STACK_OVERFLOW();
+		taskCHECK_FOR_STACK_OVERFLOW();
 
 		/* Select a new task to run using either the generic C or port
 		optimised asm code. */
@@ -2433,7 +2432,6 @@ TickType_t xTimeToWake;
 				/* Add the task to the suspended task list instead of a delayed
 				task list to ensure the task is not woken by a timing event.  It
 				will block indefinitely. */
-				traceTASK_DELAY_SUSPEND( pxCurrentTCB );
 				vListInsertEnd( &xSuspendedTaskList, &( pxCurrentTCB->xGenericListItem ) );
 			}
 			else
@@ -3582,7 +3580,6 @@ TCB_t *pxTCB;
 			{
 				portASSERT_IF_IN_ISR();
 			}
-
 		}
 		else
 		{
@@ -3630,14 +3627,14 @@ TCB_t *pxTCB;
 
 	static char *prvWriteNameToBuffer( char *pcBuffer, const char *pcTaskName )
 	{
-	BaseType_t x;
+	size_t x;
 
 		/* Start by copying the entire string. */
 		strcpy( pcBuffer, pcTaskName );
 
 		/* Pad the end of the string with spaces to ensure columns line up when
 		printed out. */
-		for( x = strlen( pcBuffer ); x < ( configMAX_TASK_NAME_LEN - 1 ); x++ )
+		for( x = strlen( pcBuffer ); x < ( size_t ) ( configMAX_TASK_NAME_LEN - 1 ); x++ )
 		{
 			pcBuffer[ x ] = ' ';
 		}
@@ -4080,7 +4077,7 @@ TickType_t uxReturn;
 					#endif /* INCLUDE_vTaskSuspend */
 
 					traceTASK_NOTIFY_WAIT_BLOCK();
-					
+
 					/* All ports are written to allow a yield in a critical
 					section (some will yield immediately, others wait until the
 					critical section exits) - but it is not something that
@@ -4102,7 +4099,7 @@ TickType_t uxReturn;
 		taskENTER_CRITICAL();
 		{
 			traceTASK_NOTIFY_WAIT();
-			
+
 			if( pulNotificationValue != NULL )
 			{
 				/* Output the current notification value, which may or may not
@@ -4317,7 +4314,7 @@ TickType_t uxReturn;
 			}
 
 			traceTASK_NOTIFY_FROM_ISR();
-			
+
 			/* If the task is in the blocked state specifically to wait for a
 			notification then unblock it now. */
 			if( eOriginalNotifyState == eWaitingNotification )
@@ -4398,7 +4395,7 @@ TickType_t uxReturn;
 			/* 'Giving' is equivalent to incrementing a count in a counting
 			semaphore. */
 			( pxTCB->ulNotifiedValue )++;
-			
+
 			traceTASK_NOTIFY_GIVE_FROM_ISR();
 
 			/* If the task is in the blocked state specifically to wait for a
@@ -4442,6 +4439,37 @@ TickType_t uxReturn;
 
 /*-----------------------------------------------------------*/
 
+#if( configUSE_TASK_NOTIFICATIONS == 1 )
+
+	BaseType_t xTaskNotifyStateClear( TaskHandle_t xTask )
+	{
+	TCB_t *pxTCB;
+	BaseType_t xReturn;
+
+		pxTCB = ( TCB_t * ) xTask;
+
+		/* If null is passed in here then it is the calling task that is having
+		its notification state cleared. */
+		pxTCB = prvGetTCBFromHandle( pxTCB );
+
+		taskENTER_CRITICAL();
+		{
+			if( pxTCB->eNotifyState == eNotified )
+			{
+				pxTCB->eNotifyState = eNotWaitingNotification;
+				xReturn = pdPASS;
+			}
+			else
+			{
+				xReturn = pdFAIL;
+			}
+		}
+		taskEXIT_CRITICAL();
+
+		return xReturn;
+	}
+
+#endif /* configUSE_TASK_NOTIFICATIONS */
 
 #ifdef FREERTOS_MODULE_TEST
 	#include "tasks_test_access_functions.h"
