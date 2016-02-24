@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -107,6 +107,7 @@ typedef void (*TaskFunction_t)( void * );
 itself. */
 #define pdFREERTOS_ERRNO_NONE			0	/* No errors */
 #define	pdFREERTOS_ERRNO_ENOENT			2	/* No such file or directory */
+#define	pdFREERTOS_ERRNO_EINTR			4	/* Interrupted system call */
 #define	pdFREERTOS_ERRNO_EIO			5	/* I/O error */
 #define	pdFREERTOS_ERRNO_ENXIO			6	/* No such device or address */
 #define	pdFREERTOS_ERRNO_EBADF			9	/* Bad file number */

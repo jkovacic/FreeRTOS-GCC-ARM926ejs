@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -87,14 +87,6 @@ header files above, but not in this file, in order to generate the correct
 privileged Vs unprivileged linkage and placement. */
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
 
-#if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( configUSE_TIMERS == 0 )
-	#error configUSE_TIMERS must be set to 1 to make the xEventGroupSetBitFromISR() function available.
-#endif
-
-#if ( INCLUDE_xEventGroupSetBitFromISR == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 0 )
-	#error INCLUDE_xTimerPendFunctionCall must also be set to one to make the xEventGroupSetBitFromISR() function available.
-#endif
-
 /* The following bit fields convey control information in a task's event list
 item value.  It is important they don't clash with the
 taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
@@ -119,6 +111,9 @@ typedef struct xEventGroupDefinition
 		UBaseType_t uxEventGroupNumber;
 	#endif
 
+	#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+		uint8_t ucStaticallyAllocated;
+	#endif
 } EventGroup_t;
 
 /*-----------------------------------------------------------*/
@@ -131,19 +126,44 @@ typedef struct xEventGroupDefinition
  * wait condition is met if any of the bits set in uxBitsToWait for are also set
  * in uxCurrentEventBits.
  */
-static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxBitsToWaitFor, const BaseType_t xWaitForAllBits );
+static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxBitsToWaitFor, const BaseType_t xWaitForAllBits ) PRIVILEGED_FUNCTION;
 
 /*-----------------------------------------------------------*/
 
-EventGroupHandle_t xEventGroupCreate( void )
+EventGroupHandle_t xEventGroupGenericCreate( StaticEventGroup_t *pxStaticEventGroup )
 {
 EventGroup_t *pxEventBits;
 
-	pxEventBits = ( EventGroup_t * ) pvPortMalloc( sizeof( EventGroup_t ) );
+	if( pxStaticEventGroup == NULL )
+	{
+		/* The user has not provided a statically allocated event group, so
+		create on dynamically. */
+		pxEventBits = ( EventGroup_t * ) pvPortMalloc( sizeof( EventGroup_t ) );
+	}
+	else
+	{
+		/* The user has provided a statically allocated event group - use it. */
+		pxEventBits = ( EventGroup_t * ) pxStaticEventGroup; /*lint !e740 EventGroup_t and StaticEventGroup_t are guaranteed to have the same size and alignment requirement - checked by configASSERT(). */
+	}
+
 	if( pxEventBits != NULL )
 	{
 		pxEventBits->uxEventBits = 0;
 		vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+
+		#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+		{
+			if( pxStaticEventGroup == NULL )
+			{
+				pxEventBits->ucStaticallyAllocated = pdFALSE;
+			}
+			else
+			{
+				pxEventBits->ucStaticallyAllocated = pdTRUE;
+			}
+		}
+		#endif /* configSUPPORT_STATIC_ALLOCATION */
+
 		traceEVENT_GROUP_CREATE( pxEventBits );
 	}
 	else
@@ -588,7 +608,19 @@ const List_t *pxTasksWaitingForBits = &( pxEventBits->xTasksWaitingForBits );
 			( void ) xTaskRemoveFromUnorderedEventList( pxTasksWaitingForBits->xListEnd.pxNext, eventUNBLOCKED_DUE_TO_BIT_SET );
 		}
 
-		vPortFree( pxEventBits );
+		/* Only free the memory if it was allocated dynamically. */
+		#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+		{
+			if( pxEventBits->ucStaticallyAllocated == ( uint8_t ) pdFALSE )
+			{
+				vPortFree( pxEventBits );
+			}
+		}
+		#else
+		{
+			vPortFree( pxEventBits );
+		}
+		#endif /* configSUPPORT_STATIC_ALLOCATION */
 	}
 	( void ) xTaskResumeAll();
 }

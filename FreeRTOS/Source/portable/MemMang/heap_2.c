@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -97,7 +97,14 @@ task.h is included from an application file. */
 static void prvHeapInit( void );
 
 /* Allocate the memory for the heap. */
-static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+#if( configAPPLICATION_ALLOCATED_HEAP == 1 )
+	/* The application writer has already defined the array used for the RTOS
+	heap - probably so it can be placed in a special segment or address. */
+	extern uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+#else
+	static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+#endif /* configAPPLICATION_ALLOCATED_HEAP */
+
 
 /* Define the linked list structure.  This is used to link free blocks in order
 of their size. */
@@ -127,7 +134,7 @@ static size_t xFreeBytesRemaining = configADJUSTED_HEAP_SIZE;
  */
 #define prvInsertBlockIntoFreeList( pxBlockToInsert )								\
 {																					\
-BlockLink_t *pxIterator;																\
+BlockLink_t *pxIterator;															\
 size_t xBlockSize;																	\
 																					\
 	xBlockSize = pxBlockToInsert->xBlockSize;										\
