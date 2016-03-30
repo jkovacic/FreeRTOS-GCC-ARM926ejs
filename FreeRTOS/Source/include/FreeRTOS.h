@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -173,20 +173,12 @@ extern "C" {
 	#define INCLUDE_xTaskAbortDelay 0
 #endif
 
-#ifndef INCLUDE_xTimerGetTimerDaemonTaskHandle
-	#define INCLUDE_xTimerGetTimerDaemonTaskHandle 0
-#endif
-
 #ifndef INCLUDE_xQueueGetMutexHolder
 	#define INCLUDE_xQueueGetMutexHolder 0
 #endif
 
 #ifndef INCLUDE_xSemaphoreGetMutexHolder
 	#define INCLUDE_xSemaphoreGetMutexHolder INCLUDE_xQueueGetMutexHolder
-#endif
-
-#ifndef INCLUDE_pcTaskGetTaskName
-	#define INCLUDE_pcTaskGetTaskName 0
 #endif
 
 #ifndef INCLUDE_xTaskGetTaskHandle
@@ -322,7 +314,7 @@ extern "C" {
 #if ( configQUEUE_REGISTRY_SIZE < 1 )
 	#define vQueueAddToRegistry( xQueue, pcName )
 	#define vQueueUnregisterQueue( xQueue )
-	#define pcQueueGetQueueName( xQueue )
+	#define pcQueueGetName( xQueue )
 #endif
 
 #ifndef portPOINTER_SIZE_TYPE
@@ -691,14 +683,6 @@ extern "C" {
 	#define portYIELD_WITHIN_API portYIELD
 #endif
 
-#ifndef pvPortMallocAligned
-	#define pvPortMallocAligned( x, puxPreallocatedBuffer ) ( ( ( puxPreallocatedBuffer ) == NULL ) ? ( pvPortMalloc( ( x ) ) ) : ( puxPreallocatedBuffer ) )
-#endif
-
-#ifndef vPortFreeAligned
-	#define vPortFreeAligned( pvBlockToFree ) vPortFree( pvBlockToFree )
-#endif
-
 #ifndef portSUPPRESS_TICKS_AND_SLEEP
 	#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime )
 #endif
@@ -784,7 +768,28 @@ extern "C" {
 #endif
 
 #ifndef configSUPPORT_STATIC_ALLOCATION
+	/* Defaults to 0 for backward compatibility. */
 	#define configSUPPORT_STATIC_ALLOCATION 0
+#endif
+
+#ifndef configSUPPORT_DYNAMIC_ALLOCATION
+	/* Defaults to 1 for backward compatibility. */
+	#define configSUPPORT_DYNAMIC_ALLOCATION 1
+#endif
+
+/* Sanity check the configuration. */
+#if( configUSE_TICKLESS_IDLE != 0 )
+	#if( INCLUDE_vTaskSuspend != 1 )
+		#error INCLUDE_vTaskSuspend must be set to 1 if configUSE_TICKLESS_IDLE is not set to 0
+	#endif /* INCLUDE_vTaskSuspend */
+#endif /* configUSE_TICKLESS_IDLE */
+
+#if( ( portUSING_MPU_WRAPPERS == 1 ) && ( configSUPPORT_STATIC_ALLOCATION != 1 ) )
+	#error configSUPPORT_STATIC_ALLOCATION must be set to 1 in FreeRTOSConfig.h when the MPU is used.
+#endif
+
+#if( ( configSUPPORT_STATIC_ALLOCATION == 0 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 0 ) )
+	#error configSUPPORT_STATIC_ALLOCATION and configSUPPORT_DYNAMIC_ALLOCATION cannot both be 0, but can both be 1.
 #endif
 
 #if( ( configUSE_RECURSIVE_MUTEXES == 1 ) && ( configUSE_MUTEXES != 1 ) )
@@ -830,6 +835,8 @@ V8 if desired. */
 	#define xCoRoutineHandle CoRoutineHandle_t
 	#define pdTASK_HOOK_CODE TaskHookFunction_t
 	#define portTICK_RATE_MS portTICK_PERIOD_MS
+	#define pcTaskGetTaskName pcTaskGetName
+	#define pcTimerGetTimerName pcTimerGetName
 
 	/* Backward compatibility within the scheduler code only - these definitions
 	are not really required but are included for completeness. */
@@ -923,7 +930,7 @@ typedef struct xSTATIC_TCB
 		void			*pxDummy14;
 	#endif
 	#if( configNUM_THREAD_LOCAL_STORAGE_POINTERS > 0 )
-		void			pvDummy15[ configNUM_THREAD_LOCAL_STORAGE_POINTERS ];
+		void			*pvDummy15[ configNUM_THREAD_LOCAL_STORAGE_POINTERS ];
 	#endif
 	#if ( configGENERATE_RUN_TIME_STATS == 1 )
 		uint32_t		ulDummy16;
@@ -935,7 +942,7 @@ typedef struct xSTATIC_TCB
 		uint32_t 		ulDummy18;
 		uint8_t 		ucDummy19;
 	#endif
-	#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
+	#if( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
 		uint8_t			uxDummy20;
 	#endif
 
@@ -966,19 +973,20 @@ typedef struct xSTATIC_QUEUE
 	} u;
 
 	StaticList_t xDummy3[ 2 ];
-	UBaseType_t uxDummy4[ 5 ];
+	UBaseType_t uxDummy4[ 3 ];
+	uint8_t ucDummy5[ 2 ];
+
+	#if( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
+		uint8_t ucDummy6;
+	#endif
 
 	#if ( configUSE_QUEUE_SETS == 1 )
 		void *pvDummy7;
 	#endif
 
 	#if ( configUSE_TRACE_FACILITY == 1 )
-		UBaseType_t uxDummy5;
-		uint8_t ucDummy6;
-	#endif
-
-	#if ( configSUPPORT_STATIC_ALLOCATION == 1 )
-			uint8_t ucDummy7;
+		UBaseType_t uxDummy8;
+		uint8_t ucDummy9;
 	#endif
 
 } StaticQueue_t;
@@ -1007,8 +1015,8 @@ typedef struct xSTATIC_EVENT_GROUP
 		UBaseType_t uxDummy3;
 	#endif
 
-	#if( configSUPPORT_STATIC_ALLOCATION == 1 )
-			uint8_t ucStaticallyAllocated;
+	#if( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
+			uint8_t ucDummy4;
 	#endif
 
 } StaticEventGroup_t;
@@ -1038,8 +1046,8 @@ typedef struct xSTATIC_TIMER
 		UBaseType_t		uxDummy6;
 	#endif
 
-	#if( configSUPPORT_STATIC_ALLOCATION == 1 )
-		uint8_t 		ucStaticallyAllocated;
+	#if( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
+		uint8_t 		ucDummy7;
 	#endif
 
 } StaticTimer_t;

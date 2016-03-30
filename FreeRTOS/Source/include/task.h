@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -85,7 +85,7 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V9.0.0rc1"
+#define tskKERNEL_VERSION_NUMBER "V9.0.0rc2"
 #define tskKERNEL_VERSION_MAJOR 9
 #define tskKERNEL_VERSION_MINOR 0
 #define tskKERNEL_VERSION_BUILD 0
@@ -277,16 +277,15 @@ is used in assert() statements. */
  *
  * Create a new task and add it to the list of tasks that are ready to run.
  *
- * Internally, within the FreeRTOS implementation, tasks's use two blocks of
- * memory.  The first block is used to hold the tasks's data structures.  The
+ * Internally, within the FreeRTOS implementation, tasks use two blocks of
+ * memory.  The first block is used to hold the task's data structures.  The
  * second block is used by the task as its stack.  If a task is created using
  * xTaskCreate() then both blocks of memory are automatically dynamically
  * allocated inside the xTaskCreate() function.  (see
  * http://www.freertos.org/a00111.html).  If a task is created using
- * xTaskCreateStatic() then the application writer can instead optionally
- * provide the memory that will get used by the task.  xTaskCreateStatic()
- * therefore allows a task to be created without using any dynamic memory
- * allocation.
+ * xTaskCreateStatic() then the application writer must provide the required
+ * memory.  xTaskCreateStatic() therefore allows a task to be created without
+ * using any dynamic memory allocation.
  *
  * See xTaskCreateStatic() for a version that does not use any dynamic memory
  * allocation.
@@ -357,7 +356,9 @@ is used in assert() statements. */
  * \defgroup xTaskCreate xTaskCreate
  * \ingroup Tasks
  */
-#define xTaskCreate( pvTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask ) xTaskGenericCreate( ( pvTaskCode ), ( pcName ), ( usStackDepth ), ( pvParameters ), ( uxPriority ), ( pxCreatedTask ), ( NULL ), ( NULL ), ( NULL ) )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	BaseType_t xTaskCreate( TaskFunction_t pxTaskCode, const char * const pcName, const uint16_t usStackDepth, void * const pvParameters, UBaseType_t uxPriority, TaskHandle_t * const pxCreatedTask ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+#endif
 
 /**
  * task. h
@@ -375,16 +376,15 @@ is used in assert() statements. */
  *
  * Create a new task and add it to the list of tasks that are ready to run.
  *
- * Internally, within the FreeRTOS implementation, tasks's use two blocks of
- * memory.  The first block is used to hold the tasks's data structures.  The
+ * Internally, within the FreeRTOS implementation, tasks use two blocks of
+ * memory.  The first block is used to hold the task's data structures.  The
  * second block is used by the task as its stack.  If a task is created using
  * xTaskCreate() then both blocks of memory are automatically dynamically
  * allocated inside the xTaskCreate() function.  (see
  * http://www.freertos.org/a00111.html).  If a task is created using
- * xTaskCreateStatic() then the application writer can instead optionally
- * provide the memory that will get used by the task.  xTaskCreateStatic()
- * therefore allows a task to be created without using any dynamic memory
- * allocation.
+ * xTaskCreateStatic() then the application writer must provide the required
+ * memory.  xTaskCreateStatic() therefore allows a task to be created without
+ * using any dynamic memory allocation.
  *
  * @param pvTaskCode Pointer to the task entry function.  Tasks
  * must be implemented to never return (i.e. continuous loop).
@@ -406,26 +406,18 @@ is used in assert() statements. */
  * @param pvCreatedTask Used to pass back a handle by which the created task
  * can be referenced.  Pass as NULL if the handle is not required.
  *
- * @param pxStackBuffer If pxStackBuffer is NULL then the stack used by the
- * task will be allocated dynamically, just as if the task was created using
- * xTaskCreate().  If pxStackBuffer is not NULL then it must point to a
- * StackType_t array that has at least usStackDepth indexes - the array will
- * then be used as the task's stack, removing the need for the stack to be
- * allocated dynamically.
+ * @param pxStackBuffer Must point to a StackType_t array that has at least
+ * usStackDepth indexes - the array will then be used as the task's stack,
+ * removing the need for the stack to be allocated dynamically.
  *
- * @param pxTaskBuffer If pxTaskBuffer is NULL then the memory used to hold the
- * task's data structures will be allocated dynamically, just as when a task is
- * created using xTaskCreate().  If pxTaskBuffer is not NULL then it must point
- * to a variable of type StaticTask_t, which will then be used to hold the
- * task's data structures, removing the need for the memory to be allocated
- * dynamically.
+ * @param pxTaskBuffer Must point to a variable of type StaticTask_t, which will
+ * then be used to hold the task's data structures, removing the need for the
+ * memory to be allocated dynamically.
  *
- * @return If neither pxStackBuffer or pxTaskBuffer are NULL, then the function
- * will not attempt any dynamic memory allocation, and pdPASS will always be
- * returned.  If pxStackBuffer or pxTaskBuffer is NULL then the function will
- * attempt to dynamically allocate one of both buffers.  In this case, if the
- * allocation succeeds then pdPASS will be returned, and if the allocation fails
- * then an error code defined in projdefs.h is returned.
+ * @return If neither pxStackBuffer or pxTaskBuffer are NULL, then the task will
+ * be created and pdPASS is returned.  If either pxStackBuffer or pxTaskBuffer
+ * are NULL then the task will not be created and
+ * errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY is returned.
  *
  * Example usage:
    <pre>
@@ -458,21 +450,21 @@ is used in assert() statements. */
  TaskHandle_t xHandle = NULL;
 
 	 // Create the task without using any dynamic memory allocation.
-	 xTaskCreate( vTaskCode,          // As per xTaskCreate() parameter.
-				  "NAME",             // As per xTaskCreate() parameter.
-				  STACK_SIZE,         // As per xTaskCreate() parameter.
-				  &ucParameterToPass, // As per xTaskCreate() parameter.
-				  tskIDLE_PRIORITY,   // As per xTaskCreate() parameter.
-				  &xHandle,           // As per xTaskCreate() parameter.
-				  xStack,             // Pointer to the buffer that the task being created will use as its stack.
-				  &xTaskBuffer );     // Pointer to a StaticTask_t structure for use as the memory require by the task.
+	 xTaskCreateStatic( vTaskCode,          // As per xTaskCreate() parameter.
+				        "NAME",             // As per xTaskCreate() parameter.
+				        STACK_SIZE,         // As per xTaskCreate() parameter.
+				        &ucParameterToPass, // As per xTaskCreate() parameter.
+				        tskIDLE_PRIORITY,   // As per xTaskCreate() parameter.
+				        &xHandle,           // As per xTaskCreate() parameter.
+				        xStack,             // Pointer to the buffer that the task being created will use as its stack.
+				        &xTaskBuffer );     // Pointer to a StaticTask_t structure for use as the memory require by the task.
  }
    </pre>
  * \defgroup xTaskCreateStatic xTaskCreateStatic
  * \ingroup Tasks
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xTaskCreateStatic( pvTaskCode, pcName, usStackDepth, pvParameters, uxPriority, pxCreatedTask, puxStackBuffer, pxTaskBuffer ) xTaskGenericCreate( ( pvTaskCode ), ( pcName ), ( usStackDepth ), ( pvParameters ), ( uxPriority ), ( pxCreatedTask ), ( puxStackBuffer ), ( pxTaskBuffer ), ( NULL ) )
+	BaseType_t xTaskCreateStatic( TaskFunction_t pxTaskCode, const char * const pcName, const uint16_t usStackDepth, void * const pvParameters, UBaseType_t uxPriority, TaskHandle_t * const pxCreatedTask, StackType_t * const puxStackBuffer, StaticTask_t * const pxTaskBuffer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -1310,17 +1302,16 @@ UBaseType_t uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
- * <PRE>char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery );</PRE>
+ * <PRE>char *pcTaskGetName( TaskHandle_t xTaskToQuery );</PRE>
  *
  * @return The text (human readable) name of the task referenced by the handle
  * xTaskToQuery.  A task can query its own name by either passing in its own
- * handle, or by setting xTaskToQuery to NULL.  INCLUDE_pcTaskGetTaskName must be
- * set to 1 in FreeRTOSConfig.h for pcTaskGetTaskName() to be available.
+ * handle, or by setting xTaskToQuery to NULL.
  *
- * \defgroup pcTaskGetTaskName pcTaskGetTaskName
+ * \defgroup pcTaskGetName pcTaskGetName
  * \ingroup TaskUtils
  */
-char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+char *pcTaskGetName( TaskHandle_t xTaskToQuery ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /**
  * task. h
@@ -2206,12 +2197,6 @@ void vTaskPriorityInherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTIO
  * inherited a higher priority while it was holding a semaphore.
  */
 BaseType_t xTaskPriorityDisinherit( TaskHandle_t const pxMutexHolder ) PRIVILEGED_FUNCTION;
-
-/*
- * Generic version of the task creation function which is in turn called by the
- * xTaskCreate() and xTaskCreateRestricted() macros.
- */
-BaseType_t xTaskGenericCreate( TaskFunction_t pxTaskCode, const char * const pcName, const uint16_t usStackDepth, void * const pvParameters, UBaseType_t uxPriority, TaskHandle_t * const pxCreatedTask, StackType_t * const puxStackBuffer, StaticTask_t * const pxTaskBuffer, const MemoryRegion_t * const xRegions ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /*
  * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.

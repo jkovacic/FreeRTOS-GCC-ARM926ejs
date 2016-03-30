@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -123,8 +123,11 @@ only for ports that are using the MPU. */
 		#define xQueueRemoveFromSet				MPU_xQueueRemoveFromSet
 		#define xQueueGetMutexHolder			MPU_xQueueGetMutexHolder
 
-		#define pvPortMalloc					MPU_pvPortMalloc
-		#define vPortFree						MPU_vPortFree
+		#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+			#define pvPortMalloc					MPU_pvPortMalloc
+			#define vPortFree						MPU_vPortFree
+		#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+
 		#define xPortGetFreeHeapSize			MPU_xPortGetFreeHeapSize
 		#define vPortInitialiseBlocks			MPU_vPortInitialiseBlocks
 		#define xPortGetMinimumEverFreeHeapSize	MPU_xPortGetMinimumEverFreeHeapSize
@@ -140,7 +143,7 @@ only for ports that are using the MPU. */
 		#define xTimerIsTimerActive				MPU_xTimerIsTimerActive
 		#define xTimerGetTimerDaemonTaskHandle	MPU_xTimerGetTimerDaemonTaskHandle
 		#define xTimerPendFunctionCall			MPU_xTimerPendFunctionCall
-		#define pcTimerGetTimerName				MPU_pcTimerGetTimerName
+		#define pcTimerGetName					MPU_pcTimerGetName
 		#define xTimerGenericCommand			MPU_xTimerGenericCommand
 
 		#define xEventGroupCreate				MPU_xEventGroupCreate

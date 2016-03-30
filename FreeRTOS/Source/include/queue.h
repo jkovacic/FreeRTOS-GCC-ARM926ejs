@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -126,16 +126,17 @@ typedef void * QueueSetMemberHandle_t;
  * Creates a new queue instance, and returns a handle by which the new queue
  * can be referenced.
  *
- * Internally, within the FreeRTOS implementation, queue's use two blocks of
+ * Internally, within the FreeRTOS implementation, queues use two blocks of
  * memory.  The first block is used to hold the queue's data structures.  The
  * second block is used to hold items placed into the queue.  If a queue is
  * created using xQueueCreate() then both blocks of memory are automatically
  * dynamically allocated inside the xQueueCreate() function.  (see
  * http://www.freertos.org/a00111.html).  If a queue is created using
- * xQueueCreateStatic() then the application writer can instead optionally
- * provide the memory that will get used by the queue.  xQueueCreateStatic()
- * therefore allows a queue to be created without using any dynamic memory
- * allocation.
+ * xQueueCreateStatic() then the application writer must provide the memory that
+ * will get used by the queue.  xQueueCreateStatic() therefore allows a queue to
+ * be created without using any dynamic memory allocation.
+ *
+ * http://www.FreeRTOS.org/Embedded-RTOS-Queues.html
  *
  * @param uxQueueLength The maximum number of items that the queue can contain.
  *
@@ -181,7 +182,9 @@ typedef void * QueueSetMemberHandle_t;
  * \defgroup xQueueCreate xQueueCreate
  * \ingroup QueueManagement
  */
-#define xQueueCreate( uxQueueLength, uxItemSize ) xQueueGenericCreate( uxQueueLength, uxItemSize, NULL, NULL, queueQUEUE_TYPE_BASE )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define xQueueCreate( uxQueueLength, uxItemSize ) xQueueGenericCreate( ( uxQueueLength ), ( uxItemSize ), ( queueQUEUE_TYPE_BASE ) )
+#endif
 
 /**
  * queue. h
@@ -197,16 +200,17 @@ typedef void * QueueSetMemberHandle_t;
  * Creates a new queue instance, and returns a handle by which the new queue
  * can be referenced.
  *
- * Internally, within the FreeRTOS implementation, queue's use two blocks of
+ * Internally, within the FreeRTOS implementation, queues use two blocks of
  * memory.  The first block is used to hold the queue's data structures.  The
  * second block is used to hold items placed into the queue.  If a queue is
  * created using xQueueCreate() then both blocks of memory are automatically
  * dynamically allocated inside the xQueueCreate() function.  (see
  * http://www.freertos.org/a00111.html).  If a queue is created using
- * xQueueCreateStatic() then the application writer can instead optionally
- * provide the memory that will get used by the queue.  xQueueCreateStatic()
- * therefore allows a queue to be created without using any dynamic memory
- * allocation.
+ * xQueueCreateStatic() then the application writer must provide the memory that
+ * will get used by the queue.  xQueueCreateStatic() therefore allows a queue to
+ * be created without using any dynamic memory allocation.
+ *
+ * http://www.FreeRTOS.org/Embedded-RTOS-Queues.html
  *
  * @param uxQueueLength The maximum number of items that the queue can contain.
  *
@@ -215,27 +219,17 @@ typedef void * QueueSetMemberHandle_t;
  * that will be copied for each posted item.  Each item on the queue must be
  * the same size.
  *
- * @param pucQueueStorageBuffer If pucQueueStorageBuffer is NULL then the memory
- * used to hold items stored in the queue will be allocated dynamically, just as
- * when a queue is created using xQueueCreate().  If pxQueueStorageBuffer is not
- * NULL then it must point to a uint8_t array that is at least large enough to
- * hold the maximum number of items that can be in the queue at any one time -
- * which is ( uxQueueLength * uxItemsSize ) bytes.
+ * @param pucQueueStorageBuffer If uxItemSize is not zero then
+ * pucQueueStorageBuffer must point to a uint8_t array that is at least large
+ * enough to hold the maximum number of items that can be in the queue at any
+ * one time - which is ( uxQueueLength * uxItemsSize ) bytes.  If uxItemSize is
+ * zero then pucQueueStorageBuffer can be NULL.
  *
- * @param pxQueueBuffer If pxQueueBuffer is NULL then the memory required to
- * hold the queue's data structures will be allocated dynamically, just as when
- * a queue is created using xQueueCreate().  If pxQueueBuffer is not NULL then
- * it must point to a variable of type StaticQueue_t, which will then be used to
- * hold the queue's data structure, removing the need for the memory to be
- * allocated dynamically.
+ * @param pxQueueBuffer Must point to a variable of type StaticQueue_t, which
+ * will be used to hold the queue's data structure.
  *
- * @return If neither pucQueueStorageBuffer or pxQueueBuffer are NULL, then the
- * function will not attempt any dynamic memory allocation, and a handle to the
- * created queue will always be returned.  If pucQueueStorageBuffer or
- * pxQueueBuffer is NULL then the function will attempt to dynamically allocate
- * one of both buffers.  In this case, if the allocation succeeds then a handle
- * to the created queue will be returned, and if one of the the allocation fails
- * NULL will be returned.
+ * @return If the queue is created then a handle to the created queue is
+ * returned.  If pxQueueBuffer is NULL then NULL is returned.
  *
  * Example usage:
    <pre>
@@ -266,7 +260,7 @@ typedef void * QueueSetMemberHandle_t;
 							&xQueueBuffer ); // The buffer that will hold the queue structure.
 
 	// The queue is guaranteed to be created successfully as no dynamic memory
-	// allocation was used.  Therefore xQueue1 is now a handle to a valid queue.
+	// allocation is used.  Therefore xQueue1 is now a handle to a valid queue.
 
 	// ... Rest of task code.
  }
@@ -275,7 +269,7 @@ typedef void * QueueSetMemberHandle_t;
  * \ingroup QueueManagement
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xQueueCreateStatic( uxQueueLength, uxItemSize, pucQueueStorage, pxQueueBuffer ) xQueueGenericCreate( ( uxQueueLength ), ( uxItemSize ), ( pucQueueStorage ), ( pxQueueBuffer ), ( queueQUEUE_TYPE_BASE ) )
+	#define xQueueCreateStatic( uxQueueLength, uxItemSize, pucQueueStorage, pxQueueBuffer ) xQueueGenericCreateStatic( ( uxQueueLength ), ( uxItemSize ), ( pucQueueStorage ), ( pxQueueBuffer ), ( queueQUEUE_TYPE_BASE ) )
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -1562,8 +1556,10 @@ BaseType_t xQueueCRReceive( QueueHandle_t xQueue, void *pvBuffer, TickType_t xTi
  * xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling
  * these functions directly.
  */
-QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
-QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
+QueueHandle_t xQueueCreateMutex( const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
+QueueHandle_t xQueueCreateMutexStatic( const uint8_t ucQueueType, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
+QueueHandle_t xQueueCreateCountingSemaphore( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount ) PRIVILEGED_FUNCTION;
+QueueHandle_t xQueueCreateCountingSemaphoreStatic( const UBaseType_t uxMaxCount, const UBaseType_t uxInitialCount, StaticQueue_t *pxStaticQueue ) PRIVILEGED_FUNCTION;
 void* xQueueGetMutexHolder( QueueHandle_t xSemaphore ) PRIVILEGED_FUNCTION;
 
 /*
@@ -1620,8 +1616,8 @@ BaseType_t xQueueGiveMutexRecursive( QueueHandle_t pxMutex ) PRIVILEGED_FUNCTION
 #endif
 
 /*
- * The registry is provided as a means for kernel aware debuggers to
- * locate queues, semaphores and mutexes.  Call pcQueueGetQueueName() to look
+ * The queue registry is provided as a means for kernel aware debuggers to
+ * locate queues, semaphores and mutexes.  Call pcQueueGetName() to look
  * up and return the name of a queue in the queue registry from the queue's
  * handle.
  *
@@ -1631,14 +1627,26 @@ BaseType_t xQueueGiveMutexRecursive( QueueHandle_t pxMutex ) PRIVILEGED_FUNCTION
  * returned.
  */
 #if( configQUEUE_REGISTRY_SIZE > 0 )
-	const char *pcQueueGetQueueName( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+	const char *pcQueueGetName( QueueHandle_t xQueue ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 #endif
 
 /*
- * Generic version of the queue creation function, which is in turn called by
- * any queue, semaphore or mutex creation function or macro.
+ * Generic version of the function used to creaet a queue using dynamic memory
+ * allocation.  This is called by other functions and macros that create other
+ * RTOS objects that use the queue structure as their base.
  */
-QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, uint8_t *pucQueueStorage, StaticQueue_t *pxStaticQueue, const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	QueueHandle_t xQueueGenericCreate( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
+#endif
+
+/*
+ * Generic version of the function used to creaet a queue using dynamic memory
+ * allocation.  This is called by other functions and macros that create other
+ * RTOS objects that use the queue structure as their base.
+ */
+#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+	QueueHandle_t xQueueGenericCreateStatic( const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, uint8_t *pucQueueStorage, StaticQueue_t *pxStaticQueue, const uint8_t ucQueueType ) PRIVILEGED_FUNCTION;
+#endif
 
 /*
  * Queue sets provide a mechanism to allow a task to block (pend) on a read

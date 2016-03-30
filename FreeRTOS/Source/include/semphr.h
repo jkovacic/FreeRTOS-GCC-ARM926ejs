@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -132,14 +132,16 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup vSemaphoreCreateBinary vSemaphoreCreateBinary
  * \ingroup Semaphores
  */
-#define vSemaphoreCreateBinary( xSemaphore )																										\
-	{																																				\
-		( xSemaphore ) = xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, NULL, NULL, queueQUEUE_TYPE_BINARY_SEMAPHORE );	\
-		if( ( xSemaphore ) != NULL )																												\
-		{																																			\
-			( void ) xSemaphoreGive( ( xSemaphore ) );																								\
-		}																																			\
-	}
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define vSemaphoreCreateBinary( xSemaphore )																							\
+		{																																	\
+			( xSemaphore ) = xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE );	\
+			if( ( xSemaphore ) != NULL )																									\
+			{																																\
+				( void ) xSemaphoreGive( ( xSemaphore ) );																					\
+			}																																\
+		}
+#endif
 
 /**
  * semphr. h
@@ -158,9 +160,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * automatically dynamically allocated inside the xSemaphoreCreateBinary()
  * function.  (see http://www.freertos.org/a00111.html).  If a binary semaphore
  * is created using xSemaphoreCreateBinaryStatic() then the application writer
- * can instead optionally provide the memory that will get used by the binary
- * semaphore.  xSemaphoreCreateBinaryStatic() therefore allows a binary
- * semaphore to be created without using any dynamic memory allocation.
+ * must provide the memory.  xSemaphoreCreateBinaryStatic() therefore allows a
+ * binary semaphore to be created without using any dynamic memory allocation.
  *
  * The old vSemaphoreCreateBinary() macro is now deprecated in favour of this
  * xSemaphoreCreateBinary() function.  Note that binary semaphores created using
@@ -199,7 +200,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup xSemaphoreCreateBinary xSemaphoreCreateBinary
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateBinary() xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, NULL, NULL, queueQUEUE_TYPE_BINARY_SEMAPHORE )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define xSemaphoreCreateBinary() xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE )
+#endif
 
 /**
  * semphr. h
@@ -218,9 +221,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * automatically dynamically allocated inside the xSemaphoreCreateBinary()
  * function.  (see http://www.freertos.org/a00111.html).  If a binary semaphore
  * is created using xSemaphoreCreateBinaryStatic() then the application writer
- * can instead optionally provide the memory that will get used by the binary
- * semaphore.  xSemaphoreCreateBinaryStatic() therefore allows a binary
- * semaphore to be created without using any dynamic memory allocation.
+ * must provide the memory.  xSemaphoreCreateBinaryStatic() therefore allows a
+ * binary semaphore to be created without using any dynamic memory allocation.
  *
  * This type of semaphore can be used for pure synchronisation between tasks or
  * between an interrupt and a task.  The semaphore need not be given back once
@@ -229,21 +231,12 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * semaphore does not use a priority inheritance mechanism.  For an alternative
  * that does use priority inheritance see xSemaphoreCreateMutex().
  *
- * @param pxSemaphoreBuffer If pxSemaphoreBuffer is NULL then the memory
- * required to hold the semaphore's data structures will be allocated
- * dynamically, just as when a semaphore is created using
- * xSemaphoreCreateBinary().  If pxSemaphoreBuffer is not NULL then it must
- * point to a variable of type StaticSemaphore_t, which will then be used to
- * hold the semaphore's data structure, removing the need for the memory to be
- * allocated dynamically.
+ * @param pxSemaphoreBuffer Must point to a variable of type StaticSemaphore_t,
+ * which will then be used to hold the semaphore's data structure, removing the
+ * need for the memory to be allocated dynamically.
  *
- * @return If pxSemaphoreBuffer is not NULL then the function will not attempt
- * any dynamic memory allocation, and a handle to the created semaphore will
- * always be returned.  If pxSemaphoreBuffer is NULL then the function will
- * attempt to dynamically allocate the memory required to hold the semaphore's
- * data structures.  In this case, if the allocation succeeds then a handle to
- * the created semaphore will be returned, and if the allocation fails NULL will
- * be returned.
+ * @return If the semaphore is created then a handle to the created semaphore is
+ * returned.  If pxSemaphoreBuffer is NULL then NULL is returned.
  *
  * Example usage:
  <pre>
@@ -267,7 +260,7 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \ingroup Semaphores
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xSemaphoreCreateBinaryStatic( pxStaticSemaphore ) xQueueGenericCreate( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, NULL, pxStaticSemaphore, queueQUEUE_TYPE_BINARY_SEMAPHORE )
+	#define xSemaphoreCreateBinaryStatic( pxStaticSemaphore ) xQueueGenericCreateStatic( ( UBaseType_t ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, NULL, pxStaticSemaphore, queueQUEUE_TYPE_BINARY_SEMAPHORE )
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -714,10 +707,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * using xSemaphoreCreateMutex() then the required memory is automatically
  * dynamically allocated inside the xSemaphoreCreateMutex() function.  (see
  * http://www.freertos.org/a00111.html).  If a mutex is created using
- * xSemaphoreCreateMutexStatic() then the application writer can instead
- * optionally provide the memory that will get used by the mutex.
- * xSemaphoreCreateMutexStatic() therefore allows a mutex to be created without
- * using any dynamic memory allocation.
+ * xSemaphoreCreateMutexStatic() then the application writer must provided the
+ * memory.  xSemaphoreCreateMutexStatic() therefore allows a mutex to be created
+ * without using any dynamic memory allocation.
  *
  * Mutexes created using this function can be accessed using the xSemaphoreTake()
  * and xSemaphoreGive() macros.  The xSemaphoreTakeRecursive() and
@@ -758,7 +750,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup xSemaphoreCreateMutex xSemaphoreCreateMutex
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateMutex() xQueueCreateMutex( queueQUEUE_TYPE_MUTEX, NULL )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define xSemaphoreCreateMutex() xQueueCreateMutex( queueQUEUE_TYPE_MUTEX )
+#endif
 
 /**
  * semphr. h
@@ -772,10 +766,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * using xSemaphoreCreateMutex() then the required memory is automatically
  * dynamically allocated inside the xSemaphoreCreateMutex() function.  (see
  * http://www.freertos.org/a00111.html).  If a mutex is created using
- * xSemaphoreCreateMutexStatic() then the application writer can instead
- * optionally provide the memory that will get used by the mutex.
- * xSemaphoreCreateMutexStatic() therefore allows a mutex to be created without
- * using any dynamic memory allocation.
+ * xSemaphoreCreateMutexStatic() then the application writer must provided the
+ * memory.  xSemaphoreCreateMutexStatic() therefore allows a mutex to be created
+ * without using any dynamic memory allocation.
  *
  * Mutexes created using this function can be accessed using the xSemaphoreTake()
  * and xSemaphoreGive() macros.  The xSemaphoreTakeRecursive() and
@@ -792,16 +785,12 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * semaphore and another always 'takes' the semaphore) and from within interrupt
  * service routines.
  *
- * @param pxMutexBuffer If pxMutexBuffer is NULL then the memory required to
- * hold the mutex's data structures will be allocated dynamically, just as when
- * a mutex is created using xSemaphoreCreateMutex().  If pxMutexBuffer is not
- * NULL then it must point to a variable of type StaticSemaphore_t, which will
- * then be used to hold the mutex's data structure, removing the need for
+ * @param pxMutexBuffer Must point to a variable of type StaticSemaphore_t,
+ * which will be used to hold the mutex's data structure, removing the need for
  * the memory to be allocated dynamically.
  *
  * @return If the mutex was successfully created then a handle to the created
- * mutex is returned.  If pxMutexBuffer was NULL, and there was not enough
- * heap to allocate the mutex data structures, then NULL is returned.
+ * mutex is returned.  If pxMutexBuffer was NULL then NULL is returned.
  *
  * Example usage:
  <pre>
@@ -823,7 +812,7 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \ingroup Semaphores
  */
  #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xSemaphoreCreateMutexStatic( pxMutexBuffer ) xQueueCreateMutex( queueQUEUE_TYPE_MUTEX, ( pxMutexBuffer ) )
+	#define xSemaphoreCreateMutexStatic( pxMutexBuffer ) xQueueCreateMutexStatic( queueQUEUE_TYPE_MUTEX, ( pxMutexBuffer ) )
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 
@@ -840,8 +829,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * automatically dynamically allocated inside the
  * xSemaphoreCreateRecursiveMutex() function.  (see
  * http://www.freertos.org/a00111.html).  If a recursive mutex is created using
- * xSemaphoreCreateRecursiveMutexStatic() then the application writer can
- * instead optionally provide the memory that will get used by the mutex.
+ * xSemaphoreCreateRecursiveMutexStatic() then the application writer must
+ * provide the memory that will get used by the mutex.
  * xSemaphoreCreateRecursiveMutexStatic() therefore allows a recursive mutex to
  * be created without using any dynamic memory allocation.
  *
@@ -890,7 +879,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup xSemaphoreCreateRecursiveMutex xSemaphoreCreateRecursiveMutex
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateRecursiveMutex() xQueueCreateMutex( queueQUEUE_TYPE_RECURSIVE_MUTEX, NULL )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define xSemaphoreCreateRecursiveMutex() xQueueCreateMutex( queueQUEUE_TYPE_RECURSIVE_MUTEX )
+#endif
 
 /**
  * semphr. h
@@ -905,8 +896,8 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * automatically dynamically allocated inside the
  * xSemaphoreCreateRecursiveMutex() function.  (see
  * http://www.freertos.org/a00111.html).  If a recursive mutex is created using
- * xSemaphoreCreateRecursiveMutexStatic() then the application writer can
- * instead optionally provide the memory that will get used by the mutex.
+ * xSemaphoreCreateRecursiveMutexStatic() then the application writer must
+ * provide the memory that will get used by the mutex.
  * xSemaphoreCreateRecursiveMutexStatic() therefore allows a recursive mutex to
  * be created without using any dynamic memory allocation.
  *
@@ -932,17 +923,12 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * semaphore and another always 'takes' the semaphore) and from within interrupt
  * service routines.
  *
- * @param pxMutexBuffer If pxMutexBuffer is NULL then the memory required to
- * hold the recursive mutex's data structures will be allocated dynamically,
- * just as when a recursive mutex is created using
- * xSemaphoreCreateRecursiveMutex().  If pxMutexBuffer is not NULL then it must
- * point to a variable of type StaticSemaphore_t, which will then be used to
- * hold the recursive mutex's data structure, removing the need for the memory
- * to be allocated dynamically.
+ * @param pxMutexBuffer Must point to a variable of type StaticSemaphore_t,
+ * which will then be used to hold the recursive mutex's data structure,
+ * removing the need for the memory to be allocated dynamically.
  *
  * @return If the recursive mutex was successfully created then a handle to the
- * created recursive mutex is returned.  If pxMutexBuffer was NULL, and there
- * was not enough heap to allocate the mutex data structures, then NULL is
+ * created recursive mutex is returned.  If pxMutexBuffer was NULL then NULL is
  * returned.
  *
  * Example usage:
@@ -967,7 +953,7 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \ingroup Semaphores
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xSemaphoreCreateRecursiveMutexStatic( pxStaticSemaphore ) xQueueCreateMutex( queueQUEUE_TYPE_RECURSIVE_MUTEX, pxStaticSemaphore )
+	#define xSemaphoreCreateRecursiveMutexStatic( pxStaticSemaphore ) xQueueCreateMutexStatic( queueQUEUE_TYPE_RECURSIVE_MUTEX, pxStaticSemaphore )
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -976,6 +962,10 @@ typedef QueueHandle_t SemaphoreHandle_t;
  *
  * Creates a new counting semaphore instance, and returns a handle by which the
  * new counting semaphore can be referenced.
+ *
+ * In many usage scenarios it is faster and more memory efficient to use a
+ * direct to task notification in place of a counting semaphore!
+ * http://www.freertos.org/RTOS-task-notifications.html
  *
  * Internally, within the FreeRTOS implementation, counting semaphores use a
  * block of memory, in which the counting semaphore structure is stored.  If a
@@ -1042,7 +1032,9 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup xSemaphoreCreateCounting xSemaphoreCreateCounting
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateCounting( uxMaxCount, uxInitialCount ) xQueueCreateCountingSemaphore( ( uxMaxCount ), ( uxInitialCount ), ( NULL ) )
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+	#define xSemaphoreCreateCounting( uxMaxCount, uxInitialCount ) xQueueCreateCountingSemaphore( ( uxMaxCount ), ( uxInitialCount ) )
+#endif
 
 /**
  * semphr. h
@@ -1051,16 +1043,19 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * Creates a new counting semaphore instance, and returns a handle by which the
  * new counting semaphore can be referenced.
  *
+ * In many usage scenarios it is faster and more memory efficient to use a
+ * direct to task notification in place of a counting semaphore!
+ * http://www.freertos.org/RTOS-task-notifications.html
+ *
  * Internally, within the FreeRTOS implementation, counting semaphores use a
  * block of memory, in which the counting semaphore structure is stored.  If a
  * counting semaphore is created using xSemaphoreCreateCounting() then the
  * required memory is automatically dynamically allocated inside the
  * xSemaphoreCreateCounting() function.  (see
  * http://www.freertos.org/a00111.html).  If a counting semaphore is created
- * using xSemaphoreCreateCountingStatic() then the application writer can
- * instead optionally provide the memory that will get used by the counting
- * semaphore.  xSemaphoreCreateCountingStatic() therefore allows a counting
- * semaphore to be created without using any dynamic memory allocation.
+ * using xSemaphoreCreateCountingStatic() then the application writer must
+ * provide the memory.  xSemaphoreCreateCountingStatic() therefore allows a
+ * counting semaphore to be created without using any dynamic memory allocation.
  *
  * Counting semaphores are typically used for two things:
  *
@@ -1090,18 +1085,13 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * @param uxInitialCount The count value assigned to the semaphore when it is
  *        created.
  *
- * @param pxSemaphoreBuffer If pxSemaphoreBuffer is NULL then the memory
- * required to hold the semaphore's data structures will be allocated
- * dynamically, just as when a counting semaphore is created using
- * xSemaphoreCreateCounting().  If pxSemaphoreBuffer is not NULL then it must
- * point to a variable of type StaticSemaphore_t, which will then be used to
- * hold the semaphore's data structure, removing the need for the memory
- * to be allocated dynamically.
+ * @param pxSemaphoreBuffer Must point to a variable of type StaticSemaphore_t,
+ * which will then be used to hold the semaphore's data structure, removing the
+ * need for the memory to be allocated dynamically.
  *
  * @return If the counting semaphore was successfully created then a handle to
- * the created counting semaphore is returned.  If pxSemaphoreBuffer was NULL,
- * and there was not enough heap to allocate the counting semaphore data
- * structures, then NULL is returned.
+ * the created counting semaphore is returned.  If pxSemaphoreBuffer was NULL
+ * then NULL is returned.
  *
  * Example usage:
  <pre>
@@ -1128,7 +1118,7 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \ingroup Semaphores
  */
 #if( configSUPPORT_STATIC_ALLOCATION == 1 )
-	#define xSemaphoreCreateCountingStatic( uxMaxCount, uxInitialCount, pxSemaphoreBuffer ) xQueueCreateCountingSemaphore( ( uxMaxCount ), ( uxInitialCount ), ( pxSemaphoreBuffer ) )
+	#define xSemaphoreCreateCountingStatic( uxMaxCount, uxInitialCount, pxSemaphoreBuffer ) xQueueCreateCountingSemaphoreStatic( ( uxMaxCount ), ( uxInitialCount ), ( pxSemaphoreBuffer ) )
 #endif /* configSUPPORT_STATIC_ALLOCATION */
 
 /**
@@ -1162,11 +1152,11 @@ typedef QueueHandle_t SemaphoreHandle_t;
 
 /**
  * semphr.h
- * <pre>TaskHandle_t xSemaphoreGetCount( SemaphoreHandle_t xMutex );</pre>
+ * <pre>UBaseType_t uxSemaphoreGetCount( SemaphoreHandle_t xMutex );</pre>
  *
- * If the semaphore is a counting semaphore then xSemaphoreGetCount() returns
+ * If the semaphore is a counting semaphore then uxSemaphoreGetCount() returns
  * its current count value.  If the semaphore is a binary semaphore then
- * xSemaphoreGetCount() returns 1 if the semaphore is available, and 0 if the
+ * uxSemaphoreGetCount() returns 1 if the semaphore is available, and 0 if the
  * semaphore is not available.
  *
  */

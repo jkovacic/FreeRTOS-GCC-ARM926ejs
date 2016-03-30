@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V9.0.0rc1 - Copyright (C) 2016 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0rc2 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -86,6 +86,10 @@ task.h is included from an application file. */
 #include "task.h"
 
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 0 )
+	#error This file must not be used if configSUPPORT_DYNAMIC_ALLOCATION is 0
+#endif
 
 /* A few bytes might be lost to byte aligning the heap start address. */
 #define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
