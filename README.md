@@ -2,7 +2,7 @@
 [FreeRTOS](http://www.freertos.org/) ported to [ARM Versatile Platform Baseboard](http://infocenter.arm.com/help/topic/com.arm.doc.dui0225d/DUI0225D_versatile_application_baseboard_arm926ej_s_ug.pdf),
 based on the ARM926EJ-S CPU.
 
-The current version is based on FreeRTOS 8.2.3. The port will be regularly
+The current version is based on FreeRTOS 9.0.0. The port will be regularly
 updated with newer versions of FreeRTOS when they are released.
 
 The port is still at an early development stage and includes only very basic
