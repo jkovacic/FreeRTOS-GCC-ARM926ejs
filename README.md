@@ -2,7 +2,7 @@
 [FreeRTOS](http://www.freertos.org/) ported to [ARM Versatile Platform Baseboard](http://infocenter.arm.com/help/topic/com.arm.doc.dui0225d/DUI0225D_versatile_application_baseboard_arm926ej_s_ug.pdf),
 based on the ARM926EJ-S CPU.
 
-The current version is based on FreeRTOS 9.0.0. The port will be regularly
+The current version is based on FreeRTOS 10.0.0. The port will be regularly
 updated with newer versions of FreeRTOS when they are released.
 
 The port is still at an early development stage and includes only very basic
@@ -46,7 +46,7 @@ For more details, see extensive comments in both scripts.
 
 ## License
 All source and header files in FreeRTOS/ and its subdirectiories are licensed under
-the [modified GPL license](http://www.freertos.org/license.txt).
+the [MIT license](https://www.freertos.org/a00114.html).
 All other files that are not derived from the FreeRTOS source distribution are licensed
 under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 

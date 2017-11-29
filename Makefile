@@ -73,6 +73,7 @@ FREERTOS_OBJS = queue.o list.o tasks.o
 #FREERTOS_OBJS += timers.o
 #FREERTOS_OBJS += croutine.o
 #FREERTOS_OBJS += event_groups.o
+#FREERTOS_OBJS += stream_buffer.o
 
 # Only one memory management .o file must be uncommented!
 FREERTOS_MEMMANG_OBJS = heap_1.o
@@ -159,6 +160,9 @@ $(OBJDIR)croutine.o : $(FREERTOS_SRC)croutine.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 $(OBJDIR)event_groups.o : $(FREERTOS_SRC)event_groups.c
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
+
+$(OBJDIR)stream_buffer.o : $(FREERTOS_SRC)stream_buffer.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 
