@@ -86,7 +86,7 @@ extern "C" {
 #endif
 
 
-#if configMAX_PRIORITIES < 1
+#if( configMAX_PRIORITIES < 1 )
 	#error configMAX_PRIORITIES must be defined to be greater than or equal to 1.
 #endif
 
