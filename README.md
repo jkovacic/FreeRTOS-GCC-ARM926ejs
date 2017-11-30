@@ -45,10 +45,8 @@ multiple instances of _qemu-system-arm_ are running.
 For more details, see extensive comments in both scripts.
 
 ## License
-All source and header files in FreeRTOS/ and its subdirectiories are licensed under
+All source and header files are licensed under
 the [MIT license](https://www.freertos.org/a00114.html).
-All other files that are not derived from the FreeRTOS source distribution are licensed
-under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 
 For the avoidance of any doubt refer to the comment included at the top of each source and
 header file for license and copyright information.
