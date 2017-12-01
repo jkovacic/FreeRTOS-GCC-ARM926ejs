@@ -116,7 +116,7 @@ typedef struct _ARM926EJS_TIMER_REGS
  */
 #define CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
 
-static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS]=
+static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS] =
                          {
                              BSP_TIMER_BASE_ADDRESSES(CAST_ADDR)
                          };

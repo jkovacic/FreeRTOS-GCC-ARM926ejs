@@ -176,7 +176,7 @@ typedef struct _ARM926EJS_UART_REGS
 
 #define CAST_ADDR(ADDR)    (ARM926EJS_UART_REGS*) (ADDR),
 
-static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS]=
+static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS] =
                          {
                              BSP_UART_BASE_ADDRESSES(CAST_ADDR)
                          };

@@ -32,7 +32,7 @@
  * http://infocenter.arm.com/help/topic/com.arm.doc.dui0225d/DUI0225D_versatile_application_baseboard_arm926ej_s_ug.pdf
  *
  * The header should be included into each source file that implements peripherals' drivers
- * or handle their interrupt requests.
+ * or handles their interrupt requests.
  *
  * @author Jernej Kovacic
  */
