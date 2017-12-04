@@ -19,17 +19,17 @@
 
 
 # NOTE:
-# Only IA32 version of the toolchain is available. In order to work properly on 
-# x64 systems, 'ia32-libs' must also be installed.
+# For Linux, only 64-bit version of the toolchain is available. If building
+# on a 32-bit Linux host, consider using an older version of the toolchain or
+# building it from the provided source code.
 
-# Version 2014-05.28 of "Sourcery CodeBench Lite Edition for ARM EABI" 
-# (now owned by Mentor Graphics) is used as the toolchain. It can be downloaded from
-# http://www.mentor.com/embedded-software/sourcery-tools/sourcery-codebench/editions/lite-edition/arm-eabi
-# (a free registration is necessary to download). I downloaded the advanced package
-# of IA32 GNU/Linux TAR and manually unpacked it into /opt, so all paths 
-# will be relative to this one:
+# Version "6-2017-q2-update" of "GNU Arm Embedded Toolchain" 
+# is used as the toolchain. It can be downloaded from
+# https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
+# I downloaded the Linux 64-bit build of the toolchain and manually unpacked
+# it into /opt, so all paths will be relative to this one:
 
-TOOLCHAIN=/opt/arm-2014.05
+TOOLCHAIN=/opt/gcc-arm-none-eabi-6-2017-q2-update
 
 # Add a path to gnu-none-eabi-* executables:
 export PATH=$PATH:$TOOLCHAIN/bin

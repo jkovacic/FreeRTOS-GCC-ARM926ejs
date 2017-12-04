@@ -272,7 +272,10 @@ static inline void __printCh(uint8_t nr, char ch)
     * In this case, wait until some "waiting" characters have been transmitted and
     * the TXFF is set to 0, indicating the Transmit FIFO can accept additional characters.
     */
-   while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_TXFF ) );
+   while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_TXFF ) )
+   { 
+       /* an empty loop; prevents "-Werror=misleading-indentation" */
+   }
 
    /*
     * The Data Register is a 32-bit word, however only the least significant 8 bits

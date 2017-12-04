@@ -24,9 +24,9 @@
 #
 
 
-# Version 2014-05.28 of the Sourcery toolchain is used as a build tool.
-# See comments in "setenv.sh" for more details about downloading it
-# and setting the appropriate environment variables.
+# Version "6-2017-q2-update" of the "GNU Arm Embedded Toolchain" is used
+# as a build tool. See comments in "setenv.sh" for more details about
+# downloading it and setting the appropriate environment variables.
 
 TOOLCHAIN = arm-none-eabi-
 CC = $(TOOLCHAIN)gcc
