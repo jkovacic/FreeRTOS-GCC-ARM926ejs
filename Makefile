@@ -149,67 +149,23 @@ $(OBJDIR)startup.o : $(APP_SRC)startup.s
 
 
 # FreeRTOS core
-
-$(OBJDIR)queue.o : $(FREERTOS_SRC)queue.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)list.o : $(FREERTOS_SRC)list.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)tasks.o : $(FREERTOS_SRC)tasks.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)timers.o : $(FREERTOS_SRC)timers.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)croutine.o : $(FREERTOS_SRC)croutine.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)event_groups.o : $(FREERTOS_SRC)event_groups.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)stream_buffer.o : $(FREERTOS_SRC)stream_buffer.c
+$(OBJDIR)%.o : $(FREERTOS_SRC)%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
-
-$(OBJDIR)port.o : $(FREERTOS_PORT_SRC)port.c
+$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
-
-$(OBJDIR)portISR.o : $(FREERTOS_PORT_SRC)portISR.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
-
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
-
-$(OBJDIR)heap_1.o : $(FREERTOS_MEMMANG_SRC)heap_1.c
+$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)heap_2.o : $(FREERTOS_MEMMANG_SRC)heap_2.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)heap_3.o : $(FREERTOS_MEMMANG_SRC)heap_3.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)heap_4.o : $(FREERTOS_MEMMANG_SRC)heap_4.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)heap_5.o : $(FREERTOS_MEMMANG_SRC)heap_5.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
 
 # Drivers
-
-$(OBJDIR)timer.o : $(DRIVERS_SRC)timer.c $(DEP_BSP)
+$(OBJDIR)%.o : $(DRIVERS_SRC)%.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)interrupt.o : $(DRIVERS_SRC)interrupt.c $(DEP_BSP)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
-
-$(OBJDIR)uart.o : $(DRIVERS_SRC)uart.c $(DEP_BSP)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Demo application
 
