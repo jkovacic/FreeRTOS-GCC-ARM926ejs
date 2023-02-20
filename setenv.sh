@@ -32,7 +32,7 @@
 TOOLCHAIN=/opt/gcc-arm-none-eabi-6-2017-q2-update
 
 # Add a path to gnu-none-eabi-* executables:
-export PATH=$PATH:$TOOLCHAIN/bin
+export PATH=$TOOLCHAIN/bin:$PATH
 
 # After the script completes, you may check that output of
 #    echo $PATH
