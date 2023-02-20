@@ -42,7 +42,7 @@ OFLAG = -o
 INCLUDEFLAG = -I
 CPUFLAG = -mcpu=arm926ej-s
 WFLAG = -Wall -Wextra -Werror
-CFLAGS = $(CPUFLAG) $(WFLAG)
+CFLAGS = $(CPUFLAG) $(WFLAG) -O2
 
 # Additional C compiler flags to produce debugging symbols
 DEB_FLAG = -g -DDEBUG
@@ -155,7 +155,7 @@ $(OBJDIR)%.o : $(FREERTOS_SRC)%.c
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
 $(OBJDIR)%.o : $(FREERTOS_PORT_SRC)%.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+	$(CC) $(CFLAG) $(CFLAGS) -O1 $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
@@ -182,7 +182,7 @@ $(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
-	$(CC) $(CFLAG) $(CFLAGS) $< $(OFLAG) $@
+	$(CC) $(CFLAG) $(CFLAGS) -O1 $< $(OFLAG) $@
 
 
 # Cleanup directives:
