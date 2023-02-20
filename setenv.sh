@@ -29,7 +29,8 @@
 # I downloaded the Linux 64-bit build of the toolchain and manually unpacked
 # it into /opt, so all paths will be relative to this one:
 
-TOOLCHAIN=/opt/gcc-arm-none-eabi-6-2017-q2-update
+#TOOLCHAIN=/opt/gcc-arm-none-eabi-9-2020-q2-update
+TOOLCHAIN=/opt/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-eabi
 
 # Add a path to gnu-none-eabi-* executables:
 export PATH=$TOOLCHAIN/bin:$PATH
