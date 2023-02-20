@@ -210,6 +210,13 @@ help :
 	@echo - clean_intermediate: deletes all intermediate binaries, only keeps the target image \'$(TARGET)\'.
 	@echo - clean: deletes all intermediate binaries, incl. the target image \'$(TARGET)\'.
 	@echo - help: displays these help instructions.
+	@echo - run: run qemu.
 	@echo
 
-.PHONY : all rebuild clean clean_obj clean_intermediate debug debug_rebuild _debug_flags help
+
+run : all
+	@echo "Please exit qemu by pressing \"Ctrl-A x\""
+	qemu-system-arm -M versatilepb -nographic -m 128 -kernel image.bin
+
+
+.PHONY : all rebuild clean clean_obj clean_intermediate debug debug_rebuild _debug_flags help run
