@@ -31,43 +31,29 @@
  * @author Jernej Kovacic
  */
 
- #include <stdint.h>
+#include <stdint.h>
 
- #include "bsp.h"
+#include "bsp.h"
 
- #include "interrupt.h"
- #include "timer.h"
- #include "uart.h"
+#include "interrupt.h"
+#include "timer.h"
+#include "uart.h"
 
  /*
   * Performs initialization of all supported hardware.
   * All peripherals are stopped, their interrupt triggering is disabled, etc.
   */
- void _init(void)
- {
-     uint8_t i;
-     uint8_t j;
-     const uint8_t ctrs = timer_countersPerTimer();
+void _init(void)
+{
+    /* Disable IRQ triggering (may be reenabled after ISRs are properly set) */
+    irq_disableIrqMode();
 
-     /* Disable IRQ triggering (may be reenabled after ISRs are properly set) */
-     irq_disableIrqMode();
+    /* Init the vectored interrupt controller */
+    pic_init();
 
-     /* Init the vectored interrupt controller */
-     pic_init();
+    /* Init all counters of all available timers */
+    all_timer_init();
 
-     /* Init all counters of all available timers */
-     for ( i=0; i<BSP_NR_TIMERS; ++i )
-     {
-         for ( j=0; j<ctrs; ++j )
-         {
-             timer_init(i, j);
-         }
-     }
-
-     /* Init all available UARTs */
-     for ( i=0; i<BSP_NR_UARTS; ++i )
-     {
-         uart_init(i);
-     }
-
+    /* Init all available UARTs */
+    all_uart_init();
 }

@@ -59,6 +59,7 @@
 #define HWREG_CLEAR_BITS(reg, mask)      reg &= ~(mask);
 
 
+#if 0
 /**
  * First all "reg" bits, whose equivalent "mask" bits equal 1,
  * are cleared to 0.
@@ -69,6 +70,7 @@
 #define HWREG_SET_CLEAR_BITS(reg, value, mask) \
         reg &= ~( mask );   \
         reg |= ( (value) & (mask) );
+#endif
 
 
 /**

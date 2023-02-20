@@ -43,7 +43,9 @@
  */
 typedef void (*pVectoredIsrPrototype)(void);
 
+#if 0
 void irq_enableIrqMode(void);
+#endif
 
 void irq_disableIrqMode(void);
 
@@ -51,6 +53,7 @@ void pic_init(void);
 
 void pic_enableInterrupt(uint8_t irq);
 
+#if 0
 void pic_disableInterrupt(uint8_t irq);
 
 void pic_disableAllInterrupts(void);
@@ -62,12 +65,14 @@ int8_t pic_getInterruptType(uint8_t irq);
 void pic_setInterruptType(uint8_t irq, int8_t toIrq);
 
 void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr);
+#endif
 
 int8_t pic_registerIrq(
                         uint8_t irq,
                         pVectoredIsrPrototype addr,
                         uint8_t priority );
 
+#if 0
 void pic_unregisterIrq(uint8_t irq);
 
 void pic_unregisterAllIrqs(void);
@@ -79,6 +84,7 @@ int8_t pic_clearSwInterruptNr(uint8_t irq);
 int8_t pic_setSoftwareInterrupt(void);
 
 int8_t pic_clearSoftwareInterrupt(void);
+#endif
 
 
 #endif  /* _INTERRUPT_H_ */

@@ -37,26 +37,34 @@
 #include <stdint.h>
 
 
+void all_timer_init(void);
+
 void timer_init(uint8_t timerNr, uint8_t counterNr);
 
 void timer_start(uint8_t timerNr, uint8_t counterNr);
 
+#if 0
 void timer_stop(uint8_t timerNr, uint8_t counterNr);
 
 int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr);
+#endif
 
 void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr);
 
+#if 0
 void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr);
+#endif
 
 void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr);
 
 void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value);
 
+#if 0
 uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr);
 
 const volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr);
 
 uint8_t timer_countersPerTimer(void);
+#endif
 
 #endif  /* _TIMER_H_*/

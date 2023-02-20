@@ -67,8 +67,10 @@
 /* Base address of the Primary Interrupt Controller (see page 4-44 of the DUI0225D): */
 #define BSP_PIC_BASE_ADDRESS        ( 0x10140000 )
 
+#if 0
 /* Base address of the Secondary Interrupt Controller (see page 4-44 of the DUI0225D): */
 #define BSP_SIC_BASE_ADDRESS        ( 0x10003000 )
+#endif
 
 
 
@@ -105,6 +107,7 @@
 
 
 
+#if 0
 /*
  * Base address and IRQ of the built-in real time clock (RTC) controller
  * (see page 4-60 of the DUI0225D):
@@ -131,6 +134,7 @@
  */
 
 #define BSP_SOFTWARE_IRQ            ( 1 )
+#endif
 
 
 #endif   /* _BSP_H_ */

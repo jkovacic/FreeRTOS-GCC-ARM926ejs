@@ -42,6 +42,7 @@
 
 #include "regutil.h"
 #include "bsp.h"
+#include "uart.h"
 
 
 /*
@@ -193,14 +194,8 @@ static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS] =
  *
  * @param nr - number of the UART (between 0 and 2)
  */
-void uart_init(uint8_t nr)
+static void uart_init(uint8_t nr)
 {
-    /* Sanity check */
-    if ( nr >= BSP_NR_UARTS )
-    {
-        return;
-    }
-
     /*
      * Registers' reserved bits should not be modified.
      * For that reason, the registers are set in two steps:
@@ -245,6 +240,21 @@ void uart_init(uint8_t nr)
     HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 
     /* reserved bits remained unmodified */
+}
+
+
+/**
+ * Initializes a UART controller.
+ */
+void all_uart_init(void)
+{
+    uint8_t i;
+
+    /* Init all available UARTs */
+    for ( i=0; i<BSP_NR_UARTS; ++i )
+    {
+        uart_init(i);
+    }
 }
 
 
@@ -350,6 +360,7 @@ void uart_print(uint8_t nr, const char* str)
 }
 
 
+#if 0
 /**
  * Enables the specified UART controller.
  *
@@ -386,6 +397,7 @@ void uart_disableUart(uint8_t nr)
 
     HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
+#endif
 
 
 /*
@@ -451,6 +463,7 @@ void uart_enableTx(uint8_t nr)
 }
 
 
+#if 0
 /**
  * Disables specified UART's transmit (Tx) section.
  * UART's general enable status (UARTEN) remains unmodified.
@@ -463,6 +476,7 @@ void uart_disableTx(uint8_t nr)
 {
     __setCrBit(nr, false, CTL_TXE);
 }
+#endif
 
 
 /**
@@ -479,6 +493,7 @@ void uart_enableRx(uint8_t nr)
 }
 
 
+#if 0
 /**
  * Disables specified UART's transmit (Rx) section.
  * UART's general enable status (UARTEN) remains unmodified.
@@ -491,6 +506,7 @@ void uart_disableRx(uint8_t nr)
 {
     __setCrBit(nr, false, CTL_RXE);
 }
+#endif
 
 
 /**
@@ -513,6 +529,7 @@ void uart_enableRxInterrupt(uint8_t nr)
 }
 
 
+#if 0
 /**
  * Disables the interrupt triggering by the specified UART when a character is received.
  *
@@ -531,6 +548,7 @@ void uart_disableRxInterrupt(uint8_t nr)
     /* Clear bit 4 of the IMSC register: */
     HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
 }
+#endif
 
 
 /**

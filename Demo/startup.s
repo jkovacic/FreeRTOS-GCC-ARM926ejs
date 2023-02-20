@@ -95,7 +95,7 @@ vectors_end:
 /*
  * Implementation of the reset handler, executed also at startup.
  * It sets stack pointers for all supported operating modes (Supervisor,
- * IRQ and System), disables IRQ iand FIQ nterrupts for all modes and finally
+ * IRQ and System), disables IRQ and FIQ interrupts for all modes and finally
  * it jumps into the startup function.
  *
  * Note: 'stack_top', 'irq_stack_top' and 'svc_stack_top' are allocated in qemu.ld

@@ -52,6 +52,7 @@
 
 #include "regutil.h"
 #include "bsp.h"
+#include "uart.h"
 
 /* For public definitions of types: */
 #include "interrupt.h"
@@ -162,6 +163,7 @@ static isrVectRecord __irqVect[NR_INTERRUPTS];
 
 
 
+#if 0
 /**
  * Enable CPU's IRQ mode that handles IRQ interrupt requests.
  */
@@ -177,6 +179,7 @@ void irq_enableIrqMode(void)
     __asm volatile("BIC r0, r0, #0x80");   /* Clear bit 8, (0x80) -- Causes IRQs to be enabled. */
     __asm volatile("MSR cpsr_c, r0");      /* Write it back to the CPSR register */
 }
+#endif
 
 
 /**
@@ -186,7 +189,7 @@ void irq_disableIrqMode(void)
 {
     /*
      * To disable IRQ mode, bit 7 of the Program Status Register (CSPR)
-     * must be set t1 0. See pp. 2-15 to 2-17 of the DDI0222 for more details.
+     * must be set to 0. See pp. 2-15 to 2-17 of the DDI0222 for more details.
      * The CSPR can only be accessed using assembler.
      */
 
@@ -197,7 +200,7 @@ void irq_disableIrqMode(void)
 
 
 /* a prototype required for __irq_dummyISR() */
-extern void uart_print(uint8_t nr, char* str);
+/* extern void uart_print(uint8_t nr, char* str); */
 
 /*
  * A dummy ISR routine for servicing vectored IRQs.
@@ -359,6 +362,7 @@ void pic_enableInterrupt(uint8_t irq)
 }
 
 
+#if 0
 /**
  * Disable the the interrupt request line on the PIC for the specified interrupt number.
  *
@@ -485,6 +489,7 @@ void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr)
         pPicReg->VICDEFVECTADDR = (uint32_t) addr;
     }
 }
+#endif
 
 
 /**
@@ -623,6 +628,7 @@ int8_t pic_registerIrq(
 }
 
 
+#if 0
 /**
  * Unregisters a vector interrupt ISR for the requested interrupt request line.
  *
@@ -819,3 +825,4 @@ int8_t pic_clearSoftwareInterrupt(void)
 {
     return pic_clearSwInterruptNr(BSP_SOFTWARE_IRQ);
 }
+#endif

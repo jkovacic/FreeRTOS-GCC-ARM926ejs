@@ -47,6 +47,7 @@
 
 #include "regutil.h"
 #include "bsp.h"
+#include "timer.h"
 
 
 /* Number of counters per timer: */
@@ -123,6 +124,25 @@ static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS] =
 
 #undef CAST_ADDR
 
+
+/**
+ * Initializes all timer controller.
+ */
+void all_timer_init(void)
+{
+    uint8_t i, j;
+
+    /* Init all counters of all available timers */
+    for ( i=0; i<BSP_NR_TIMERS; ++i )
+    {
+        for ( j=0; j<NR_COUNTERS; ++j )
+        {
+            timer_init(i, j);
+        }
+    }
+}
+
+
 /**
  * Initializes the specified timer's counter controller.
  * The following parameters are set:
@@ -164,7 +184,7 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, ( CTL_MODE | CTL_CTRLEN ) );
 
     /*
-     * The following bits are will be to 0:
+     * The following bits will be set to 0:
      * - enable bit (disabled, i.e. timer not running)
      * - interrupt bit (disabled)
      * - both prescale bits (00 = 1)
@@ -200,6 +220,7 @@ void timer_start(uint8_t timerNr, uint8_t counterNr)
 }
 
 
+#if 0
 /**
  * Stops the specified timer's counter.
  *
@@ -248,6 +269,7 @@ int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
     /* just check the enable bit of the timer's Control Register */
     return ( 0!=HWREG_READ_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE ) );
 }
+#endif
 
 
 /**
@@ -272,6 +294,7 @@ void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
 }
 
 
+#if 0
 /**
  * Disables the timer's interrupt triggering (when the counter reaches 0).
  *
@@ -292,6 +315,7 @@ void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
     /* Set bit 5 of the Control Register to 0, do not modify other bits */
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
 }
+#endif
 
 
 /**
@@ -347,6 +371,7 @@ void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value)
 }
 
 
+#if 0
 /**
  * Returns the value of the specified counter's Value Register,
  * i.e. the value of the counter at the moment of reading.
@@ -405,3 +430,4 @@ uint8_t timer_countersPerTimer(void)
 {
     return NR_COUNTERS;
 }
+#endif
