@@ -96,7 +96,7 @@ int16_t recvInit(void)
     const uint8_t irq = ( uart_nr<BSP_NR_UARTS ?  uartIrqs[uart_nr] : MY_UINT8_MAX);
     uint16_t i;
 
-    for ( i=0; i<RECV_BUFFER_SIZE; ++i )
+    for ( i=0U; i<RECV_BUFFER_SIZE; ++i )
     {
         memset((void*) buf[i], '\0', RECV_TOTAL_BUFFER_LEN);
         strcpy(buf[i], MSG_TEXT);

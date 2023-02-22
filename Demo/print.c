@@ -57,7 +57,7 @@
 static portCHAR printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
-static uint16_t chBufCntr = 0;
+static uint16_t chBufCntr = 0U;
 
 
 
@@ -87,12 +87,12 @@ int16_t printInit(void)
      * Initialize the character print buffer.
      * It is sufficient to set each string's second character to '\0'.
      */
-    for ( i=0; i<PRINT_CHR_BUF_SIZE; ++i )
+    for ( i=0U; i<PRINT_CHR_BUF_SIZE; ++i )
     {
         printChBuf[i][1] = '\0';
     }
 
-    chBufCntr = 0;
+    chBufCntr = 0U;
 
     /* Check if UART number is valid */
     if ( uart_nr >= BSP_NR_UARTS )

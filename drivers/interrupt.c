@@ -129,7 +129,7 @@ typedef struct _ARM926EJS_SIC_REGS
 /* SIC_PICENSET (Set interrupt pass through bits) shares its address with SIC_PICENABLE. */
 #define SIC_PICENSET    SIC_PICENABLE
 
-#endif /* if 0 */
+#endif
 
 
 #define UL0                    ( 0x00000000U )
