@@ -34,7 +34,7 @@
 #include <FreeRTOS.h>
 
 
-int16_t printInit(uint16_t uart_nr);
+int16_t printInit(void);
 
 void printGateKeeperTask(void* params);
 

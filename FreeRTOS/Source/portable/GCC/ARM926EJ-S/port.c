@@ -201,9 +201,13 @@ static void prvSetupTimerInterrupt( void )
 #error Invalid timer selected!
 #endif
 
-	uint32_t ulCompareMatch;
+    uint32_t ulCompareMatch;
+#if 0
     const uint8_t irqs[BSP_NR_TIMERS] = BSP_TIMER_IRQS;
-    const uint8_t irq = irqs[portTICK_TIMER];
+    const uint8_t irq = irqs[portTICK_TIMER]; /* This is IRQ4. */
+#else
+    const uint8_t irq = 4U;
+#endif
 
     extern void vTickISR(void);
 
@@ -225,7 +229,7 @@ static void prvSetupTimerInterrupt( void )
     timer_enableInterrupt(portTICK_TIMER, portTICK_TIMER_COUNTER);
 
     /* Configure the VIC to service IRQ4 (triggered by the timer) properly */
-    pic_registerIrq(irq, &vTickISR, PIC_MAX_PRIORITY);
+    (void) pic_registerIrq(irq, &vTickISR, PIC_MAX_PRIORITY);
 
     /* Enable servicing of IRQ4 */
     pic_enableInterrupt(irq);

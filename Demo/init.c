@@ -46,7 +46,7 @@
 void _init(void)
 {
     /* Disable IRQ triggering (may be reenabled after ISRs are properly set) */
-    irq_disableIrqMode();
+    /* irq_disableIrqMode(); This is already done in startup.s??? */
 
     /* Init the vectored interrupt controller */
     pic_init();

@@ -63,16 +63,7 @@
 #define _BSP_H_
 
 
-
-/* Base address of the Primary Interrupt Controller (see page 4-44 of the DUI0225D): */
-#define BSP_PIC_BASE_ADDRESS        ( 0x10140000 )
-
-#if 0
-/* Base address of the Secondary Interrupt Controller (see page 4-44 of the DUI0225D): */
-#define BSP_SIC_BASE_ADDRESS        ( 0x10003000 )
-#endif
-
-
+#define MY_UINT8_MAX ((uint8_t) 255U)
 
 
 /*
@@ -80,7 +71,7 @@
  * (see page 4-68 of the DUI0225D):
  */
 
-#define BSP_NR_UARTS        ( 3 )
+#define BSP_NR_UARTS        ( 3U )
 
 #define BSP_UART_BASE_ADDRESSES(CAST) \
     CAST( (0x101F1000) ) \
@@ -97,7 +88,7 @@
  * (see pp. 4-21  and 4-67 of DUI0225D):
  */
 
-#define BSP_NR_TIMERS       ( 2 )
+#define BSP_NR_TIMERS       ( 2U )
 
 #define BSP_TIMER_BASE_ADDRESSES(CAST) \
     CAST( (0x101E2000) ) \

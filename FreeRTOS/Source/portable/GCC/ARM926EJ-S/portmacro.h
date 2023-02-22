@@ -33,7 +33,6 @@
  * https://www.FreeRTOS.org
  * https://github.com/FreeRTOS
  *
- * 1 tab == 4 spaces!
  */
 
 
@@ -74,30 +73,35 @@ typedef uint32_t UBaseType_t;
     typedef uint32_t TickType_t;
     #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
 #endif
+
+/* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
+   not need to be guarded with a critical section. Different on 16-bit: */
+/* #define portTICK_TYPE_IS_ATOMIC 1 */
+
+#define portMEMORY_BARRIER() __asm volatile( "" ::: "memory" )
+
 /*-----------------------------------------------------------*/
 
 /* Architecture specifics. */
 #define portSTACK_GROWTH            ( -1 )
 #define portTICK_PERIOD_MS          ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT          8
-#define portNOP()                   __asm volatile ( "NOP" );
+/* #define portNOP()                   __asm volatile ( "NOP" ); */
 /*-----------------------------------------------------------*/
 
 
 /* Scheduler utilities. */
+extern volatile unsigned long ulCriticalNesting;
 
 /*
- * portRESTORE_CONTEXT, portRESTORE_CONTEXT, portENTER_SWITCHING_ISR
- * and portEXIT_SWITCHING_ISR can only be called from ARM mode, but
- * are included here for efficiency.  An attempt to call one from
- * THUMB mode code will result in a compile time error.
+ * portRESTORE_CONTEXT and portSAVE_CONTEXT can only be called from
+ * ARM mode, but are included here for efficiency.  An attempt to call
+ * one from THUMB mode code will result in a compile time error.
  */
 
 #define portRESTORE_CONTEXT()                                           \
 {                                                                       \
-extern volatile void * volatile pxCurrentTCB;                           \
-extern volatile uint32_t ulCriticalNesting;                    \
-                                                                        \
+    extern volatile void * volatile pxCurrentTCB;                       \
     /* Set the LR to the task stack. */                                 \
     __asm volatile (                                                    \
     "LDR        R0, =pxCurrentTCB                               \n\t"   \
@@ -132,9 +136,7 @@ extern volatile uint32_t ulCriticalNesting;                    \
 
 #define portSAVE_CONTEXT()                                              \
 {                                                                       \
-extern volatile void * volatile pxCurrentTCB;                           \
-extern volatile uint32_t ulCriticalNesting;                    \
-                                                                        \
+    extern volatile void * volatile pxCurrentTCB;                       \
     /* Push R0 as we are going to use the register. */                  \
     __asm volatile (                                                    \
     "STMDB  SP!, {R0}                                           \n\t"   \
@@ -176,7 +178,7 @@ extern volatile uint32_t ulCriticalNesting;                    \
     ( void ) pxCurrentTCB;                                              \
 }
 
-extern void vTaskSwitchContext( void );
+/* extern void vTaskSwitchContext( void ); */
 #define portYIELD_FROM_ISR()        vTaskSwitchContext()
 #define portYIELD()                 __asm volatile ( "SWI 0" )
 /*-----------------------------------------------------------*/

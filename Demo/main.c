@@ -53,20 +53,20 @@
 /* Struct with settings for each task */
 typedef struct _paramStruct
 {
-    portCHAR* text;                  /* text to be printed by the task */
-    UBaseType_t  delay;              /* delay in milliseconds */
+    const portCHAR* text;            /* text to be printed by the task */
+    UBaseType_t delay;               /* delay in milliseconds */
 } paramStruct;
 
 /* Default parameters if no parameter struct is available */
 static const portCHAR defaultText[] = "<NO TEXT>\r\n";
-static const UBaseType_t defaultDelay = 1000;
+static const UBaseType_t defaultDelay = 1000U;
 
 
 /* Task function - may be instantiated in multiple tasks */
-void vTaskFunction( void *pvParameters )
+static void vTaskFunction( void *pvParameters )
 {
     const portCHAR* taskName;
-    UBaseType_t  delay;
+    UBaseType_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
     taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
@@ -91,7 +91,7 @@ void vTaskFunction( void *pvParameters )
 
 
 /* Fixed frequency periodic task function - may be instantiated in multiple tasks */
-void vPeriodicTaskFunction(void* pvParameters)
+static void vPeriodicTaskFunction(void* pvParameters)
 {
     const portCHAR* taskName;
     UBaseType_t delay;
@@ -131,10 +131,10 @@ void vPeriodicTaskFunction(void* pvParameters)
 
 
 /* Parameters for two tasks */
-static const paramStruct tParam[2] =
+static paramStruct tParam[2] =
 {
-    (paramStruct) { .text="Task1\r\n", .delay=2000 },
-    (paramStruct) { .text="Periodic task\r\n", .delay=3000 }
+    { "Task1\r\n", 2000U },
+    { "Periodic task\r\n", 3000U }
 };
 
 
@@ -157,7 +157,7 @@ static void FreeRTOS_Error(const portCHAR* msg)
 void main(void)
 {
     /* Init of print related tasks: */
-    if ( pdFAIL == printInit(PRINT_UART_NR) )
+    if ( pdFAIL == printInit() )
     {
         FreeRTOS_Error("Initialization of print failed\r\n");
     }
@@ -171,7 +171,7 @@ void main(void)
     vDirectPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
 
     /* Init of receiver related tasks: */
-    if ( pdFAIL == recvInit(RECV_UART_NR) )
+    if ( pdFAIL == recvInit() )
     {
         FreeRTOS_Error("Initialization of receiver failed\r\n");
     }
@@ -189,13 +189,13 @@ void main(void)
     }
 
     /* And finally create two tasks: */
-    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0],
+    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void * const) &tParam[0],
                                PRIOR_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task1\r\n");
     }
 
-    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void*) &tParam[1],
+    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void * const) &tParam[1],
                                PRIOR_FIX_FREQ_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task2\r\n");

@@ -42,7 +42,7 @@
  * A definition with a LSB set, it can be shifted left
  * to represent any single bit.
  */
-#define MASK_ONE           ( 0x00000001 )
+#define MASK_ONE           ( 0x00000001U )
 
 
 /**
@@ -83,7 +83,7 @@
 /**
  * Returns a mask with a "bit"'th least significant bit set.
  */
-#define HWREG_SINGLE_BIT_MASK(bit)       ( MASK_ONE << bit )
+#define HWREG_SINGLE_BIT_MASK(bit)       ( MASK_ONE << (bit) )
 
 
 /**

@@ -69,13 +69,13 @@
  *   0: one shot enable bit (0: wrapping, 1: one shot)
  */
 
-#define CTL_ENABLE          ( 0x00000080 )
-#define CTL_MODE            ( 0x00000040 )
-#define CTL_INTR            ( 0x00000020 )
-#define CTL_PRESCALE_1      ( 0x00000008 )
-#define CTL_PRESCALE_2      ( 0x00000004 )
-#define CTL_CTRLEN          ( 0x00000002 )
-#define CTL_ONESHOT         ( 0x00000001 )
+#define CTL_ENABLE          ( 0x00000080U )
+#define CTL_MODE            ( 0x00000040U )
+#define CTL_INTR            ( 0x00000020U )
+#define CTL_PRESCALE_1      ( 0x00000008U )
+#define CTL_PRESCALE_2      ( 0x00000004U )
+#define CTL_CTRLEN          ( 0x00000002U )
+#define CTL_ONESHOT         ( 0x00000001U )
 
 
 /*
@@ -85,13 +85,13 @@
 typedef struct _SP804_COUNTER_REGS
 {
     uint32_t LOAD;                   /* Load Register, TimerXLoad */
-    const uint32_t VALUE;            /* Current Value Register, TimerXValue, read only */
+    uint32_t VALUE;                  /* Current Value Register, TimerXValue, read only */
     uint32_t CONTROL;                /* Control Register, TimerXControl */
     uint32_t INTCLR;                 /* Interrupt Clear Register, TimerXIntClr, write only */
     uint32_t RIS;                    /* Raw Interrupt Status Register, TimerXRIS, read only */
     uint32_t MIS;                    /* Masked Interrupt Status Register, TimerXMIS, read only */
     uint32_t BGLOAD;                 /* Background Load Register, TimerXBGLoad */
-    const uint32_t Unused;           /* Unused, should not be modified */
+    uint32_t Unused;                 /* Unused, should not be modified */
 } SP804_COUNTER_REGS;
 
 
@@ -103,12 +103,12 @@ typedef struct _SP804_COUNTER_REGS
 typedef struct _ARM926EJS_TIMER_REGS
 {
     SP804_COUNTER_REGS CNTR[NR_COUNTERS];     /* Registers for each of timer's two counters */
-    const uint32_t Reserved1[944];            /* Reserved for future expansion, should not be modified */
+    uint32_t Reserved1[944];                  /* Reserved for future expansion, should not be modified */
     uint32_t ITCR;                            /* Integration Test Control Register */
     uint32_t ITOP;                            /* Integration Test Output Set Register, write only */
-    const uint32_t Reserved2[54];             /* Reserved for future expansion, should not be modified */
-    const uint32_t PERIPHID[4];               /* Timer Peripheral ID, read only */
-    const uint32_t CELLID[4];                 /* PrimeCell ID, read only */
+    uint32_t Reserved2[54];                   /* Reserved for future expansion, should not be modified */
+    uint32_t PERIPHID[4];                     /* Timer Peripheral ID, read only */
+    uint32_t CELLID[4];                       /* PrimeCell ID, read only */
 } ARM926EJS_TIMER_REGS;
 
 
@@ -117,7 +117,7 @@ typedef struct _ARM926EJS_TIMER_REGS
  */
 #define CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
 
-static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS] =
+static volatile ARM926EJS_TIMER_REGS* const pReg[BSP_NR_TIMERS] =
                          {
                              BSP_TIMER_BASE_ADDRESSES(CAST_ADDR)
                          };
@@ -340,7 +340,7 @@ void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr)
      * Interrupt Clear Register clears the timer's interrupt output.
      * See page 3-6 of DDI0271.
      */
-    pReg[timerNr]->CNTR[counterNr].INTCLR = 0xFFFFFFFF;
+    pReg[timerNr]->CNTR[counterNr].INTCLR = 0xFFFFFFFFU;
 }
 
 
@@ -410,7 +410,7 @@ uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr)
  *
  * @return read-only address of the timer's counter (i.e. the Value Register)
  */
-const volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
+volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
 {
 
     /* sanity check: */
@@ -419,7 +419,7 @@ const volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
         return NULL;
     }
 
-    return (const volatile uint32_t*) &(pReg[timerNr]->CNTR[counterNr].VALUE);
+    return (volatile uint32_t*) &(pReg[timerNr]->CNTR[counterNr].VALUE);
 }
 
 

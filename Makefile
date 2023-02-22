@@ -41,7 +41,10 @@ CFLAG = -c
 OFLAG = -o
 INCLUDEFLAG = -I
 CPUFLAG = -mcpu=arm926ej-s
-WFLAG = -Wall -Wextra -Werror
+WFLAG = -Wall -Wextra -pedantic
+#WFLAG += -Werror
+#WFLAG += -Wundef -Wshadow -Wwrite-strings -Wold-style-definition -Wcast-align=strict -Wunreachable-code -Waggregate-return -Wlogical-op -Wtrampolines -Wc90-c99-compat -Wc99-c11-compat
+#WFLAG += -Wconversion -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Wcast-qual -Wswitch-default
 CFLAGS = $(CPUFLAG) $(WFLAG) -O2
 
 # Additional C compiler flags to produce debugging symbols

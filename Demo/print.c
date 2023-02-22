@@ -34,6 +34,7 @@
 #include "app_config.h"
 #include "bsp.h"
 #include "uart.h"
+#include "print.h"
 
 
 
@@ -61,7 +62,7 @@ static uint16_t chBufCntr = 0;
 
 
 /* UART number: */
-static uint8_t printUartNr = (uint8_t) -1;
+static uint8_t printUartNr = MY_UINT8_MAX;
 
 /* Messages to be printed will be pushed to this queue */
 static QueueHandle_t printQueue;
@@ -77,8 +78,9 @@ static QueueHandle_t printQueue;
  *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-int16_t printInit(uint8_t uart_nr)
+int16_t printInit(void)
 {
+    uint8_t uart_nr = PRINT_UART_NR;
     uint16_t i;
 
     /*

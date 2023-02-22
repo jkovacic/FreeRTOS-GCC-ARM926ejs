@@ -33,9 +33,9 @@
 #define _TICK_TIMER_SETTINGS_H_
 
 
-#define portTICK_TIMER               ( 0 )
+#define portTICK_TIMER               ( 0U )
 
-#define portTICK_TIMER_COUNTER       ( 0 )
+#define portTICK_TIMER_COUNTER       ( 0U )
 
 
 #endif  /* _TICK_TIMER_SETTINGS_H_ */

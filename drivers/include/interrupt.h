@@ -36,7 +36,7 @@
 
 #include <stdint.h>
 
-#define PIC_MAX_PRIORITY     ( 127 )
+#define PIC_MAX_PRIORITY     ( 127U )
 
 /**
  * Required prototype for vectored ISR servicing routines

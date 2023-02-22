@@ -38,8 +38,8 @@
 /* Settings for main.c */
 
 /* Uart(s) to print to and/or to receive from */
-#define PRINT_UART_NR                    ( 0 )
-#define RECV_UART_NR                     ( 0 )
+#define PRINT_UART_NR                    ( 0U )
+#define RECV_UART_NR                     ( 0U )
 
 /*
  * Priorities of certain tasks.
@@ -76,6 +76,6 @@
  * Note: this limit does not include '\0' and additional extra characters, necessary
  * to print the string properly.
  */
-#define RECV_BUFFER_LEN                  ( 50 )
+#define RECV_BUFFER_LEN                  ( 50U )
 
 #endif  /* _APP_CONFIG_H_ */
