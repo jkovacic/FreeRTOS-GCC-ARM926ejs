@@ -92,9 +92,7 @@ extern void vPortISRStartFirstTask( void );
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-StackType_t *pxOriginalTOS;
-
-    pxOriginalTOS = pxTopOfStack;
+    StackType_t *pxOriginalTOS = pxTopOfStack;
 
     /* To ensure asserts in tasks.c don't fail, although in this case the assert
     is not really required. */
@@ -147,7 +145,7 @@ StackType_t *pxOriginalTOS;
     system mode, with interrupts enabled. */
     *pxTopOfStack = ( StackType_t ) portINITIAL_SPSR;
 
-    if( ( ( uint32_t ) pxCode & 0x01UL ) != 0x00 )
+    if( ( ( uint32_t ) pxCode & 0x01UL ) != 0x00U )
     {
         /* We want the task to start in thumb mode. */
         *pxTopOfStack |= portTHUMB_MODE_BIT;

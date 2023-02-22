@@ -93,7 +93,7 @@ int16_t recvInit(void)
     /* Obtain the UART's IRQ from BSP */
     const uint8_t uart_nr = RECV_UART_NR;
     const uint8_t uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
-    const uint8_t irq = ( uart_nr<BSP_NR_UARTS ?  uartIrqs[uart_nr] : MY_UINT8_MAX);
+    const uint8_t irq = (uart_nr < BSP_NR_UARTS)?  uartIrqs[uart_nr] : MY_UINT8_MAX;
     uint16_t i;
 
     for ( i=0U; i<RECV_BUFFER_SIZE; ++i )

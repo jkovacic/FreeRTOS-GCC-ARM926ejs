@@ -142,7 +142,6 @@ void vFreeRTOS_ISR( void )
  */
 void vTickISR( void )
 {
-
     /* Increment the RTOS tick count, then look for the highest priority
     task that is ready to run. */
     __asm volatile
@@ -156,7 +155,6 @@ void vTickISR( void )
 
     /* Acknowledge the interrupt on timer */
     timer_clearInterrupt(portTICK_TIMER, portTICK_TIMER_COUNTER);
-
 }
 
 
@@ -224,14 +222,14 @@ void vPortEnterCritical( void )
 
 void vPortExitCritical( void )
 {
-    if( ulCriticalNesting > portNO_CRITICAL_NESTING )
+    if ( ulCriticalNesting > portNO_CRITICAL_NESTING )
     {
         /* Decrement the nesting count as we are leaving a critical section. */
         ulCriticalNesting--;
 
         /* If the nesting level has reached zero then interrupts should be
         re-enabled. */
-        if( ulCriticalNesting == portNO_CRITICAL_NESTING )
+        if ( ulCriticalNesting == portNO_CRITICAL_NESTING )
         {
             /*
              * NOTE:
