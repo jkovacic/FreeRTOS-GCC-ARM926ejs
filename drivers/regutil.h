@@ -49,14 +49,14 @@
  * All bits of "reg", whose equivalent "mask" bits equal 1,
  * are set to 1. All other "reg" bits remain unmodified.
  */
-#define HWREG_SET_BITS(reg, mask)        reg |= (mask);
+#define HWREG_SET_BITS(reg, mask)        reg |= (mask)
 
 
 /**
  * All bits of "reg", whose equivalent 'mask' bits equal 1,
  * are cleared to 0. All other "reg" bits remain unmodified.
  */
-#define HWREG_CLEAR_BITS(reg, mask)      reg &= ~(mask);
+#define HWREG_CLEAR_BITS(reg, mask)      reg &= ~(mask)
 
 
 #if 0

@@ -69,8 +69,8 @@ static void vTaskFunction( void *pvParameters )
     UBaseType_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
-    taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
-    delay = ( NULL==params ? defaultDelay : params->delay);
+    taskName = ( NULL==params || NULL==params->text ) ? defaultText : params->text;
+    delay = ( NULL==params ) ? defaultDelay : params->delay;
 
     for( ; ; )
     {
@@ -98,8 +98,8 @@ static void vPeriodicTaskFunction(void* pvParameters)
     paramStruct* params = (paramStruct*) pvParameters;
     TickType_t lastWakeTime;
 
-    taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
-    delay = ( NULL==params ? defaultDelay : params->delay);
+    taskName = ( NULL==params || NULL==params->text ) ? defaultText : params->text;
+    delay = ( NULL==params ) ? defaultDelay : params->delay;
 
     /*
      * This variable must be initialized once.
@@ -130,14 +130,6 @@ static void vPeriodicTaskFunction(void* pvParameters)
 }
 
 
-/* Parameters for two tasks */
-static paramStruct tParam[2] =
-{
-    { "Task1\r\n", 2000U },
-    { "Periodic task\r\n", 3000U }
-};
-
-
 /*
  * A convenience function that is called when a FreeRTOS API call fails
  * and a program cannot continue. It prints a message (if provided) and
@@ -156,6 +148,13 @@ static void FreeRTOS_Error(const portCHAR* msg)
 /* Startup function that creates and runs two FreeRTOS tasks */
 void main(void)
 {
+    /* Parameters for two tasks */
+    static paramStruct tParam[2] =
+    {
+        { "Task1\r\n", 2000U },
+        { "Periodic task\r\n", 3000U }
+    };
+
     /* Init of print related tasks: */
     if ( pdFAIL == printInit() )
     {
