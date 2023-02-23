@@ -34,7 +34,6 @@
  *
  * https://www.FreeRTOS.org
  * https://github.com/FreeRTOS
- *
  */
 
 /*-----------------------------------------------------------
@@ -42,24 +41,6 @@
  * contained in port.c  The ISR routines, which can only be compiled
  * to ARM mode, are contained in this file.
  *----------------------------------------------------------*/
-
-/*
-    Changes from V2.5.2
-
-    + The critical section management functions have been changed.  These no
-      longer modify the stack and are safe to use at all optimisation levels.
-      The functions are now also the same for both ARM and THUMB modes.
-
-    Changes from V2.6.0
-
-    + Removed the 'static' from the definition of vNonPreemptiveTick() to
-      allow the demo to link when using the cooperative scheduler.
-
-    Changes from V3.2.4
-
-    + The assembler statements are now included in a single asm block rather
-      than each line having its own asm block.
-*/
 
 
 /* Scheduler includes. */

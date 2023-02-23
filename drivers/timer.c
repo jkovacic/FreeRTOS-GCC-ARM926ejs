@@ -51,7 +51,7 @@
 
 
 /* Number of counters per timer: */
-#define NR_COUNTERS      ( 2 )
+#define NR_COUNTERS      ( 2U )
 
 
 /*
@@ -133,9 +133,9 @@ void all_timer_init(void)
     uint8_t i, j;
 
     /* Init all counters of all available timers */
-    for ( i=0; i<BSP_NR_TIMERS; ++i )
+    for ( i=0U; i<BSP_NR_TIMERS; ++i )
     {
-        for ( j=0; j<NR_COUNTERS; ++j )
+        for ( j=0U; j<NR_COUNTERS; ++j )
         {
             timer_init(i, j);
         }
