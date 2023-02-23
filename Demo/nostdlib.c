@@ -34,8 +34,8 @@
 #include <stddef.h>
 #include <string.h>
 
-/* A convenience macro that defines the upper limit of 'size_t' */
-#define SIZE_T_MAX     ( (size_t) (-1) )
+/* A convenience macro that defines the upper limit of a pointer */
+#define MY_PTRDIFF_MAX  ( (unsigned char *) 0xFFFFFFFFU )
 
 
 /*
@@ -77,9 +77,9 @@ void* memset(void* ptr, int value, size_t num )
      * If destination block exceeds the range of 'size_t',
      * decrease 'num' accordingly.
      */
-    if ( num > (size_t) ((unsigned char*) (SIZE_T_MAX) - p) )
+    if ( num > (size_t) (MY_PTRDIFF_MAX - p) )
     {
-        n = (size_t) ((unsigned char*) (SIZE_T_MAX) - p);
+        n = (size_t) (MY_PTRDIFF_MAX - p);
         /* TODO or maybe just goto endf???? */
     }
 
@@ -139,11 +139,11 @@ void* memcpy(void* destination, const void* source, size_t num )
      * If any block exceeds the range of 'size_t',
      * decrease 'num' accordingly.
      */
-    if ( num > (size_t) ((unsigned char*) SIZE_T_MAX-destptr) ||
-         num > (size_t) ((unsigned char*) SIZE_T_MAX-srcptr) )
+    if ( num > (size_t) (MY_PTRDIFF_MAX - destptr) ||
+         num > (size_t) (MY_PTRDIFF_MAX - srcptr) )
     {
-        n = minval((size_t) ((unsigned char*) SIZE_T_MAX-destptr),
-                   (size_t) ((unsigned char*) SIZE_T_MAX-srcptr));
+        n = minval((size_t) (MY_PTRDIFF_MAX - destptr),
+                   (size_t) (MY_PTRDIFF_MAX - srcptr));
         /* TODO or maybe just return destination? */
     }
 
