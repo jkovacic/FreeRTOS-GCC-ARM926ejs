@@ -34,21 +34,6 @@
 #include <stddef.h>
 #include <string.h>
 
-/* A convenience macro that defines the upper limit of a pointer */
-#define MY_PTRDIFF_MAX  ( (unsigned char *) 0xFFFFFFFFU )
-
-
-/*
- * @param x - first value
- * @param y - second value
- *
- * @return smaller of both input values
- */
-static inline size_t minval(size_t x, size_t y)
-{
-    return ( x<=y ? x : y );
-}
-
 
 /**
  * Fill block of memory.
@@ -62,35 +47,14 @@ static inline size_t minval(size_t x, size_t y)
  *
  * @return 'ptr' is returned
  */
-void* memset(void* ptr, int value, size_t num )
+void * memset(void *m, int c, size_t n)
 {
-    unsigned char* p = (unsigned char*) ptr;
-    size_t n = num;
+    char *s = (char *) m;
 
-    /* sanity check */
-    if ( NULL==p )
-    {
-        goto endf;
-    }
-
-    /*
-     * If destination block exceeds the range of 'size_t',
-     * decrease 'num' accordingly.
-     */
-    if ( num > (size_t) (MY_PTRDIFF_MAX - p) )
-    {
-        n = (size_t) (MY_PTRDIFF_MAX - p);
-        /* TODO or maybe just goto endf???? */
-    }
-
-    /* Set 'value' to each byte of the block: */
     while (n--)
-    {
-        *(p++) = (unsigned char) value;
-    }
+      *s++ = (char) c;
 
-endf:
-    return ptr;
+    return m;
 }
 
 
@@ -117,65 +81,18 @@ endf:
  *
  * @return 'destination' is returned or NULL if any parameter equals NULL
  */
-void* memcpy(void* destination, const void* source, size_t num )
+void * memcpy(void *dest, const void *src, size_t n)
 {
-    const unsigned char* srcptr = (const unsigned char*) source;
-    unsigned char* destptr = (unsigned char*) destination;
-    size_t n = num;
+    char *destc = dest;
+    const char *srcc = src;
+    size_t i;
 
-    /* sanity check */
-    if ( NULL==srcptr || NULL==destptr )
-    {
-        return NULL;
-    }
+    for (i = 0; i < n; i++)
+        destc[i] = srcc[i];
 
-    /* Nothing to do if attempting to copy to itself: */
-    if ( srcptr == destptr )
-    {
-        return destination;
-    }
-
-    /*
-     * If any block exceeds the range of 'size_t',
-     * decrease 'num' accordingly.
-     */
-    if ( num > (size_t) (MY_PTRDIFF_MAX - destptr) ||
-         num > (size_t) (MY_PTRDIFF_MAX - srcptr) )
-    {
-        n = minval((size_t) (MY_PTRDIFF_MAX - destptr),
-                   (size_t) (MY_PTRDIFF_MAX - srcptr));
-        /* TODO or maybe just return destination? */
-    }
-
-    if ( destptr<srcptr || destptr>=(srcptr+n) )
-    {
-        /*
-         * If blocks do not overlap or or backwards copy is requested,
-         * it is safe to copy the source block from begin to end.
-         */
-        while (n--)
-        {
-            *destptr++ = *srcptr++;
-        }
-    }
-    else
-    {
-        /*
-         * If forward copy is requested and blocks overlap, forward copy
-         * (from block's begin to end) would cause a corruption.
-         * Hence backward copy (from end to begin) is performed.
-         */
-        srcptr += n - 1;
-        destptr += n - 1;
-
-        while (n--)
-        {
-            *destptr-- = *srcptr--;
-        }
-    }
-
-    return destination;
+    return dest;
 }
+
 
 /**
  * Copy string.
@@ -193,24 +110,12 @@ void* memcpy(void* destination, const void* source, size_t num )
  *
  * @return 'destination' is returned or NULL if any parameter equals NULL
  */
-char* strcpy (char* destination, const char* source)
+char * strcpy(char *dst0, const char *src0)
 {
-    const char* srcptr = source;
-    char* destptr = destination;
+    char *s = dst0;
 
-    /* sanity check */
-    if ( NULL==destptr || NULL==srcptr )
-    {
-        return NULL;
-    }
+    while ((*dst0++ = *src0++))
+        ;
 
-    while ( '\0' != *srcptr )
-    {
-        *destptr++ = *srcptr++;
-    }
-
-    /* Do not forget to append a '\0' at the end of destination! */
-    *destptr = '\0';
-
-    return destination;
+    return s;
 }
