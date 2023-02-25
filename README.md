@@ -12,8 +12,8 @@ demo tasks. More complex tasks will be included in the future.
 ## Prerequisites
 * _[GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)_,
 based on GCC. See comments in _setenv.sh_ for more details about download and installation.
-* _GNU Make_
-* _Qemu_ (version 1.3 or newer, older versions do not emulate the interrupt controller properly!)
+* _[GNU Make](https://www.gnu.org/software/make/manual/make.html)_
+* _[Qemu](https://www.qemu.org/)_
 
 ## Build
 A convenience Bash script _setenv.sh_ is provided to set paths to toolchain's commands
