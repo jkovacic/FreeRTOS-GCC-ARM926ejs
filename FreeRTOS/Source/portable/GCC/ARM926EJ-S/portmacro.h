@@ -76,7 +76,7 @@ typedef uint32_t UBaseType_t;
 
 /* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
    not need to be guarded with a critical section. Different on 16-bit: */
-/* #define portTICK_TYPE_IS_ATOMIC 1 */
+#define portTICK_TYPE_IS_ATOMIC 1
 
 #define portMEMORY_BARRIER() __asm volatile( "" ::: "memory" )
 
@@ -86,7 +86,8 @@ typedef uint32_t UBaseType_t;
 #define portSTACK_GROWTH            ( -1 )
 #define portTICK_PERIOD_MS          ( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT          8
-/* #define portNOP()                   __asm volatile ( "NOP" ); */
+#define portNOP()                   __asm volatile ( "NOP" );
+#define portINLINE __inline
 /*-----------------------------------------------------------*/
 
 
