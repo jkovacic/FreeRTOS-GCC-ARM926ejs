@@ -218,7 +218,7 @@ void vPortExitCritical( void )
              * If this is necessary, replace #0x80 by #0xC0.
              */
 
-            /* Enable interrupts as per portEXIT_CRITICAL().                    */
+            /* Enable interrupts as per portENABLE_INTERRUPTS();                */
             __asm volatile (
                 "STMDB  SP!, {R0}       \n\t"   /* Push R0.                     */
                 "MRS    R0, CPSR        \n\t"   /* Get CPSR.                    */

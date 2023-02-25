@@ -196,7 +196,7 @@ void irq_disableIrqMode(void)
 {
     /*
      * To disable IRQ mode, bit 7 of the Program Status Register (CSPR)
-     * must be set to 0. See pp. 2-15 to 2-17 of the DDI0222 for more details.
+     * must be set to 1. See pp. 2-15 to 2-17 of the DDI0222 for more details.
      * The CSPR can only be accessed using assembler.
      */
 
