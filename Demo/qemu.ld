@@ -112,12 +112,15 @@ SECTIONS
     .bss :
     {
         __bss_begin = .;
+        __bss_start__ = .;
         *(.bss)
         __bss_end = .;
+        __bss_end__ = .;
     }
     . = ALIGN(4);                  /* The section size is aligned to the 4-byte boundary */
 
     __ld_FootPrint_End = .;        /* A convenience symbol to determine the actual memory footprint */
+    end = .;
 
     /* The remainder of RAM is reserved for the heap (if malloc is ever used) */
     .heap :

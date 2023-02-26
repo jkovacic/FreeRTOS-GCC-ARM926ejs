@@ -28,6 +28,9 @@ edit the linker script [qemu.ld](Demo/qemu.ld) and adjust the startup address pr
 To build the image with the test application, just run _make_ or _make rebuild_.
 If the build process is successful, the image file _image.bin_ will be ready to boot.
 
+You can edit the [Makefile](Makefile) and set USE_NEWLIB=1 if you want to link against
+a full libc for a bigger project using more C-functions from the standard library.
+
 # Run
 To run the target image in Qemu, enter the following command ('Ctrl-A x' to exit qemu):
 

@@ -24,6 +24,12 @@
 #
 
 
+#
+# Do we want to link against newlib?
+#
+USE_NEWLIB=0
+
+
 # Version "6-2017-q2-update" of the "GNU Arm Embedded Toolchain" is used
 # as a build tool. See comments in "setenv.sh" for more details about
 # downloading it and setting the appropriate environment variables.
@@ -46,6 +52,10 @@ WFLAG = -Wall -Wextra -pedantic
 #WFLAG += -Wundef -Wshadow -Wwrite-strings -Wold-style-definition -Wcast-align=strict -Wunreachable-code -Waggregate-return -Wlogical-op -Wtrampolines -Wc90-c99-compat -Wc99-c11-compat
 #WFLAG += -Wconversion -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Wcast-qual -Wswitch-default
 CFLAGS = $(CPUFLAG) $(WFLAG) -O2
+
+ifeq ($(USE_NEWLIB),1)
+CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
+endif
 
 # Additional C compiler flags to produce debugging symbols
 DEB_FLAG = -g -DDEBUG
@@ -96,8 +106,9 @@ STARTUP_OBJ = startup.o
 DRIVERS_OBJS = timer.o interrupt.o uart.o
 
 APP_OBJS = init.o main.o print.o receive.o
-# nostdlib.o must be commented out if standard lib is going to be linked!
+ifeq ($(USE_NEWLIB),0)
 APP_OBJS += nostdlib.o
+endif
 
 
 # All object files specified above are prefixed the intermediate directory
@@ -135,7 +146,11 @@ $(OBJDIR) :
 	mkdir -p $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
-	$(LD) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
+ifeq ($(USE_NEWLIB),0)
+	$(CC) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
+else
+	$(CC) --specs=nano.specs --specs=nosys.specs -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
+endif
 
 debug : _debug_flags all
 

@@ -54,7 +54,29 @@
 #define configIDLE_SHOULD_YIELD           1
 #define configUSE_APPLICATION_TASK_TAG    1
 
+#if USE_NEWLIB == 1
+#define configUSE_NEWLIB_REENTRANT        1
+#endif
+
+#if USE_LARGE_DEMO == 0
 #define configUSE_MUTEXES                 0
+#else
+#define configUSE_MUTEXES                 1
+#define configUSE_RECURSIVE_MUTEXES       1
+#define configUSE_COUNTING_SEMAPHORES     1
+
+#define configUSE_TIMERS                  1
+#define configTIMER_TASK_PRIORITY         2
+#define configTIMER_QUEUE_LENGTH         20
+#define configTIMER_TASK_STACK_DEPTH    ( configMINIMAL_STACK_SIZE * 2 )
+#endif
+
+#if USE_DEBUG_FLAGS == 1
+#define configUSE_MALLOC_FAILED_HOOK      1
+#define configCHECK_FOR_STACK_OVERFLOW    1
+extern void vAssertCalled( const char *pcFile, uint32_t ulLine );
+#define configASSERT( x )  if ( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+#endif
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES             0
