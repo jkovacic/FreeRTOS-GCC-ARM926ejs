@@ -204,8 +204,10 @@ $(OBJDIR)print.o : $(APP_SRC)print.c
 $(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
+# Or use -ffreestanding or -fno-hosted instead?
+# They all disable -fno-tree-loop-distribute-patterns.
 $(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
-	$(CC) $(CFLAG) $(CFLAGS) -O1 $< $(OFLAG) $@
+	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
 
 
 # Cleanup directives:
