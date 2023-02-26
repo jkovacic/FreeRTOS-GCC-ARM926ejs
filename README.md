@@ -48,6 +48,7 @@ The demo application will run infinitely so it must be stopped manually by
 A convenience Bash script [stop\_qemu.sh](stop_qemu.sh) (it must be run in another shell)
 is provided to automate the process. Note that it may not work properly if
 multiple instances of _qemu-system-arm_ are running.
+You can also just execute _killall qemu-system-arm_ in another shell to stop all qemu instances.
 
 For more details, see extensive comments in both scripts.
 
