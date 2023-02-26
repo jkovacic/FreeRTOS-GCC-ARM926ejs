@@ -10,20 +10,20 @@ demo tasks. More complex tasks will be included in the future.
 
 
 ## Prerequisites
-* _[GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)_,
+* [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads),
 based on GCC. See comments in _setenv.sh_ for more details about download and installation.
-* _[GNU Make](https://www.gnu.org/software/make/manual/make.html)_
-* _[Qemu](https://www.qemu.org/)_
+* [GNU Make](https://www.gnu.org/software/make/manual/make.html)
+* [Qemu](https://www.qemu.org/)
 
 ## Build
-A convenience Bash script _setenv.sh_ is provided to set paths to toolchain's commands
+A convenience Bash script [setenv.sh](setenv.sh) is provided to set paths to toolchain's commands
 and libraries. You may edit it and adjust the paths according to your setup. To set up
 the necessary paths, simply type:
 
 `. setenv.sh`
 
 If you wish to run the image anywhere else except in Qemu, you will probably have to
-edit the linker script _qemu.ld_ and adjust the startup address properly.
+edit the linker script [qemu.ld](Demo/qemu.ld) and adjust the startup address properly.
 
 To build the image with the test application, just run _make_ or _make rebuild_.
 If the build process is successful, the image file _image.bin_ will be ready to boot.
@@ -42,7 +42,7 @@ edit it and adjust paths to Qemu and/or target image.
 
 The demo application will run infinitely so it must be stopped manually by
 "killing" the instance of Qemu (an "equivalent" to switching off the board).
-A convenience Bash script _stop\_qemu.sh_ (it must be run in another shell)
+A convenience Bash script [stop\_qemu.sh](stop_qemu.sh) (it must be run in another shell)
 is provided to automate the process. Note that it may not work properly if
 multiple instances of _qemu-system-arm_ are running.
 
