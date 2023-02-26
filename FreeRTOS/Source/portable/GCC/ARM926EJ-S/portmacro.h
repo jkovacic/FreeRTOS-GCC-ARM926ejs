@@ -102,7 +102,6 @@ extern volatile unsigned long ulCriticalNesting;
 
 #define portRESTORE_CONTEXT()                                           \
 {                                                                       \
-    extern volatile void * volatile pxCurrentTCB;                       \
     /* Set the LR to the task stack. */                                 \
     __asm volatile (                                                    \
     "LDR        R0, =pxCurrentTCB                               \n\t"   \
@@ -130,14 +129,11 @@ extern volatile unsigned long ulCriticalNesting;
     /* correct address. */                                              \
     "SUBS   PC, LR, #4                                          \n\t"   \
     );                                                                  \
-    ( void ) ulCriticalNesting;                                         \
-    ( void ) pxCurrentTCB;                                              \
 }
 /*-----------------------------------------------------------*/
 
 #define portSAVE_CONTEXT()                                              \
 {                                                                       \
-    extern volatile void * volatile pxCurrentTCB;                       \
     /* Push R0 as we are going to use the register. */                  \
     __asm volatile (                                                    \
     "STMDB  SP!, {R0}                                           \n\t"   \
@@ -175,8 +171,6 @@ extern volatile unsigned long ulCriticalNesting;
     "LDR    R0, [R0]                                            \n\t"   \
     "STR    LR, [R0]                                            \n\t"   \
     );                                                                  \
-    ( void ) ulCriticalNesting;                                         \
-    ( void ) pxCurrentTCB;                                              \
 }
 
 /* extern void vTaskSwitchContext( void ); */
