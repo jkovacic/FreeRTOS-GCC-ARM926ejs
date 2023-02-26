@@ -55,6 +55,8 @@ CFLAGS = $(CPUFLAG) $(WFLAG) -O2
 
 ifeq ($(USE_NEWLIB),1)
 CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
+else
+CFLAGS += -DUSE_NEWLIB=0
 endif
 
 # Additional C compiler flags to produce debugging symbols
