@@ -92,7 +92,6 @@ typedef uint32_t UBaseType_t;
 
 
 /* Scheduler utilities. */
-extern volatile unsigned long ulCriticalNesting;
 
 /*
  * portRESTORE_CONTEXT and portSAVE_CONTEXT can only be called from
