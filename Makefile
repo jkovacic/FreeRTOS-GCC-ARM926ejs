@@ -29,6 +29,11 @@
 #
 USE_NEWLIB=0
 
+#
+# Compile a debugging version?
+#
+USE_DEBUG_FLAGS=1
+
 
 # Version "6-2017-q2-update" of the "GNU Arm Embedded Toolchain" is used
 # as a build tool. See comments in "setenv.sh" for more details about
@@ -59,8 +64,12 @@ else
 CFLAGS += -DUSE_NEWLIB=0
 endif
 
+ifeq ($(USE_DEBUG_FLAGS),1)
 # Additional C compiler flags to produce debugging symbols
-DEB_FLAG = -g -DDEBUG
+CFLAGS += -g -DDEBUG -DUSE_DEBUG_FLAGS___XXX=1
+else
+CFLAGS += -DUSE_DEBUG_FLAGS=0
+endif
 
 
 # Compiler/target path in FreeRTOS/Source/portable
@@ -155,13 +164,6 @@ else
 	$(CC) --specs=nano.specs --specs=nosys.specs -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 endif
 
-debug : _debug_flags all
-
-debug_rebuild : _debug_flags rebuild
-
-_debug_flags :
-	$(eval CFLAGS += $(DEB_FLAG))
-
 
 # Startup code, implemented in assembler
 
@@ -224,8 +226,6 @@ help :
 	@echo Valid targets:
 	@echo - all: builds missing dependencies and creates the target image \'$(TARGET)\'.
 	@echo - rebuild: rebuilds all dependencies and creates the target image \'$(TARGET)\'.
-	@echo - debug: same as \'all\', also includes debugging symbols to \'$(ELF_IMAGE)\'.
-	@echo - debug_rebuild: same as \'rebuild\', also includes debugging symbols to \'$(ELF_IMAGE)\'.
 	@echo - clean_obj: deletes all object files, only keeps \'$(ELF_IMAGE)\' and \'$(TARGET)\'.
 	@echo - clean_intermediate: deletes all intermediate binaries, only keeps the target image \'$(TARGET)\'.
 	@echo - clean: deletes all intermediate binaries, incl. the target image \'$(TARGET)\'.
@@ -239,4 +239,4 @@ run : all
 	qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET)
 
 
-.PHONY : all rebuild clean clean_obj clean_intermediate debug debug_rebuild _debug_flags help run
+.PHONY : all rebuild clean clean_obj clean_intermediate help run
