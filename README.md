@@ -37,7 +37,7 @@ Or more conveniently:
 
 `make run`
 
-A convenience Bash script _start\_qemu.sh_ is provided. If necessary, you may
+A convenience Bash script [start\_qemu.sh](start_qemu.sh) is provided. If necessary, you may
 edit it and adjust paths to Qemu and/or target image.
 
 The demo application will run infinitely so it must be stopped manually by
