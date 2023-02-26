@@ -5,9 +5,9 @@ obj/
 *.o
 
 # Image files:
-*.bin
-*.img
-*.elf
+image.bin
+image.elf
+image.map
 
 # Backup files of some editors:
 *~
