@@ -117,6 +117,7 @@ OBJS = $(addprefix $(OBJDIR), $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG
 # Definition of the linker script and final targets
 LINKER_SCRIPT = $(addprefix $(APP_SRC), qemu.ld)
 ELF_IMAGE = image.elf
+MAPFILE = image.map
 TARGET = image.bin
 
 # Include paths to be passed to $(CC) where necessary
@@ -147,9 +148,9 @@ $(OBJDIR) :
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 ifeq ($(USE_NEWLIB),0)
-	$(CC) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
+	$(CC) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 else
-	$(CC) --specs=nano.specs --specs=nosys.specs -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@
+	$(CC) --specs=nano.specs --specs=nosys.specs -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 endif
 
 debug : _debug_flags all
@@ -209,11 +210,10 @@ clean_obj :
 	$(RM) -r $(OBJDIR)
 
 clean_intermediate : clean_obj
-	$(RM) *.elf
-	$(RM) *.img
+	$(RM) $(ELF_IMAGE) $(MAPFILE)
 
 clean : clean_intermediate
-	$(RM) *.bin
+	$(RM) $(TARGET)
 
 # Short help instructions:
 
@@ -234,7 +234,7 @@ help :
 
 run : all
 	@echo "Please exit qemu by pressing \"Ctrl-A x\""
-	qemu-system-arm -M versatilepb -nographic -m 128 -kernel image.bin
+	qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET)
 
 
 .PHONY : all rebuild clean clean_obj clean_intermediate debug debug_rebuild _debug_flags help run
