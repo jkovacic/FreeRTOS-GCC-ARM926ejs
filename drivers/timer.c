@@ -82,7 +82,7 @@
  * 32-bit registers of each counter within a timer controller.
  * See page 3-2 of DDI0271:
  */
-typedef struct _SP804_COUNTER_REGS
+typedef struct
 {
     uint32_t LOAD;                   /* Load Register, TimerXLoad */
     uint32_t VALUE;                  /* Current Value Register, TimerXValue, read only */
@@ -100,7 +100,7 @@ typedef struct _SP804_COUNTER_REGS
  * relative to the controllers' base address:
  * See page 3-2 of DDI0271:
  */
-typedef struct _ARM926EJS_TIMER_REGS
+typedef struct
 {
     SP804_COUNTER_REGS CNTR[NR_COUNTERS];     /* Registers for each of timer's two counters */
     uint32_t Reserved1[944];                  /* Reserved for future expansion, should not be modified */

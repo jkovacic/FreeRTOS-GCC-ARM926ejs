@@ -51,7 +51,7 @@
 
 
 /* Struct with settings for each task */
-typedef struct _paramStruct
+typedef struct
 {
     const portCHAR* text;            /* text to be printed by the task */
     UBaseType_t delay;               /* delay in milliseconds */

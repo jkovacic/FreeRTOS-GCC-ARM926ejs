@@ -145,7 +145,7 @@
  * the remaining bits should be handled, therefore they will be treated as
  * "should not be modified".
  */
-typedef struct _ARM926EJS_UART_REGS
+typedef struct
 {
     uint8_t UARTDR[4];                 /* UART Data Register, UARTDR */
     uint32_t UARTRSR;                  /* Receive Status Register, Error Clear Register, UARTRSR/UARTECR */
