@@ -68,7 +68,7 @@
  * among certain groups of registers. The gaps are filled by
  * Unused* "registers" and are treated as "should not be modified".
  */
-typedef struct _ARM926EJS_PIC_REGS
+typedef struct
 {
     uint32_t VICIRQSTATUS;            /* IRQ Status Register, read only */
     uint32_t VICFIQSTATUS;            /* FIQ Status Register, read only */
@@ -111,7 +111,7 @@ typedef struct _ARM926EJS_PIC_REGS
  *
  * Note that some registers share their addresses. See #defines below.
  */
-typedef struct _ARM926EJS_SIC_REGS
+typedef struct
 {
     uint32_t SIC_STATUS;              /* Status of interrupt (after mask), read only */
     uint32_t SIC_RAWSTAT;             /* Status of interrupt (before mask), read only */
@@ -160,10 +160,10 @@ static volatile ARM926EJS_PIC_REGS* const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_P
  * does not serve any IRQ. In this case, the corresponding VICVECTCNTLn is
  * supposed to be set to 0 and its VICVECTADDRn should be set to __irq_dummyISR.
  */
-typedef struct _isrVectRecord
+typedef struct
 {
-    uint8_t irq;                  /* IRQ handled by this record */
     pVectoredIsrPrototype isr;    /* address of the ISR */
+    uint8_t irq;                  /* IRQ handled by this record */
     uint8_t priority;             /* priority of this IRQ */
 } isrVectRecord;
 
@@ -235,8 +235,6 @@ static void __defaultVectorIsr(void)
     uint8_t cntr;
 
     /*
-     * TODO should scanning of the priority table start at 16 or maybe at 0 ????
-     *
      * The current implementation assumes that the first 16 entries are properly serviced
      * and also enabled in their respective VICVECTCNTLn registers.
      */
@@ -273,20 +271,17 @@ static void __defaultVectorIsr(void)
  */
 void _pic_IrqHandler(void)
 {
-
     /*
      * Vectored implementation, a.k.a. "Vectored interrupt flow sequence", described
      * on page 2-9 of DDI0181.
      */
-
-    pVectoredIsrPrototype isrAddr;
 
     /*
      * Reads the Vector Address Register with the ISR address of the currently active interrupt.
      * Reading this register also indicates to the priority hardware that the interrupt
      * is being serviced.
      */
-    isrAddr = (pVectoredIsrPrototype) pPicReg->VICVECTADDR;
+    pVectoredIsrPrototype isrAddr = (pVectoredIsrPrototype) pPicReg->VICVECTADDR;
 
     /* Execute the routine at the vector address */
     (*isrAddr)();
@@ -296,7 +291,6 @@ void _pic_IrqHandler(void)
      * priority hardware that the interrupt has been serviced.
      */
     pPicReg->VICVECTADDR = ULFF;
-
 }
 
 
@@ -327,8 +321,8 @@ void pic_init(void)
     for ( i=0U; i<NR_INTERRUPTS; ++i )
     {
         /* clear its entry in the table */
-        __irqVect[i].irq = MY_UINT8_MAX;       /* no IRQ assigned */
         __irqVect[i].isr = &__irq_dummyISR;    /* dummy ISR routine */
+        __irqVect[i].irq = MY_UINT8_MAX;       /* no IRQ assigned */
         __irqVect[i].priority = MY_UINT8_MAX;  /* lowest priority */
 
         if ( i<NR_VECTORS )
@@ -339,7 +333,6 @@ void pic_init(void)
             pPicReg->VICVECTADDRn[i] = (uint32_t) &__irq_dummyISR;
         }
     }
-
 }
 
 
@@ -553,7 +546,7 @@ int8_t pic_registerIrq(
         {
             prPos = i;
         }
-    }  /* for i */
+    }
 
     /* just in case, should never occur */
     if ( irqPos == MY_UINT8_MAX || prPos == MY_UINT8_MAX )
@@ -561,7 +554,7 @@ int8_t pic_registerIrq(
         return -1;
     }
 
-    /* if prPos is less than irqPos, move all intermediate entries one line down */
+    /* if prPos is less than irqPos, move all intermediate entries one line up */
     if ( irqPos > prPos )
     {
         for ( i=irqPos; i>prPos; --i )
@@ -586,7 +579,7 @@ int8_t pic_registerIrq(
         }  /* for i*/
     }  /* if irqPos > prPos */
 
-    /* if prPos is greater than irqPos, move all intermediate entries one line up... */
+    /* if prPos is greater than irqPos, move all intermediate entries one line down */
     if ( prPos > irqPos )
     {
         /* however this does not include the entry at prPos, whose priority is less than prior!!! */
@@ -615,8 +608,8 @@ int8_t pic_registerIrq(
     }  /* if prPos > irqPos */
 
     /* finally fill the entry at 'prPos' with the input values */
-    __irqVect[prPos].irq = irq;
     __irqVect[prPos].isr = addr;
+    __irqVect[prPos].irq = irq;
     __irqVect[prPos].priority = prior;
 
     /* if prPos<16 also update the appropriate vector registers */
@@ -693,8 +686,8 @@ void pic_unregisterIrq(uint8_t irq)
     }
 
     /* And "clear" the last entry to "default" values (see also pic_init()): */
-    __irqVect[NR_INTERRUPTS-1].irq = MY_UINT8_MAX;      /* no IRQ assigned */
     __irqVect[NR_INTERRUPTS-1].isr = &__irq_dummyISR;   /* dummy ISR routine */
+    __irqVect[NR_INTERRUPTS-1].irq = MY_UINT8_MAX;      /* no IRQ assigned */
     __irqVect[NR_INTERRUPTS-1].priority = MY_UINT8_MAX; /* lowest priority */
 }
 
@@ -710,8 +703,8 @@ void pic_unregisterAllIrqs(void)
     /* Clear all entries in the priority table */
     for ( i=0U; i<NR_VECTORS; ++i )
     {
-        __irqVect[i].irq = MY_UINT8_MAX;
         __irqVect[i].isr = &__irq_dummyISR;
+        __irqVect[i].irq = MY_UINT8_MAX;
         __irqVect[i].priority = MY_UINT8_MAX;
 
         /* Clear all vector's VICVECTCNTLn and VICVECTADDRn registers: */
