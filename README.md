@@ -15,6 +15,11 @@ based on GCC. See comments in _setenv.sh_ for more details about download and in
 * [GNU Make](https://www.gnu.org/software/make/manual/make.html)
 * [Qemu](https://www.qemu.org/)
 
+On Debian or Ubuntu you should be ready to go with:
+<pre>
+sudo apt install gcc-arm-none-eabi make qemu-system-arm
+</pre>
+
 ## Build
 A convenience Bash script [setenv.sh](setenv.sh) is provided to set paths to toolchain's commands
 and libraries. You may edit it and adjust the paths according to your setup. To set up
