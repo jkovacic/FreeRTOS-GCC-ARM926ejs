@@ -52,15 +52,16 @@
 #define configUSE_TRACE_FACILITY          0
 #define configUSE_16_BIT_TICKS            0
 #define configIDLE_SHOULD_YIELD           1
-#define configUSE_APPLICATION_TASK_TAG    1
 
 #if USE_NEWLIB == 1
 #define configUSE_NEWLIB_REENTRANT        1
 #endif
 
 #if USE_LARGE_DEMO == 0
+#define configUSE_APPLICATION_TASK_TAG    0
 #define configUSE_MUTEXES                 0
 #else
+#define configUSE_APPLICATION_TASK_TAG    1
 #define configUSE_MUTEXES                 1
 #define configUSE_RECURSIVE_MUTEXES       1
 #define configUSE_COUNTING_SEMAPHORES     1
