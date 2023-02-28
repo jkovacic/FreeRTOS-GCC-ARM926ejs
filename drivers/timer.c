@@ -142,6 +142,10 @@ void all_timer_init(void)
     }
 }
 
+#ifdef DEBUG
+#define CHECK_TIMER 1
+#endif
+
 
 /**
  * Initializes the specified timer's counter controller.
@@ -159,12 +163,13 @@ void all_timer_init(void)
  */
 void timer_init(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
 
     /*
@@ -208,12 +213,13 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_start(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 7 of the Control Register to 1, do not modify other bits */
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
@@ -231,12 +237,13 @@ void timer_start(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_stop(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 7 of the Control Register to 0, do not modify other bits */
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
@@ -259,12 +266,13 @@ void timer_stop(uint8_t timerNr, uint8_t counterNr)
  */
 int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return 0;
     }
+#endif
 
     /* just check the enable bit of the timer's Control Register */
     return ( 0!=HWREG_READ_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE ) );
@@ -282,12 +290,13 @@ int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 5 of the Control Register to 1, do not modify other bits */
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
@@ -305,12 +314,13 @@ void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 5 of the Control Register to 0, do not modify other bits */
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
@@ -328,12 +338,13 @@ void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /*
      * Writing anything (e.g. 0xFFFFFFFF, i.e. all ones) into the
@@ -360,12 +371,13 @@ void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     pReg[timerNr]->CNTR[counterNr].LOAD = value;
 }
@@ -385,12 +397,13 @@ void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value)
  */
 uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return 0UL;
     }
+#endif
 
     return pReg[timerNr]->CNTR[counterNr].VALUE;
 }
@@ -412,12 +425,13 @@ uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr)
  */
 volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return NULL;
     }
+#endif
 
     return (volatile uint32_t*) &(pReg[timerNr]->CNTR[counterNr].VALUE);
 }

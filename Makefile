@@ -34,6 +34,11 @@ USE_NEWLIB=0
 #
 USE_DEBUG_FLAGS=0
 
+#
+# What app to compile?
+#
+USE_LARGE_DEMO=0
+
 
 # Version "6-2017-q2-update" of the "GNU Arm Embedded Toolchain" is used
 # as a build tool. See comments in "setenv.sh" for more details about
@@ -71,6 +76,9 @@ else
 CFLAGS += -g -DUSE_DEBUG_FLAGS=0
 endif
 
+ifeq ($(USE_LARGE_DEMO),0)
+CFLAGS += -DUSE_LARGE_DEMO=0
+endif
 
 # Compiler/target path in FreeRTOS/Source/portable
 PORT_COMP_TARG = GCC/ARM926EJ-S
