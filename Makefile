@@ -32,7 +32,7 @@ USE_NEWLIB=0
 #
 # Compile a debugging version?
 #
-USE_DEBUG_FLAGS=1
+USE_DEBUG_FLAGS=0
 
 
 # Version "6-2017-q2-update" of the "GNU Arm Embedded Toolchain" is used
@@ -68,30 +68,30 @@ ifeq ($(USE_DEBUG_FLAGS),1)
 # Additional C compiler flags to produce debugging symbols
 CFLAGS += -g -DDEBUG -DUSE_DEBUG_FLAGS___XXX=1
 else
-CFLAGS += -DUSE_DEBUG_FLAGS=0
+CFLAGS += -g -DUSE_DEBUG_FLAGS=0
 endif
 
 
 # Compiler/target path in FreeRTOS/Source/portable
-PORT_COMP_TARG = GCC/ARM926EJ-S/
+PORT_COMP_TARG = GCC/ARM926EJ-S
 
 # Intermediate directory for all *.o and other files:
 OBJDIR = obj/
 
 # FreeRTOS source base directory
-FREERTOS_SRC = FreeRTOS/Source/
+FREERTOS_SRC = FreeRTOS/Source
 
 # Directory with memory management source files
-FREERTOS_MEMMANG_SRC = $(FREERTOS_SRC)portable/MemMang/
+FREERTOS_MEMMANG_SRC = $(FREERTOS_SRC)/portable/MemMang
 
 # Directory with platform specific source files
-FREERTOS_PORT_SRC = $(FREERTOS_SRC)portable/$(PORT_COMP_TARG)
+FREERTOS_PORT_SRC = $(FREERTOS_SRC)/portable/$(PORT_COMP_TARG)
 
 # Directory with HW drivers' source files
-DRIVERS_SRC = drivers/
+DRIVERS_SRC = drivers
 
 # Directory with demo specific source (and header) files
-APP_SRC = Demo/
+APP_SRC = Demo
 
 
 # Object files to be linked into an application
@@ -106,9 +106,13 @@ FREERTOS_OBJS = queue.o list.o tasks.o
 #FREERTOS_OBJS += stream_buffer.o
 
 # Only one memory management .o file must be uncommented!
+ifeq ($(USE_NEWLIB),0)
 FREERTOS_MEMMANG_OBJS = heap_1.o
+endif
 #FREERTOS_MEMMANG_OBJS = heap_2.o
-#FREERTOS_MEMMANG_OBJS = heap_3.o
+ifeq ($(USE_NEWLIB),1)
+FREERTOS_MEMMANG_OBJS = heap_3.o
+endif
 #FREERTOS_MEMMANG_OBJS = heap_4.o
 #FREERTOS_MEMMANG_OBJS = heap_5.o
 
@@ -126,21 +130,21 @@ endif
 OBJS = $(addprefix $(OBJDIR), $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG_OBJS) $(FREERTOS_PORT_OBJS) $(DRIVERS_OBJS) $(APP_OBJS))
 
 # Definition of the linker script and final targets
-LINKER_SCRIPT = $(addprefix $(APP_SRC), qemu.ld)
+LINKER_SCRIPT = $(addprefix $(APP_SRC)/, qemu.ld)
 ELF_IMAGE = image.elf
 MAPFILE = image.map
 TARGET = image.bin
 
 # Include paths to be passed to $(CC) where necessary
-INC_FREERTOS = $(FREERTOS_SRC)include/
-INC_DRIVERS = $(DRIVERS_SRC)include/
+INC_FREERTOS = $(FREERTOS_SRC)/include
+INC_DRIVERS = $(DRIVERS_SRC)
 
 # Complete include flags to be passed to $(CC) where necessary
 INC_FLAGS = $(INCLUDEFLAG)$(INC_FREERTOS) $(INCLUDEFLAG)$(APP_SRC) $(INCLUDEFLAG)$(FREERTOS_PORT_SRC)
 INC_FLAG_DRIVERS = $(INCLUDEFLAG)$(INC_DRIVERS)
 
 # Dependency on HW specific settings
-DEP_BSP = $(INC_DRIVERS)bsp.h
+DEP_BSP = $(INC_DRIVERS)/bsp.h
 
 
 #
@@ -159,54 +163,54 @@ $(OBJDIR) :
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 ifeq ($(USE_NEWLIB),0)
-	$(CC) -nostdlib -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
+	$(CC) -nostdlib -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 else
-	$(CC) --specs=nano.specs --specs=nosys.specs -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
+	$(CC) --specs=nano.specs --specs=nosys.specs -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 endif
 
 
 # Startup code, implemented in assembler
 
-$(OBJDIR)startup.o : $(APP_SRC)startup.s
+$(OBJDIR)startup.o : $(APP_SRC)/startup.s
 	$(AS) $(CPUFLAG) $< $(OFLAG) $@
 
 
 # FreeRTOS core
-$(OBJDIR)%.o : $(FREERTOS_SRC)%.c
+$(OBJDIR)%.o : $(FREERTOS_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
-$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)%.c
+$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) -O1 $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
-$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)%.c
+$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 # Drivers
-$(OBJDIR)%.o : $(DRIVERS_SRC)%.c $(DEP_BSP)
+$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 
 # Demo application
 
-$(OBJDIR)main.o : $(APP_SRC)main.c
+$(OBJDIR)main.o : $(APP_SRC)/main.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
-$(OBJDIR)init.o : $(APP_SRC)init.c $(DEP_BSP)
+$(OBJDIR)init.o : $(APP_SRC)/init.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)print.o : $(APP_SRC)print.c
+$(OBJDIR)print.o : $(APP_SRC)/print.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)receive.o : $(APP_SRC)receive.c $(DEP_BSP)
+$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Or use -ffreestanding or -fno-hosted instead?
 # They all disable -fno-tree-loop-distribute-patterns.
-$(OBJDIR)nostdlib.o : $(APP_SRC)nostdlib.c
+$(OBJDIR)nostdlib.o : $(APP_SRC)/nostdlib.c
 	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
 
 
