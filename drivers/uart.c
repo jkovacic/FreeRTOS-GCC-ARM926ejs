@@ -185,6 +185,11 @@ static volatile ARM926EJS_UART_REGS * const pReg[BSP_NR_UARTS] =
 #undef CAST_ADDR
 
 
+#ifdef DEBUG
+#define CHECK_UART 1
+#endif
+
+
 /**
  * Initializes a UART controller.
  * It is enabled for transmission (Tx) only, receive must be enabled separately.
@@ -311,11 +316,13 @@ static inline void __printCh(uint8_t nr, char ch)
  */
 void uart_printChar(uint8_t nr, char ch)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* just use the provided inline function: */
     __printCh(nr, ch);
@@ -341,11 +348,13 @@ void uart_print(uint8_t nr, const char* str)
     const char* null_str = "<NULL>\r\n";
     const char* cp;
 
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* handle possible NULL value of str: */
     cp = ( NULL==str ? null_str : str );
@@ -370,11 +379,13 @@ void uart_print(uint8_t nr, const char* str)
  */
 void uart_enableUart(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
@@ -389,11 +400,13 @@ void uart_enableUart(uint8_t nr)
  */
 void uart_disableUart(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
@@ -414,11 +427,13 @@ static inline void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
 {
     uint32_t enabled;
 
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Store UART's enable status (UARTEN) */
     enabled = HWREG_READ_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
@@ -518,11 +533,13 @@ void uart_disableRx(uint8_t nr)
  */
 void uart_enableRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Set bit 4 of the IMSC register: */
     HWREG_SET_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
@@ -539,11 +556,13 @@ void uart_enableRxInterrupt(uint8_t nr)
  */
 void uart_disableRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Clear bit 4 of the IMSC register: */
     HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
@@ -560,11 +579,13 @@ void uart_disableRxInterrupt(uint8_t nr)
  */
 void uart_clearRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /*
      * The register is write only, so usage of the |= operator is not permitted.
@@ -589,11 +610,13 @@ void uart_clearRxInterrupt(uint8_t nr)
  */
 char uart_readChar(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return (char) 0;
     }
+#endif
 
     /* Wait until the receiving FIFO is not empty */
     while ( 0U != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_RXFE ) );

@@ -170,6 +170,10 @@ typedef struct
 static isrVectRecord __irqVect[NR_INTERRUPTS];
 
 
+#ifdef DEBUG
+#define CHECK_INTERRUPT
+#endif
+
 
 #if 0
 /**
@@ -347,13 +351,16 @@ void pic_enableInterrupt(uint8_t irq)
 {
     /* TODO check for valid (unreserved) interrupt numbers? Applies also for other functions */
 
-    if ( irq < NR_INTERRUPTS )
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
     {
-        /* See description of VICINTENABLE, page 3-7 of DDI0181: */
-        HWREG_SET_SINGLE_BIT(pPicReg->VICINTENABLE, irq);
-
-        /* Only the bit for the requested interrupt source is modified. */
+        return;
     }
+#endif
+
+    /* See description of VICINTENABLE, page 3-7 of DDI0181: */
+    /* Only the bit for the requested interrupt source is modified. */
+    HWREG_SET_SINGLE_BIT(pPicReg->VICINTENABLE, irq);
 }
 
 
@@ -367,20 +374,24 @@ void pic_enableInterrupt(uint8_t irq)
  */
 void pic_disableInterrupt(uint8_t irq)
 {
-    if ( irq < NR_INTERRUPTS )
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
     {
-        /*
-         * VICINTENCLEAR is a write only register and any attempt of reading it
-         * will result in a crash. For that reason, operators as |=, &=, etc.
-         * are not permitted and only direct setting of it (using operator =)
-         * is possible. This is not a problem anyway as only 1-bits disable their
-         * corresponding IRQs while 0-bits do not affect their corresponding
-         * interrupt lines.
-         *
-         * For more details, see description of VICINTENCLEAR on page 3-7 of DDI0181.
-         */
-        pPicReg->VICINTENCLEAR = HWREG_SINGLE_BIT_MASK(irq);
+        return;
     }
+#endif
+
+    /*
+     * VICINTENCLEAR is a write only register and any attempt of reading it
+     * will result in a crash. For that reason, operators as |=, &=, etc.
+     * are not permitted and only direct setting of it (using operator =)
+     * is possible. This is not a problem anyway as only 1-bits disable their
+     * corresponding IRQs while 0-bits do not affect their corresponding
+     * interrupt lines.
+     *
+     * For more details, see description of VICINTENCLEAR on page 3-7 of DDI0181.
+     */
+    pPicReg->VICINTENCLEAR = HWREG_SINGLE_BIT_MASK(irq);
 }
 
 
@@ -408,9 +419,15 @@ void pic_disableAllInterrupts(void)
  */
 int8_t pic_isInterruptEnabled(uint8_t irq)
 {
-    /* See description of VICINTENCLEAR, page 3-7 of DDI0181: */
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
+    {
+        return 0;
+    }
+#endif
 
-    return ( irq<NR_INTERRUPTS && (0U!=HWREG_READ_SINGLE_BIT(pPicReg->VICINTENABLE, irq)) );
+    /* See description of VICINTENCLEAR, page 3-7 of DDI0181: */
+    return (0U != HWREG_READ_SINGLE_BIT(pPicReg->VICINTENABLE, irq));
 }
 
 
@@ -425,6 +442,13 @@ int8_t pic_isInterruptEnabled(uint8_t irq)
  */
 int8_t pic_getInterruptType(uint8_t irq)
 {
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
+    {
+        return 0;
+    }
+#endif
+
     /*
      * See description of VICINTSELECT, page 3-7 of DDI0181.
      *
@@ -432,7 +456,7 @@ int8_t pic_getInterruptType(uint8_t irq)
      * otherwise it is IRQ.
      */
 
-	return ( irq<NR_INTERRUPTS && 0U==HWREG_READ_SINGLE_BIT(pPicReg->VICINTSELECT, irq) );
+    return 0U == HWREG_READ_SINGLE_BIT(pPicReg->VICINTSELECT, irq);
 }
 
 
@@ -446,26 +470,29 @@ int8_t pic_getInterruptType(uint8_t irq)
  */
 void pic_setInterruptType(uint8_t irq, int8_t toIrq)
 {
-    if (irq<NR_INTERRUPTS)
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
     {
+        return;
+    }
+#endif
 
-        /*
-         * Only the corresponding bit must be modified, all other bits must remain unmodified.
-         * For that reason, appropriate bitwise operators are applied.
-         *
-         * The interrupt's type is set via VICINTSELECT. See description
-         * of the register at page 3-7 of DDI0181.
-         */
-        if ( 0 != toIrq )
-        {
-            /* Set the corresponding bit to 0 by bitwise and'ing bitmask's zero complement */
-            HWREG_CLEAR_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
-        }
-        else
-        {
-            /* Set the corresponding bit to 1 by bitwise or'ing the bitmask */
-            HWREG_SET_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
-        }
+    /*
+     * Only the corresponding bit must be modified, all other bits must remain unmodified.
+     * For that reason, appropriate bitwise operators are applied.
+     *
+     * The interrupt's type is set via VICINTSELECT. See description
+     * of the register at page 3-7 of DDI0181.
+     */
+    if ( 0 != toIrq )
+    {
+        /* Set the corresponding bit to 0 by bitwise and'ing bitmask's zero complement */
+        HWREG_CLEAR_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
+    }
+    else
+    {
+        /* Set the corresponding bit to 1 by bitwise or'ing the bitmask */
+        HWREG_SET_SINGLE_BIT( pPicReg->VICINTSELECT, irq );
     }
 }
 
@@ -479,10 +506,14 @@ void pic_setInterruptType(uint8_t irq, int8_t toIrq)
  */
 void pic_setDefaultVectorAddr(pVectoredIsrPrototype addr)
 {
-    if ( NULL != addr )
+#ifdef CHECK_INTERRUPT
+    if ( NULL == addr )
     {
-        pPicReg->VICDEFVECTADDR = (uint32_t) addr;
+        return;
     }
+#endif
+
+    pPicReg->VICDEFVECTADDR = (uint32_t) addr;
 }
 #endif
 
@@ -521,11 +552,13 @@ int8_t pic_registerIrq(
     uint8_t prPos = MY_UINT8_MAX;
     uint8_t i;
 
+#ifdef CHECK_INTERRUPT
     /* sanity check: */
     if (irq>=NR_INTERRUPTS || NULL==addr )
     {
         return -1;
     }
+#endif
 
     /*
      * The priority table is traversed and two values are obtained:
@@ -638,12 +671,12 @@ void pic_unregisterIrq(uint8_t irq)
 {
     uint8_t pos;
 
-    /* sanity check */
-    if (irq>=NR_INTERRUPTS)
+#ifdef CHECK_INTERRUPT
+    if ( irq >= NR_INTERRUPTS )
     {
         return;
     }
-
+#endif
 
     /* Find the 'irq' in the priority table: */
     for ( pos=0U; pos<NR_INTERRUPTS; ++pos )
@@ -734,10 +767,12 @@ void pic_unregisterAllIrqs(void)
  */
 int8_t pic_setSwInterruptNr(uint8_t irq)
 {
+#ifdef CHECK_INTERRUPT
     if (irq>=NR_INTERRUPTS)
     {
         return -1;
     }
+#endif
 
     /*
      * Interrupts can be software triggered via VICSOFTINT.
@@ -768,10 +803,12 @@ int8_t pic_clearSwInterruptNr(uint8_t irq)
     uint32_t bitmask;
     uint8_t retVal = MY_UINT8_MAX;
 
+#ifdef CHECK_INTERRUPT
     if (irq>=NR_INTERRUPTS)
     {
         return -1;
     }
+#endif
 
     /*
      * Interrupts can be software cleared via VICSOFTINTCLEAR.
