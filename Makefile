@@ -173,7 +173,7 @@ $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 ifeq ($(USE_NEWLIB),0)
 	$(CC) -nostdlib -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 else
-	$(CC) --specs=nano.specs --specs=nosys.specs -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
+	$(CC) --specs=nano.specs --specs=nosys.specs -nostartfiles -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 endif
 
 
