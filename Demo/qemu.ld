@@ -127,7 +127,7 @@ SECTIONS
     {
         __heap_begin = .;
         *(.heap)
-        . = __ld_Ram_size;
+        . = __ld_Ram_size - __ld_FootPrint_End;
         __heap_end = .;
     }
 }
