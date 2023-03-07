@@ -56,9 +56,7 @@
 .section .init
 .code 32                                   @ 32-bit ARM instruction set
 
-@ This symbol must be visible to the linker
 .global vectors_start
-
 vectors_start:
     @ Exception vectors, relative to the base address, see page 2-26 of DDI0222
     LDR pc, reset_handler_addr             @ Reset (and startup) vector
@@ -88,7 +86,6 @@ irq_handler_addr:
 fiq_handler_addr:
     .word unhandled
 
-vectors_end:
 
 .text
 .code 32
@@ -131,33 +128,24 @@ bss_clear_loop:
 
     @ Disable IRQ and FIQ interrupts for the Supervisor mode
     @ This should be disabled by default, but it doesn't hurt...
-    ORR r1, r0, #IRQ_BIT|FIQ_BIT
-    MSR cpsr, r1
+    ORR r0, r0, #IRQ_BIT|FIQ_BIT
+    MSR cpsr, r0
 
-    @ Switch to System mode and disable IRQ/FIQ
-    BIC r1, r0, #PSR_MASK                  @ clear lowest 5 bits
-    ORR r1, r1, #MODE_SYS                  @ and set them to the System mode
-    ORR r1, r1, #IRQ_BIT|FIQ_BIT           @ disable IRQ and FIW triggering
-    MSR cpsr, r1                           @ update CPSR and enter System mode
+    BIC r0, r0, #PSR_MASK                  @ clear lowest 5 bits
+
+    @ Switch to System mode, disable IRQ/FIQ and set stack pointer:
+    ORR r1, r0, #MODE_SYS                  @ and set them to the System mode
+    MSR cpsr, r1                           @ update CPSR for System mode
     LDR sp, =stack_top                     @ set stack for System mode
 
-    @ Set and switch into IRQ mode
-    BIC r1, r0, #PSR_MASK                  @ clear least significant 5 bits...
-    ORR r1, r1, #MODE_IRQ                  @ and set them to b10010 (0x12), i.e set IRQ mode
-    ORR r1, r1, #IRQ_BIT|FIQ_BIT           @ also disable IRQ and FIQ triggering (a default setting, but...)
+    @ Switch into IRQ mode, disable IRQ/FIQ and set stack pointer:
+    ORR r1, r0, #MODE_IRQ                  @ and set them to IRQ mode
     MSR cpsr, r1                           @ update CPSR (program status register) for IRQ mode
-
-    @ When in IRQ mode, set its stack pointer
-    LDR sp, =irq_stack_top                 @ stack for the IRQ mode
-
-    @ Prepare and enter into System mode.
-    BIC r1, r0, #PSR_MASK                  @ clear lowest 5 bits
-    ORR r1, r1, #MODE_SYS                  @ and set them to the System mode
+    LDR sp, =irq_stack_top                 @ stack for IRQ mode
 
     @ Return to Supervisor mode. When the first task starts it will switch
     @ to System mode and enable IRQ triggering.
-    BIC r1, r1, #PSR_MASK
-    ORR r1, r1, #MODE_SVC
+    ORR r1, r0, #MODE_SVC
     MSR cpsr, r1
 
     BL init                                @ before the application is started, initialize all hardware
