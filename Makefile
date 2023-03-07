@@ -52,16 +52,17 @@ LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
 AR = $(TOOLCHAIN)ar
 
-# GCC flags
 CFLAG = -c
 OFLAG = -o
 INCLUDEFLAG = -I
+
 CPUFLAG = -mcpu=arm926ej-s
 WFLAG = -Wall -Wextra -pedantic
 #WFLAG += -Werror
 #WFLAG += -Wundef -Wshadow -Wwrite-strings -Wold-style-definition -Wcast-align=strict -Wunreachable-code -Waggregate-return -Wlogical-op -Wtrampolines -Wc90-c99-compat -Wc99-c11-compat
 #WFLAG += -Wconversion -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Wcast-qual -Wswitch-default
 CFLAGS = $(CPUFLAG) $(WFLAG) -O2
+# -fno-use-cxa-atexit
 
 ifeq ($(USE_NEWLIB),1)
 CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
@@ -126,12 +127,11 @@ endif
 
 FREERTOS_PORT_OBJS = port.o portISR.o
 STARTUP_OBJ = startup.o
-DRIVERS_OBJS = timer.o interrupt.o uart.o
-
-APP_OBJS = init.o main.o print.o receive.o
+DRIVERS_OBJS = timer.o interrupt.o uart.o hw_init.o
 ifeq ($(USE_NEWLIB),0)
-APP_OBJS += nostdlib.o
+DRIVERS_OBJS += nostdlib.o
 endif
+APP_OBJS = main.o print.o receive.o
 
 
 # All object files specified above are prefixed the intermediate directory
@@ -178,15 +178,12 @@ endif
 
 
 # Startup code, implemented in assembler
-
-$(OBJDIR)startup.o : $(APP_SRC)/startup.s
+$(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s
 	$(AS) $(CPUFLAG) $< $(OFLAG) $@
-
 
 # FreeRTOS core
 $(OBJDIR)%.o : $(FREERTOS_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
 
 # HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
 $(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c
@@ -201,14 +198,14 @@ $(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c
 $(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
+# Or use -ffreestanding or -fno-hosted instead?
+# They all disable -fno-tree-loop-distribute-patterns.
+$(OBJDIR)nostdlib.o : $(DRIVERS_SRC)/nostdlib.c
+	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
 
 # Demo application
-
-$(OBJDIR)main.o : $(APP_SRC)/main.c
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
-
-$(OBJDIR)init.o : $(APP_SRC)/init.c $(DEP_BSP)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)main.o : $(APP_SRC)/main.c $(DEP_BSP)
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)print.o : $(APP_SRC)/print.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
@@ -216,14 +213,8 @@ $(OBJDIR)print.o : $(APP_SRC)/print.c
 $(OBJDIR)receive.o : $(APP_SRC)/receive.c $(DEP_BSP)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-# Or use -ffreestanding or -fno-hosted instead?
-# They all disable -fno-tree-loop-distribute-patterns.
-$(OBJDIR)nostdlib.o : $(APP_SRC)/nostdlib.c
-	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
-
 
 # Cleanup directives:
-
 clean_obj :
 	$(RM) -r $(OBJDIR)
 
@@ -233,8 +224,8 @@ clean_intermediate : clean_obj
 clean : clean_intermediate
 	$(RM) $(TARGET)
 
-# Short help instructions:
 
+# Short help instructions:
 help :
 	@echo
 	@echo Valid targets:

@@ -43,7 +43,7 @@
   * Performs initialization of all supported hardware.
   * All peripherals are stopped, their interrupt triggering is disabled, etc.
   */
-void init(void)
+void hw_init(void)
 {
     /* Disable IRQ triggering (may be reenabled after ISRs are properly set) */
     /* irq_disableIrqMode(); This is already done in startup.s??? */

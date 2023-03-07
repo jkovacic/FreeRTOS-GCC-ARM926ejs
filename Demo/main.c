@@ -35,6 +35,7 @@
 #include <task.h>
 
 #include "app_config.h"
+#include "bsp.h"
 #include "print.h"
 #include "receive.h"
 
@@ -145,6 +146,7 @@ static void FreeRTOS_Error(const portCHAR* msg)
     for ( ; ; );
 }
 
+
 /* Startup function that creates and runs two FreeRTOS tasks */
 void main(void)
 {
@@ -154,6 +156,8 @@ void main(void)
         { "Task1\r\n", 2000U },
         { "Periodic task\r\n", 3000U }
     };
+
+    hw_init();
 
     /* Init of print related tasks: */
     if ( pdFAIL == printInit() )

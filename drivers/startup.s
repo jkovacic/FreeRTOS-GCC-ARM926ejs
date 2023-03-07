@@ -148,8 +148,6 @@ bss_clear_loop:
     ORR r1, r0, #MODE_SVC
     MSR cpsr, r1
 
-    BL init                                @ before the application is started, initialize all hardware
-
     B main                                 @ and finally start the application
 
 unhandled:

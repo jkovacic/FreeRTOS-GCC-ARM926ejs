@@ -127,5 +127,7 @@
 #define BSP_SOFTWARE_IRQ            ( 1 )
 #endif
 
+void hw_init(void);
+
 
 #endif   /* _BSP_H_ */
