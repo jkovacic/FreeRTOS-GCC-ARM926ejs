@@ -57,11 +57,10 @@ SECTIONS
      */
 
      /* Constants used within this command: */
-
-    __ld_Vectors_Size = 16 * 4;   /* Vectors at the very beginning of the memory (rounded up to 16) */
+    __ld_Vectors_Size = 16 * 4;   /* Vectors at the very beginning of the memory (64 bytes) */
     __ld_Svc_Stack_Size = 0x1000; /* Very generous size of the Supervisor mode's stack (4 kB) */
     __ld_Irq_Stack_size = 0x1000; /* Very generous size of the IRQ mode's stack (4 kB) */
-    __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address */
+    __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address, 64 kB */
     __ld_Ram_size = 128M;         /* Total capacity of RAM */
 
 
@@ -73,7 +72,7 @@ SECTIONS
     . = . + __ld_Irq_Stack_size; /* Allocate memory for IRQ mode's stack */
     irq_stack_top = .;           /* Initial stack pointer for the IRQ mode */
 
-    /* Approx. 50 kB remains for the System mode's stack: */
+    /* System mode's stack: 64 kB - 8 kB - 64 B = approx. 56 kB */
     . = __ld_Init_Addr - 4;      /* Allocate memory for System mode's stack */
     stack_top = .;               /* It starts just in front of the startup address */
 
@@ -90,12 +89,10 @@ SECTIONS
     {
         *(.rodata)
     }
-
     .data :
     {
         *(.data)
     }
-
     .bss :
     {
         __bss_begin = .;
