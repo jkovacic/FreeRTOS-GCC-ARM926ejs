@@ -59,14 +59,13 @@ SECTIONS
      /* Constants used within this command: */
 
     __ld_Vectors_Size = 16 * 4;   /* Vectors at the very beginning of the memory (rounded up to 16) */
-    __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address */
     __ld_Svc_Stack_Size = 0x1000; /* Very generous size of the Supervisor mode's stack (4 kB) */
     __ld_Irq_Stack_size = 0x1000; /* Very generous size of the IRQ mode's stack (4 kB) */
+    __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address */
     __ld_Ram_size = 128M;         /* Total capacity of RAM */
 
 
     . = __ld_Vectors_Size;        /* Move the pointer after the "reserved" area for exception vectors */
-    . = ALIGN(16);                /* Align it to a multiple of 16; just in case... */
 
     . = . + __ld_Svc_Stack_Size;  /* Allocate memory for Supervisor mode's stack */
     svc_stack_top = .;            /* Initial stack pointer for the Supervisor mode */
@@ -81,32 +80,20 @@ SECTIONS
     . = __ld_Init_Addr;          /* Qemu will boot from this address */
     .init :
     {
-        __init_begin = .;
         *(.init)                 /* ARM exception vectors must be placed to startup address */
-        __init_end = .;
     }
-
-    /* The other sections follow: */
     .text :
     {
-        __text_begin = .;
         *(.text)
-        __text_end = .;
     }
-
-    /* followed by other sections... */
     .rodata :
     {
-        __rodata_begin = .;
         *(.rodata)
-        __rodata_end = .;
     }
 
     .data :
     {
-        __data_begin = .;
         *(.data)
-        __data_end = .;
     }
 
     .bss :
@@ -125,9 +112,7 @@ SECTIONS
     /* The remainder of RAM is reserved for the heap (if malloc is ever used) */
     .heap :
     {
-        __heap_begin = .;
         *(.heap)
         . = __ld_Ram_size - __ld_FootPrint_End;
-        __heap_end = .;
     }
 }
