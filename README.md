@@ -57,6 +57,18 @@ You can also just execute _killall qemu-system-arm_ in another shell to stop all
 
 For more details, see extensive comments in both scripts.
 
+To check the size of the compiled image, you can look at:
+
+`arm-none-eabi-size image.elf`
+
+Or:
+
+`arm-none-eabi-size  obj/*.o | sort -n`
+
+To look at the generated assembler output, you can look at:
+
+`arm-none-eabi-objdump -d image.elf`
+
 ## License
 All source and header files are licensed under
 the [MIT license](https://www.freertos.org/a00114.html).
