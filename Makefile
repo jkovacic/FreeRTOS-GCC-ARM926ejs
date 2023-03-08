@@ -78,6 +78,8 @@ ifeq ($(REMOVE_DEAD_CODE),1)
 CFLAGS += -ffunction-sections
 # "-fdata-sections" could be added as well, but often increases size
 LINKER_FLAGS += -Wl,--gc-sections
+# For debugging:
+#LINKER_FLAGS += -Wl,--print-gc-sections
 endif
 
 ifeq ($(USE_NEWLIB),1)
