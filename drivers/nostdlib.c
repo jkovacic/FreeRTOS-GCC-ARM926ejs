@@ -94,6 +94,7 @@ void * memcpy(void *dest, const void *src, size_t n)
 }
 
 
+#if 0
 /**
  * Copy string.
  *
@@ -119,3 +120,4 @@ char * strcpy(char *dst0, const char *src0)
 
     return s;
 }
+#endif
