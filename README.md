@@ -69,6 +69,16 @@ To look at the generated assembler output, you can look at:
 
 `arm-none-eabi-objdump -d image.elf`
 
+## TODO
+
+- Assembler should be fixed for correct input data/functions.
+   - Fix -flto to be added correctly.
+- Add more hardware support within qemu possibilities.
+- Add more demo/test code.
+- Timer functions could be inlined?
+- Is it possible to write startup code as C with inline assembler?
+- Support using clang instead of gcc.
+
 ## License
 All source and header files are licensed under
 the [MIT license](https://www.freertos.org/a00114.html).
