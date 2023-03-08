@@ -61,7 +61,7 @@ To check the size of the compiled image, you can look at:
 
 `arm-none-eabi-size image.elf`
 
-Or:
+Or the size of the individual object files:
 
 `arm-none-eabi-size  obj/*.o | sort -n`
 
