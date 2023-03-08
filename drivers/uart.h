@@ -37,37 +37,25 @@
 
 
 void all_uart_init(void);
-
 void uart_printChar(uint8_t nr, char ch);
-
 void uart_print(uint8_t nr, const char* str);
-
 #if 0
 void uart_enableUart(uint8_t nr);
-
 void uart_disableUart(uint8_t nr);
 #endif
-
 void uart_enableTx(uint8_t nr);
-
 #if 0
 void uart_disableTx(uint8_t nr);
 #endif
-
 void uart_enableRx(uint8_t nr);
-
 #if 0
 void uart_disableRx(uint8_t nr);
 #endif
-
 void uart_enableRxInterrupt(uint8_t nr);
-
 #if 0
 void uart_disableRxInterrupt(uint8_t nr);
 #endif
-
 void uart_clearRxInterrupt(uint8_t nr);
-
 char uart_readChar(uint8_t nr);
 
 

@@ -34,7 +34,6 @@
 #include <FreeRTOS.h>
 
 int16_t recvInit(void);
-
 void recvTask(void* params);
 
 #endif  /* _RECEIVE_H_ */
