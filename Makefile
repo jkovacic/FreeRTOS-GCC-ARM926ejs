@@ -35,6 +35,11 @@ USE_NEWLIB=0
 USE_DEBUG_FLAGS=0
 
 #
+# Remove dead code via compiler/linker flags?
+#
+REMOVE_DEAD_CODE=1
+
+#
 # What app to compile?
 #
 USE_LARGE_DEMO=0
@@ -62,7 +67,18 @@ WFLAG = -Wall -Wextra -pedantic
 #WFLAG += -Wundef -Wshadow -Wwrite-strings -Wold-style-definition -Wcast-align=strict -Wunreachable-code -Waggregate-return -Wlogical-op -Wtrampolines -Wc90-c99-compat -Wc99-c11-compat
 #WFLAG += -Wconversion -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Wcast-qual -Wswitch-default
 CFLAGS = $(CPUFLAG) $(WFLAG) -O2
-# -fno-use-cxa-atexit
+# possible future C++ option: -fno-use-cxa-atexit
+ifeq ($(USE_NEWLIB),0)
+LINKER_FLAGS = -nostdlib -g
+else
+LINKER_FLAGS = --specs=nano.specs --specs=nosys.specs -nostartfiles -g
+endif
+
+ifeq ($(REMOVE_DEAD_CODE),1)
+CFLAGS += -ffunction-sections
+# "-fdata-sections" could be added as well, but often increases size
+LINKER_FLAGS += -Wl,--gc-sections
+endif
 
 ifeq ($(USE_NEWLIB),1)
 CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
@@ -170,11 +186,7 @@ $(OBJDIR) :
 	mkdir -p $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
-ifeq ($(USE_NEWLIB),0)
-	$(CC) -nostdlib -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
-else
-	$(CC) --specs=nano.specs --specs=nosys.specs -nostartfiles -g -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
-endif
+	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 
 
 # Startup code, implemented in assembler
