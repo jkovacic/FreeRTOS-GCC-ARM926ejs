@@ -81,6 +81,7 @@ LINKER_FLAGS += -Wl,--gc-sections
 # For debugging:
 #LINKER_FLAGS += -Wl,--print-gc-sections
 endif
+# You might want to look at "-flto".
 
 ifeq ($(USE_NEWLIB),1)
 CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
