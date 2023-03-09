@@ -47,6 +47,7 @@ typedef void (*pVectoredIsrPrototype)(void);
 void irq_enableIrqMode(void);
 #endif
 void irq_disableIrqMode(void);
+void _pic_IrqHandler(void);
 void pic_init(void);
 void pic_enableInterrupt(uint8_t irq);
 #if 0

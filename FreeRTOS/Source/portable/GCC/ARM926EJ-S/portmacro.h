@@ -224,8 +224,8 @@ typedef uint32_t UBaseType_t;
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
 
-#define portENTER_CRITICAL()        vPortEnterCritical();
-#define portEXIT_CRITICAL()         vPortExitCritical();
+#define portENTER_CRITICAL()        vPortEnterCritical()
+#define portEXIT_CRITICAL()         vPortExitCritical()
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */

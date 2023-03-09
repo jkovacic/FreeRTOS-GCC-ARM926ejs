@@ -77,6 +77,8 @@
 #define configCHECK_FOR_STACK_OVERFLOW    1
 extern void vAssertCalled( const char *pcFile, uint32_t ulLine );
 #define configASSERT( x )  if ( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+#else
+#define configUSE_MALLOC_FAILED_HOOK      0
 #endif
 
 /* Co-routine definitions. */

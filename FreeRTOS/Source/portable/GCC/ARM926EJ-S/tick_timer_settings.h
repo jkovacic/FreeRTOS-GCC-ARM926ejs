@@ -38,4 +38,7 @@
 #define portTICK_TIMER_COUNTER       ( 0U )
 
 
+void vTickISR( void );
+
+
 #endif  /* _TICK_TIMER_SETTINGS_H_ */

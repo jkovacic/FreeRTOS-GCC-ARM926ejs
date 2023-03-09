@@ -205,8 +205,6 @@ static void prvSetupTimerInterrupt( void )
     const uint8_t irq = 4U;
 #endif
 
-    extern void vTickISR(void);
-
     /* Calculate the match value required for our desired tick rate. */
     ulCompareMatch = ( 0U != configTICK_RATE_HZ ) ?
                        configCPU_CLOCK_HZ / configTICK_RATE_HZ :
