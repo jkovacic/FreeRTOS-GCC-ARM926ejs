@@ -100,14 +100,14 @@ ifeq ($(USE_LARGE_DEMO),0)
 CFLAGS += -DUSE_LARGE_DEMO=0
 endif
 
-# Compiler/target path in FreeRTOS/Source/portable
+# Compiler/target path in FreeRTOS/portable
 PORT_COMP_TARG = GCC/ARM926EJ-S
 
 # Intermediate directory for all *.o and other files:
 OBJDIR = obj/
 
 # FreeRTOS source base directory
-FREERTOS_SRC = FreeRTOS/Source
+FREERTOS_SRC = FreeRTOS
 
 # Directory with memory management source files
 FREERTOS_MEMMANG_SRC = $(FREERTOS_SRC)/portable/MemMang
@@ -200,7 +200,7 @@ $(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s
 $(OBJDIR)%.o : $(FREERTOS_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
-# HW specific part, in FreeRTOS/Source/portable/$(PORT_COMP_TARGET)
+# HW specific part, in FreeRTOS/portable/$(PORT_COMP_TARGET)
 $(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c
 	$(CC) $(CFLAG) $(CFLAGS) -O1 $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
