@@ -107,14 +107,13 @@ reset_handler:
     @  Copy the branching instructions from vectors start to registers r2-r9 and then to destination
     LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Load multiple values from indexed address; auto-increment R0
     STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}     @ Store multiple values from the indexed address; auto-increment R1
-
     @  Also copy correct addresses of exception handlers
     LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}
     STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}
 
     @ Clear the whole BSS section to 0:
-    LDR r0, __bss_begin_addr
-    LDR r1, __bss_end_addr
+    LDR r0, =__bss_begin
+    LDR r1, =__bss_end
     MOV r2, #0
 bss_clear_loop:
     CMP r0, r1                     @ if (r0<r1) ....
@@ -152,12 +151,5 @@ bss_clear_loop:
 
 unhandled:
     B .                                    @ infinite loop for unsupported exceptions
-
-@ Addresses of BSS begin and end.
-@ Note that both symbols have been defined in the linker script
-__bss_begin_addr:
-    .word __bss_begin
-__bss_end_addr:
-    .word __bss_end
 
 .end
