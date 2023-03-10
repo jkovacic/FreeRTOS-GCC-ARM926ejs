@@ -47,6 +47,8 @@
  *
  * @return 'ptr' is returned
  */
+void * memset(void *m, int c, size_t n) __attribute__((used));
+
 void * memset(void *m, int c, size_t n)
 {
     char *s = (char *) m;
@@ -81,6 +83,8 @@ void * memset(void *m, int c, size_t n)
  *
  * @return 'destination' is returned or NULL if any parameter equals NULL
  */
+void * memcpy(void *dest, const void *src, size_t n) __attribute__((used));
+
 void * memcpy(void *dest, const void *src, size_t n)
 {
     char *destc = dest;

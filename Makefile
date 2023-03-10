@@ -27,7 +27,7 @@
 #
 # Do we want to link against newlib?
 #
-USE_NEWLIB=1
+USE_NEWLIB=0
 
 #
 # Compile a debugging version?
@@ -38,6 +38,12 @@ USE_DEBUG_FLAGS=0
 # Remove dead code via compiler/linker flags?
 #
 REMOVE_DEAD_CODE=1
+
+#
+# Use gcc -flto option (link time optimization).
+# This produces slightly larger code size, so disabled by default.
+#
+USE_LTO=0
 
 #
 # What app to compile?
@@ -81,7 +87,11 @@ LINKER_FLAGS += -Wl,--gc-sections
 # For debugging:
 #LINKER_FLAGS += -Wl,--print-gc-sections
 endif
-# You might want to look at "-flto".
+
+ifeq ($(USE_LTO),1)
+CFLAGS += -flto
+LINKER_FLAGS += -flto
+endif
 
 ifeq ($(USE_NEWLIB),1)
 CFLAGS += --specs=nano.specs --specs=nosys.specs -DUSE_NEWLIB=1
