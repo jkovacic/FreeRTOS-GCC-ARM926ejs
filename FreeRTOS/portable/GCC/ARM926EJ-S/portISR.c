@@ -46,6 +46,7 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 
+#include "task.h"
 #include "timer.h"
 #include "tick_timer_settings.h"
 
@@ -125,6 +126,7 @@ void vTickISR( void )
 {
     /* Increment the RTOS tick count, then look for the highest priority
     task that is ready to run. */
+#if 0
     __asm volatile
     (
         "   BL xTaskIncrementTick   \t\n" \
@@ -133,6 +135,12 @@ void vTickISR( void )
         "   BL vTaskSwitchContext   \t\n" \
         "SkipContextSwitch:         \t\n"
     );
+#else
+    if (xTaskIncrementTick() != pdFALSE)
+    {
+        vTaskSwitchContext();
+    }
+#endif
 
     /* Acknowledge the interrupt on timer */
     timer_clearInterrupt(portTICK_TIMER, portTICK_TIMER_COUNTER);

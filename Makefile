@@ -27,7 +27,7 @@
 #
 # Do we want to link against newlib?
 #
-USE_NEWLIB=0
+USE_NEWLIB=1
 
 #
 # Compile a debugging version?
@@ -202,7 +202,7 @@ $(OBJDIR)%.o : $(FREERTOS_SRC)/%.c
 
 # HW specific part, in FreeRTOS/portable/$(PORT_COMP_TARGET)
 $(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c
-	$(CC) $(CFLAG) $(CFLAGS) -O1 $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target

@@ -73,7 +73,6 @@ To look at the generated assembler output, you can look at:
 
 - Assembler should be fixed for correct input data/functions.
    - Fix -flto to be added correctly.
-   - portISR.c needs to be compiled with -O1 to work correctly.
 - Add more hardware support within qemu possibilities.
 - Add more demo/test code.
 - Timer functions could be inlined?
