@@ -118,8 +118,8 @@ reset_handler:
     MOV r2, #0
 bss_clear_loop:
     CMP r0, r1                     @ if (r0<r1) ....
-    STRLTB r2, [r0], #1            @ ...store a byte of r2 (i.r. 0) to location pointed by r0++
-    BLT bss_clear_loop             @ ...and continue the loop
+    STRLO r2, [r0], #4             @ ...clear 4 bytes
+    BLO bss_clear_loop             @ ...and continue the loop
 
 
     @ Set stack pointers and IRQ/FIQ bits for all supported operating modes
