@@ -51,6 +51,63 @@
 #pragma GCC diagnostic ignored "-Wmain"
 
 
+#if USE_DEBUG_FLAGS == 1
+void vAssertCalled( const char *pcFile, uint32_t ulLine )
+{
+    volatile unsigned long looping = 0UL;
+    ( void ) pcFile;
+    ( void ) ulLine;
+    taskENTER_CRITICAL();
+    {
+        /* Use the debugger to set ul to a non-zero value in order to step out
+           of this function to determine why it was called. */
+        while( looping == 0UL )
+        {
+            portNOP();
+        }
+    }
+    taskEXIT_CRITICAL();
+}
+
+void vApplicationMallocFailedHook( void )
+{
+    /* vApplicationMallocFailedHook() will only be called if
+     * configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
+     * function that will get called if a call to pvPortMalloc() fails.
+     * pvPortMalloc() is called internally by the kernel whenever a task, queue,
+     * timer or semaphore is created.  It is also called by various parts of the
+     * demo application.  If heap_1.c, heap_2.c or heap_4.c is being used, then the
+     * size of the    heap available to pvPortMalloc() is defined by
+     * configTOTAL_HEAP_SIZE in FreeRTOSConfig.h, and the xPortGetFreeHeapSize()
+     * API function can be used to query the size of free heap space that remains
+     * (although it does not provide information on how the remaining heap might be
+     * fragmented).  See http://www.freertos.org/a00111.html for more
+     * information. */
+
+#if 1
+    vAssertCalled( __FILE__, __LINE__ );
+#else
+    /* configPRINT_STRING(( "ERROR: Malloc failed to allocate memory\r\n" )); */
+    taskDISABLE_INTERRUPTS();
+    for(;;){}
+#endif
+}
+
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName)
+{
+    (void) xTask;
+    (void) pcTaskName;
+
+    /* Run time stack overflow checking is performed if
+     * configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+     * function is called if a stack overflow is detected.  This function is
+     * provided as an example only as stack overflow checking does not function
+     * when running the FreeRTOS POSIX port. */
+    vAssertCalled( __FILE__, __LINE__ );
+}
+#endif
+
+
 /* Struct with settings for each task */
 typedef struct
 {

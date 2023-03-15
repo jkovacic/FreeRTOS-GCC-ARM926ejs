@@ -101,7 +101,7 @@ endif
 
 ifeq ($(USE_DEBUG_FLAGS),1)
 # Additional C compiler flags to produce debugging symbols
-CFLAGS += -g -DDEBUG -DUSE_DEBUG_FLAGS___XXX=1
+CFLAGS += -g -DDEBUG -DUSE_DEBUG_FLAGS=1
 else
 CFLAGS += -g -DUSE_DEBUG_FLAGS=0
 endif
