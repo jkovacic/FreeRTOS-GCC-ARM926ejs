@@ -74,6 +74,7 @@ To look at the generated assembler output, you can look at:
 - Add more hardware support within qemu possibilities.
 - Add more demo/test code.
 - Timer functions could be inlined?
+- Small/fast timer interrupt handling.
 - Makefile dependencies and parallel build are broken
 - Is it possible to write startup code as C with inline assembler?
 - Support using clang instead of gcc.
