@@ -306,6 +306,10 @@ void recvTask(void* params)
 
                 break;
             }
+	    default:
+	    {
+		break;
+	    }
 
         }  /* switch */
 
