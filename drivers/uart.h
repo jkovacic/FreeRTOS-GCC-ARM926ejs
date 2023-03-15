@@ -37,7 +37,9 @@
 
 
 void all_uart_init(void);
+#if 0
 void uart_printChar(uint8_t nr, char ch);
+#endif
 void uart_print(uint8_t nr, const char* str);
 #if 0
 void uart_enableUart(uint8_t nr);

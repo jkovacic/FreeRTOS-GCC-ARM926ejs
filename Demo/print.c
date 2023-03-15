@@ -162,6 +162,7 @@ void vPrintMsg(const portCHAR* msg)
 }
 
 
+#if 0
 /**
  * Prints a character in a thread safe manner - even if the calling task preempts
  * another printing task, its message will not be corrupted. Additionally, if another
@@ -194,6 +195,7 @@ void vPrintChar(portCHAR ch)
     ++chBufCntr;
     chBufCntr %= PRINT_CHR_BUF_SIZE;
 }
+#endif
 
 
 /**
@@ -215,6 +217,7 @@ void vDirectPrintMsg(const portCHAR* msg)
 }
 
 
+#if 0
 /**
  * Prints a character directly to the UART. The function is not thread safe and
  * corruptions are possible when multiple tasks attempt to print "simultaneously".
@@ -227,3 +230,4 @@ void vDirectPrintCh(portCHAR ch)
 {
     uart_printChar(printUartNr, ch);
 }
+#endif

@@ -306,6 +306,7 @@ static inline void __printCh(uint8_t nr, char ch)
 }
 
 
+#if 0
 /**
  * Outputs a character to the specified UART.
  *
@@ -327,6 +328,7 @@ void uart_printChar(uint8_t nr, char ch)
     /* just use the provided inline function: */
     __printCh(nr, ch);
 }
+#endif
 
 
 /**
