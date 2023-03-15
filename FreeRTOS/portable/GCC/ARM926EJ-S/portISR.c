@@ -50,6 +50,14 @@
 #include "timer.h"
 #include "tick_timer_settings.h"
 
+#ifdef __GNUC__
+/* #define likely(x) __builtin_expect(!!(x), 1) */
+#define unlikely(x)  __builtin_expect(!!(x), 0)
+#else
+/* #define likely(x) (x) */
+#define unlikely(x)  (x)
+#endif
+
 
 /* Constants required to handle critical sections. */
 #define portNO_CRITICAL_NESTING		( 0UL )
@@ -136,7 +144,7 @@ void vTickISR( void )
         "SkipContextSwitch:         \t\n"
     );
 #else
-    if (xTaskIncrementTick() != pdFALSE)
+    if (unlikely(xTaskIncrementTick() != pdFALSE))
     {
         vTaskSwitchContext();
     }
