@@ -140,7 +140,7 @@ bss_clear_loop:
     @ Switch into IRQ mode, disable IRQ/FIQ and set stack pointer:
     ORR r1, r0, #MODE_IRQ                  @ and set them to IRQ mode
     MSR cpsr, r1                           @ update CPSR (program status register) for IRQ mode
-    LDR sp, =irq_stack_top                 @ stack for IRQ mode
+    LDR sp, =irq_stack_top                 @ set stack for IRQ mode
 
     @ Return to Supervisor mode. When the first task starts it will switch
     @ to System mode and enable IRQ triggering.

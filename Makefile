@@ -266,7 +266,7 @@ help :
 
 run : all
 	@echo "Please exit qemu by pressing \"Ctrl-A x\""
-	qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET)
+	QEMU_AUDIO_DRV=none qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET)
 
 
 .PHONY : all rebuild clean clean_obj clean_intermediate help run
