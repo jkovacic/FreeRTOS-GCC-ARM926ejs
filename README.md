@@ -21,6 +21,7 @@ sudo apt install gcc-arm-none-eabi make qemu-system-arm
 </pre>
 
 ## Build
+
 A convenience Bash script [setenv.sh](setenv.sh) is provided to set paths to toolchain's commands
 and libraries. You may edit it and adjust the paths according to your setup. To set up
 the necessary paths, simply type:
@@ -37,6 +38,7 @@ You can edit the [Makefile](Makefile) and set USE_NEWLIB=1 if you want to link a
 a full libc for a bigger project using more C-functions from the standard library.
 
 # Run
+
 To run the target image in Qemu, enter the following command ('Ctrl-A x' to exit qemu):
 
 `qemu-system-arm -M versatilepb -nographic -m 128 -kernel image.bin`
@@ -69,6 +71,21 @@ To look at the generated assembler output, you can look at:
 
 `arm-none-eabi-objdump -d image.elf`
 
+## RAM layout
+
+See also [qemu.ld](Demo/qemu.ld) to check the RAM layout:
+
+| start    | end      | size                    | description                                             |
+|:---------|:---------|:------------------------|:--------------------------------------------------------|
+| 0x000000 | 0x00003F | 64 bytes                | vectors (8 vectors and 8 offset values to branch to)    |
+| 0x000040 | 0x00103F | 4K bytes                | stack for supervisor (SVC) mode                         |
+| 0x001040 | 0x00203F | 4K bytes                | stack for IRQ mode                                      |
+| 0x002040 | 0x00FFFF | 64 kB - 8 kB - 64 bytes | stack for system mode (less than 56 kB)                 |
+| 0x010000 | 0x01003F | 64 bytes                | vectors as part of the binary image                     |
+| 0x010040 | 0x?????? |                         | text and data of the binary image                       |
+| 0x?????? | 0x?????? |                         | bss data, set to 0 on bootup                            |
+| 0x?????? | 0x?????? |                         | heap (uses up to 128 MB of the remaining available RAM) |
+
 ## TODO
 
 - Add more hardware support within qemu possibilities.
@@ -79,6 +96,7 @@ To look at the generated assembler output, you can look at:
 - Support using clang instead of gcc.
 
 ## License
+
 All source and header files are licensed under
 the [MIT license](https://www.freertos.org/a00114.html).
 
