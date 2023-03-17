@@ -181,9 +181,6 @@ INC_DRIVERS = $(DRIVERS_SRC)
 INC_FLAGS = $(INCLUDEFLAG)$(INC_FREERTOS) $(INCLUDEFLAG)$(APP_SRC) $(INCLUDEFLAG)$(FREERTOS_PORT_SRC)
 INC_FLAG_DRIVERS = $(INCLUDEFLAG)$(INC_DRIVERS)
 
-# Dependency on HW specific settings
-DEP_BSP = $(INC_DRIVERS)/bsp.h
-
 
 #
 # Make rules:
@@ -222,7 +219,7 @@ $(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 # Drivers
-$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(DEP_BSP) $(OBJDIR)
+$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Or use -ffreestanding or -fno-hosted instead?
@@ -231,13 +228,13 @@ $(OBJDIR)nostdlib.o : $(DRIVERS_SRC)/nostdlib.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
 
 # Demo application
-$(OBJDIR)main.o : $(APP_SRC)/main.c $(DEP_BSP) $(OBJDIR)
+$(OBJDIR)main.o : $(APP_SRC)/main.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 $(OBJDIR)print.o : $(APP_SRC)/print.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(DEP_BSP) $(OBJDIR)
+$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 
