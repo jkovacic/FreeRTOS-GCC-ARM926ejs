@@ -72,7 +72,8 @@ WFLAG = -Wall -Wextra -pedantic
 #WFLAG += -Werror
 #WFLAG += -Wundef -Wshadow -Wwrite-strings -Wold-style-definition -Wcast-align=strict -Wunreachable-code -Waggregate-return -Wlogical-op -Wtrampolines -Wc90-c99-compat -Wc99-c11-compat
 #WFLAG += -Wconversion -Wmissing-prototypes -Wredundant-decls -Wnested-externs -Wcast-qual -Wswitch-default
-CFLAGS = $(CPUFLAG) $(WFLAG) -O2
+DEPFLAGS = -MMD -MP
+CFLAGS = $(DEPFLAGS) $(CPUFLAG) $(WFLAG) -O2
 # possible future C++ option: -fno-use-cxa-atexit
 ifeq ($(USE_NEWLIB),0)
 LINKER_FLAGS = -nostdlib -g
@@ -192,15 +193,16 @@ all : $(TARGET)
 
 rebuild : clean all
 
-$(TARGET) : $(OBJDIR) $(ELF_IMAGE)
-	$(OBJCOPY) -O binary $(word 2,$^) $@
-
 $(OBJDIR) :
 	mkdir -p $@
+
+$(TARGET) : $(OBJDIR) $(ELF_IMAGE)
+	$(OBJCOPY) -O binary $(word 2,$^) $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
 
+-include $(wildcard $(OBJDIR)/$*.d)
 
 # Startup code, implemented in assembler
 $(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s
