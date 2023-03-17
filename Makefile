@@ -205,39 +205,39 @@ $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 -include $(wildcard $(OBJDIR)/$*.d)
 
 # Startup code, implemented in assembler
-$(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s
+$(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s $(OBJDIR)
 	$(AS) $(CPUFLAG) $< $(OFLAG) $@
 
 # FreeRTOS core
-$(OBJDIR)%.o : $(FREERTOS_SRC)/%.c
+$(OBJDIR)%.o : $(FREERTOS_SRC)/%.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 # HW specific part, in FreeRTOS/portable/$(PORT_COMP_TARGET)
-$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c
+$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
-$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c
+$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
 
 # Drivers
-$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(DEP_BSP)
+$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(DEP_BSP) $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 # Or use -ffreestanding or -fno-hosted instead?
 # They all disable -fno-tree-loop-distribute-patterns.
-$(OBJDIR)nostdlib.o : $(DRIVERS_SRC)/nostdlib.c
+$(OBJDIR)nostdlib.o : $(DRIVERS_SRC)/nostdlib.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
 
 # Demo application
-$(OBJDIR)main.o : $(APP_SRC)/main.c $(DEP_BSP)
+$(OBJDIR)main.o : $(APP_SRC)/main.c $(DEP_BSP) $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)print.o : $(APP_SRC)/print.c
+$(OBJDIR)print.o : $(APP_SRC)/print.c $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
-$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(DEP_BSP)
+$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(DEP_BSP) $(OBJDIR)
 	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
 
 
