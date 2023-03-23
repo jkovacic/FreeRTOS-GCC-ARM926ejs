@@ -115,7 +115,8 @@ extern void _pic_IrqHandler(void);
  * When an IRQ exception is triggered, it is handled by this function,
  * that reads the ISR address at the VIC controller and executes it.
  */
-void vFreeRTOS_ISR( void ) __attribute__((naked));
+void vFreeRTOS_ISR( void ) __attribute__((interrupt("IRQ"), naked));
+
 void vFreeRTOS_ISR( void )
 {
     portSAVE_CONTEXT();

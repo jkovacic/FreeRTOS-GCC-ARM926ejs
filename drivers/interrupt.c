@@ -322,14 +322,14 @@ void pic_init(void)
     pPicReg->VICDEFVECTADDR = (uint32_t) &__defaultVectorIsr;
 
     /* clear all vectored ISR addresses: */
-    for ( i=0U; i<NR_INTERRUPTS; ++i )
+    for ( i = 0U; i < NR_INTERRUPTS; ++i )
     {
         /* clear its entry in the table */
         __irqVect[i].isr = &__irq_dummyISR;    /* dummy ISR routine */
         __irqVect[i].irq = MY_UINT8_MAX;       /* no IRQ assigned */
         __irqVect[i].priority = MY_UINT8_MAX;  /* lowest priority */
 
-        if ( i<NR_VECTORS )
+        if ( i < NR_VECTORS )
         {
             /* clear its control register */
             pPicReg->VICVECTCNTLn[i] = UL0;
@@ -594,8 +594,8 @@ int8_t pic_registerIrq(
         {
             __irqVect[i] = __irqVect[i-1];
 
-            /* for i<16 also update PIC's vector address and control registers */
-            if ( i<NR_VECTORS )
+            /* for i < 16 also update PIC's vector address and control registers */
+            if ( i < NR_VECTORS )
             {
                 if ( __irqVect[i].irq != MY_UINT8_MAX)
                 {
@@ -618,7 +618,7 @@ int8_t pic_registerIrq(
         /* however this does not include the entry at prPos, whose priority is less than prior!!! */
         --prPos;
 
-        for ( i=irqPos; i<prPos; ++i )
+        for ( i = irqPos; i < prPos; ++i )
         {
             __irqVect[i] = __irqVect[i+1];
 

@@ -256,7 +256,7 @@ void all_uart_init(void)
     uint8_t i;
 
     /* Init all available UARTs */
-    for ( i=0U; i<BSP_NR_UARTS; ++i )
+    for ( i = 0U; i < BSP_NR_UARTS; ++i )
     {
         uart_init(i);
     }

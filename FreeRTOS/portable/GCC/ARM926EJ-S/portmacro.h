@@ -135,8 +135,8 @@ typedef uint32_t UBaseType_t;
 
 #define portSAVE_CONTEXT()                                              \
 {                                                                       \
-    /* Push R0 as we are going to use the register. */                  \
     __asm volatile (                                                    \
+    /* Push R0 as we are going to use the register. */                  \
     "STMDB  SP!, {R0}                                           \n\t"   \
                                                                         \
     /* Set R0 to point to the task stack pointer. */                    \
