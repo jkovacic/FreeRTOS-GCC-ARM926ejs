@@ -63,10 +63,6 @@ LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
 AR = $(TOOLCHAIN)ar
 
-CFLAG = -c
-OFLAG = -o
-INCLUDEFLAG = -I
-
 CPUFLAG = -mcpu=arm926ej-s
 WFLAG = -Wall -Wextra -pedantic
 #WFLAG += -Werror
@@ -115,7 +111,7 @@ endif
 PORT_COMP_TARG = GCC/ARM926EJ-S
 
 # Intermediate directory for all *.o and other files:
-OBJDIR = obj/
+OBJDIR = obj
 
 # FreeRTOS source base directory
 FREERTOS_SRC = FreeRTOS
@@ -165,10 +161,10 @@ APP_OBJS = main.o print.o receive.o
 
 
 # All object files specified above are prefixed the intermediate directory
-OBJS = $(addprefix $(OBJDIR), $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG_OBJS) $(FREERTOS_PORT_OBJS) $(DRIVERS_OBJS) $(APP_OBJS))
+OBJS = $(addprefix $(OBJDIR)/, $(STARTUP_OBJ) $(FREERTOS_OBJS) $(FREERTOS_MEMMANG_OBJS) $(FREERTOS_PORT_OBJS) $(DRIVERS_OBJS) $(APP_OBJS))
 
 # Definition of the linker script and final targets
-LINKER_SCRIPT = $(addprefix $(APP_SRC)/, qemu.ld)
+LINKER_SCRIPT = $(APP_SRC)/qemu.ld
 ELF_IMAGE = image.elf
 MAPFILE = image.map
 TARGET = image.bin
@@ -178,8 +174,8 @@ INC_FREERTOS = $(FREERTOS_SRC)/include
 INC_DRIVERS = $(DRIVERS_SRC)
 
 # Complete include flags to be passed to $(CC) where necessary
-INC_FLAGS = $(INCLUDEFLAG)$(INC_FREERTOS) $(INCLUDEFLAG)$(APP_SRC) $(INCLUDEFLAG)$(FREERTOS_PORT_SRC)
-INC_FLAG_DRIVERS = $(INCLUDEFLAG)$(INC_DRIVERS)
+INC_FLAGS = -I$(INC_FREERTOS) -I$(APP_SRC) -I$(FREERTOS_PORT_SRC)
+INC_FLAG_DRIVERS = -I$(INC_DRIVERS)
 
 
 #
@@ -193,49 +189,51 @@ rebuild : clean all
 $(OBJDIR) :
 	mkdir -p $@
 
-$(TARGET) : $(OBJDIR) $(ELF_IMAGE)
-	$(OBJCOPY) -O binary $(word 2,$^) $@
+$(OBJS) : | $(OBJDIR)
+
+$(TARGET) : $(ELF_IMAGE)
+	$(OBJCOPY) -O binary $^ $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
-	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) $(OFLAG) $@ -Wl,-Map=$(MAPFILE)
+	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@ -Wl,-Map=$(MAPFILE)
 
 -include $(wildcard $(OBJDIR)/$*.d)
 
 # Startup code, implemented in assembler
-$(OBJDIR)startup.o : $(DRIVERS_SRC)/startup.s $(OBJDIR)
-	$(AS) $(CPUFLAG) $< $(OFLAG) $@
+$(OBJDIR)/startup.o : $(DRIVERS_SRC)/startup.s
+	$(AS) --warn $(CPUFLAG) $< -o $@
 
 # FreeRTOS core
-$(OBJDIR)%.o : $(FREERTOS_SRC)/%.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
+$(OBJDIR)/%.o : $(FREERTOS_SRC)/%.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) -c $< -o $@
 
 # HW specific part, in FreeRTOS/portable/$(PORT_COMP_TARGET)
-$(OBJDIR)%.o : $(FREERTOS_PORT_SRC)/%.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)/%.o : $(FREERTOS_PORT_SRC)/%.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) -c $< -o $@
 
 # Rules for all MemMang implementations are provided
 # Only one of these object files must be linked to the final target
-$(OBJDIR)%.o : $(FREERTOS_MEMMANG_SRC)/%.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $< $(OFLAG) $@
+$(OBJDIR)/%.o : $(FREERTOS_MEMMANG_SRC)/%.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) -c $< -o $@
 
 # Drivers
-$(OBJDIR)%.o : $(DRIVERS_SRC)/%.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)/%.o : $(DRIVERS_SRC)/%.c
+	$(CC) $(CFLAGS) $(INC_FLAG_DRIVERS) -c $< -o $@
 
 # Or use -ffreestanding or -fno-hosted instead?
 # They all disable -fno-tree-loop-distribute-patterns.
-$(OBJDIR)nostdlib.o : $(DRIVERS_SRC)/nostdlib.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) -fno-builtin $< $(OFLAG) $@
+$(OBJDIR)/nostdlib.o : $(DRIVERS_SRC)/nostdlib.c
+	$(CC) $(CFLAGS) -fno-builtin -c $< -o $@
 
 # Demo application
-$(OBJDIR)main.o : $(APP_SRC)/main.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)/main.o : $(APP_SRC)/main.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) -c $< -o $@
 
-$(OBJDIR)print.o : $(APP_SRC)/print.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)/print.o : $(APP_SRC)/print.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) -c $< -o $@
 
-$(OBJDIR)receive.o : $(APP_SRC)/receive.c $(OBJDIR)
-	$(CC) $(CFLAG) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) $< $(OFLAG) $@
+$(OBJDIR)/receive.o : $(APP_SRC)/receive.c
+	$(CC) $(CFLAGS) $(INC_FLAGS) $(INC_FLAG_DRIVERS) -c $< -o $@
 
 
 # Cleanup directives:
