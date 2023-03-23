@@ -8,6 +8,7 @@ obj/
 image.bin
 image.elf
 image.map
+image.lst
 
 # Backup files of some editors:
 *~
