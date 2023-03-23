@@ -61,6 +61,7 @@ CXX = $(TOOLCHAIN)g++
 AS = $(TOOLCHAIN)as
 LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
+OBJDUMP = $(TOOLCHAIN)objdump
 AR = $(TOOLCHAIN)ar
 
 CPUFLAG = -mcpu=arm926ej-s
@@ -168,6 +169,7 @@ LINKER_SCRIPT = $(APP_SRC)/qemu.ld
 ELF_IMAGE = image.elf
 MAPFILE = image.map
 TARGET = image.bin
+LISTING = image.lst
 
 # Include paths to be passed to $(CC) where necessary
 INC_FREERTOS = $(FREERTOS_SRC)/include
@@ -182,7 +184,7 @@ INC_FLAG_DRIVERS = -I$(INC_DRIVERS)
 # Make rules:
 #
 
-all : $(TARGET)
+all : $(TARGET) $(LISTING)
 
 rebuild : clean all
 
@@ -193,6 +195,9 @@ $(OBJS) : | $(OBJDIR)
 
 $(TARGET) : $(ELF_IMAGE)
 	$(OBJCOPY) -O binary $^ $@
+
+$(LISTING) : $(ELF_IMAGE)
+	$(OBJDUMP) -d $^ > $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@ -Wl,-Map=$(MAPFILE)
@@ -241,7 +246,7 @@ clean_obj :
 	$(RM) -r $(OBJDIR)
 
 clean_intermediate : clean_obj
-	$(RM) $(ELF_IMAGE) $(MAPFILE)
+	$(RM) $(ELF_IMAGE) $(MAPFILE) $(LISTING)
 
 clean : clean_intermediate
 	$(RM) $(TARGET)
