@@ -1,3 +1,5 @@
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+
 /*
  * Copyright 2013, 2017, Jernej Kovacic
  *

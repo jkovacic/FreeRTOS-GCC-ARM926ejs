@@ -40,23 +40,16 @@
 #include "receive.h"
 
 
-/*
- * This diagnostic pragma will suppress the -Wmain warning,
- * raised when main() does not return an int
- * (which is perfectly OK in bare metal programming!).
- *
- * More details about the GCC diagnostic pragmas:
- * https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
- */
-#pragma GCC diagnostic ignored "-Wmain"
-
-
 #if USE_DEBUG_FLAGS == 1
 void vAssertCalled( const char *pcFile, uint32_t ulLine )
 {
     volatile unsigned long looping = 0UL;
+#if 1
     ( void ) pcFile;
     ( void ) ulLine;
+#else
+    printf("Assertion failed at %s, line %d\n\r", pcFile, ulLine);
+#endif
     taskENTER_CRITICAL();
     {
         /* Use the debugger to set ul to a non-zero value in order to step out
@@ -205,7 +198,7 @@ static void FreeRTOS_Error(const portCHAR* msg)
 
 
 /* Startup function that creates and runs two FreeRTOS tasks */
-void main(void)
+int main(void)
 {
     /* Parameters for two tasks */
     static paramStruct tParam[2] =
@@ -276,4 +269,5 @@ void main(void)
 
     /* just in case if an infinite loop is somehow omitted in FreeRTOS_Error */
     for ( ; ; );
+    return 0;
 }
