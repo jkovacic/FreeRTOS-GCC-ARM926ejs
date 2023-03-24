@@ -212,8 +212,8 @@ typedef uint32_t UBaseType_t;
      * As FIQ is currently not supported, it is not enabled by the macro.
      * If this is necessary, replace #0x80 by #0xC0.
      */
-    #define portENABLE_INTERRUPTS()												\
-        __asm volatile (														\
+    #define portENABLE_INTERRUPTS()                                             \
+        __asm volatile (                                                        \
             "STMDB  SP!, {R0}       \n\t"   /* Push R0.                     */  \
             "MRS    R0, CPSR        \n\t"   /* Get CPSR.                    */  \
             "BIC    R0, R0, #0x80   \n\t"   /* Enable IRQ                   */  \

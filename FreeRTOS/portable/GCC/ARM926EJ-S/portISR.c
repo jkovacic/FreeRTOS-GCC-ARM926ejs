@@ -60,7 +60,7 @@
 
 
 /* Constants required to handle critical sections. */
-#define portNO_CRITICAL_NESTING		( 0UL )
+#define portNO_CRITICAL_NESTING         ( 0UL )
 volatile unsigned long ulCriticalNesting = 9999UL;
 
 /*-----------------------------------------------------------*/
@@ -193,7 +193,7 @@ void vTickISR( void )
             "BIC    R0, R0, #0x80   \n\t"   /* Enable IRQ.                              */
             "MSR    CPSR, R0        \n\t"   /* Write back modified value.               */
             "LDMIA  SP!, {R0}       \n\t"   /* Pop R0.                                  */
-            "BX	    R14" );                 /* Return back to thumb.                    */
+            "BX     R14" );                 /* Return back to thumb.                    */
     }
 
 #endif /* THUMB_INTERWORK */
