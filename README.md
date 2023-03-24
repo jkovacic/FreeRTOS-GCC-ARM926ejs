@@ -67,7 +67,7 @@ Or the size of the individual object files:
 
 `arm-none-eabi-size  obj/*.o | sort -n`
 
-To look at the generated assembler output, you can look at:
+To look at the generated assembler output, you can look at (also stored into the file "image.lst"):
 
 `arm-none-eabi-objdump -d image.elf`
 
