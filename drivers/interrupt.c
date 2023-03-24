@@ -68,7 +68,7 @@
  * among certain groups of registers. The gaps are filled by
  * Unused* "registers" and are treated as "should not be modified".
  */
-typedef struct
+typedef volatile struct
 {
     uint32_t VICIRQSTATUS;            /* IRQ Status Register, read only */
     uint32_t VICFIQSTATUS;            /* FIQ Status Register, read only */
@@ -111,7 +111,7 @@ typedef struct
  *
  * Note that some registers share their addresses. See #defines below.
  */
-typedef struct
+typedef volatile struct
 {
     uint32_t SIC_STATUS;              /* Status of interrupt (after mask), read only */
     uint32_t SIC_RAWSTAT;             /* Status of interrupt (before mask), read only */
@@ -149,8 +149,8 @@ typedef struct
 #define BSP_SIC_BASE_ADDRESS        ( 0x10003000 )
 #endif
 
-static volatile ARM926EJS_PIC_REGS* const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_PIC_BASE_ADDRESS);
-/* static volatile ARM926EJS_SIC_REGS* const pSicReg = (ARM926EJS_SIC_REGS*) (BSP_SIC_BASE_ADDRESS); */
+static ARM926EJS_PIC_REGS * const pPicReg = (ARM926EJS_PIC_REGS*) (BSP_PIC_BASE_ADDRESS);
+/* static ARM926EJS_SIC_REGS * const pSicReg = (ARM926EJS_SIC_REGS*) (BSP_SIC_BASE_ADDRESS); */
 
 
 

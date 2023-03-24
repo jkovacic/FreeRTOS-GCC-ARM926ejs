@@ -100,7 +100,7 @@ typedef struct
  * relative to the controllers' base address:
  * See page 3-2 of DDI0271:
  */
-typedef struct
+typedef volatile struct
 {
     SP804_COUNTER_REGS CNTR[NR_COUNTERS];     /* Registers for each of timer's two counters */
     uint32_t Reserved1[944];                  /* Reserved for future expansion, should not be modified */
@@ -117,7 +117,7 @@ typedef struct
  */
 #define CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
 
-static volatile ARM926EJS_TIMER_REGS* const pReg[BSP_NR_TIMERS] =
+static ARM926EJS_TIMER_REGS * const pReg[BSP_NR_TIMERS] =
                          {
                              BSP_TIMER_BASE_ADDRESSES(CAST_ADDR)
                          };
@@ -133,9 +133,9 @@ void all_timer_init(void)
     uint8_t i, j;
 
     /* Init all counters of all available timers */
-    for ( i=0U; i<BSP_NR_TIMERS; ++i )
+    for ( i = 0U; i < BSP_NR_TIMERS; ++i )
     {
-        for ( j=0U; j<NR_COUNTERS; ++j )
+        for ( j = 0U; j < NR_COUNTERS; ++j )
         {
             timer_init(i, j);
         }
