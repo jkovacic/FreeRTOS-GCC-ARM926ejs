@@ -201,10 +201,10 @@ $(LISTING) : $(ELF_IMAGE)
 	$(OBJDUMP) -d $^ > $@
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
-	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@ -Wl,-Map=$(MAPFILE)
+	$(CC) $(LINKER_FLAGS) -T $(LINKER_SCRIPT) $(OBJS) -o $@ -Wl,-Map=$(MAPFILE)
 	$(SIZE) $@
 
--include $(wildcard $(OBJDIR)/$*.d)
+-include $(wildcard $(OBJDIR)/*.d)
 
 # Startup code, implemented in assembler
 $(OBJDIR)/startup.o : $(DRIVERS_SRC)/startup.s
