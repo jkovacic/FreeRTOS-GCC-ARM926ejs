@@ -59,10 +59,11 @@ TOOLCHAIN = arm-none-eabi-
 CC = $(TOOLCHAIN)gcc
 CXX = $(TOOLCHAIN)g++
 AS = $(TOOLCHAIN)as
-LD = $(TOOLCHAIN)ld
+#LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
 OBJDUMP = $(TOOLCHAIN)objdump
-AR = $(TOOLCHAIN)ar
+SIZE = $(TOOLCHAIN)size
+#AR = $(TOOLCHAIN)ar
 
 CPUFLAG = -mcpu=arm926ej-s
 WFLAG = -Wall -Wextra -pedantic
@@ -201,6 +202,7 @@ $(LISTING) : $(ELF_IMAGE)
 
 $(ELF_IMAGE) : $(OBJS) $(LINKER_SCRIPT)
 	$(CC) $(LINKER_FLAGS) -L $(OBJDIR) -T $(LINKER_SCRIPT) $(OBJS) -o $@ -Wl,-Map=$(MAPFILE)
+	$(SIZE) $@
 
 -include $(wildcard $(OBJDIR)/$*.d)
 
