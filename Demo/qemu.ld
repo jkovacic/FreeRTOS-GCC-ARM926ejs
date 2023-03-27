@@ -93,23 +93,19 @@ SECTIONS
     {
         *(.data)
     }
+    . = ALIGN(4);
     .bss :
     {
-        __bss_begin = .;
-        __bss_start__ = .;
+        __bss_start = .;
         *(.bss)
-        __bss_end = .;
-        __bss_end__ = .;
     }
-    . = ALIGN(4);                  /* The section size is aligned to the 4-byte boundary */
-
-    __ld_FootPrint_End = .;        /* A convenience symbol to determine the actual memory footprint */
+    . = ALIGN(4);
     end = .;
 
     /* The remainder of RAM is reserved for the heap (if malloc is ever used) */
     .heap :
     {
         *(.heap)
-        . = __ld_Ram_size - __ld_FootPrint_End;
+        . = __ld_Ram_size - end;
     }
 }

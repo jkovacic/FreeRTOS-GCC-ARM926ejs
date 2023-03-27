@@ -111,9 +111,9 @@ reset_handler:
     LDMIA r0!, {r2, r3, r4, r5, r6, r7, r8, r9}
     STMIA r1!, {r2, r3, r4, r5, r6, r7, r8, r9}
 
-    @ Clear the whole BSS section to 0:
-    LDR r0, =__bss_begin
-    LDR r1, =__bss_end
+    @ Clear the BSS section to 0:
+    LDR r0, =__bss_start
+    LDR r1, =end
     MOV r2, #0
 bss_clear_loop:
     CMP r0, r1                     @ if (r0<r1) ....
