@@ -132,10 +132,10 @@ void vPortFree( void * pv )
     /* Memory cannot be freed using this scheme.  See heap_2.c, heap_3.c and
      * heap_4.c for alternative implementations, and the memory management pages of
      * https://www.FreeRTOS.org for more information. */
-    ( void ) pv;
-
-    /* Force an assert as it is invalid to call this function. */
-    configASSERT( pv == NULL );
+    if (pv)
+    {
+        traceFREE( pv, 0 );
+    }
 }
 /*-----------------------------------------------------------*/
 

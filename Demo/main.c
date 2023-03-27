@@ -30,6 +30,10 @@
 
 
 #include <stddef.h>
+#if USE_NEWLIB == 1
+#include <stdio.h>
+#include <malloc.h>
+#endif
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -97,6 +101,81 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName)
      * provided as an example only as stack overflow checking does not function
      * when running the FreeRTOS POSIX port. */
     vAssertCalled( __FILE__, __LINE__ );
+}
+
+#if USE_NEWLIB == 0
+static char* itoa(int i, char b[])
+{
+    char *p = b;
+    int shifter;
+
+    if (i == 0) {
+        *p++ = '0';
+        *p = '\0';
+	return b;
+    }
+    if (i < 0) {
+        *p++ = '-';
+        i *= -1;
+    }
+    shifter = i;
+    do {
+        ++p;
+        shifter = shifter / 10;
+    } while (shifter);
+    *p = '\0';
+    do {
+        *--p = (char)('0' + (i % 10));
+        i = i / 10;
+    } while(i);
+    return b;
+}
+#endif
+
+void xtraceMALLOC(void *pvAddress, unsigned int uiSize)
+{
+#if USE_NEWLIB == 1
+    char buffer[50];
+
+    sprintf(buffer, "%d = malloc(%d)\r\n", (int)pvAddress, uiSize);
+    vDirectPrintMsg(buffer);
+#else
+    char buffer[12];
+
+    (void) pvAddress;
+    (void) itoa((int) uiSize, buffer);
+    vDirectPrintMsg("malloc(");
+    vDirectPrintMsg(buffer);
+    vDirectPrintMsg(") called\r\n");
+#endif
+}
+
+void xtraceFREE(void *pvAddress, unsigned int uiSize)
+{
+#if USE_NEWLIB == 1
+    char buffer[50];
+
+    sprintf(buffer, "free(%d, %d)\r\n", (int)pvAddress, uiSize);
+    vDirectPrintMsg(buffer);
+#else
+    (void) pvAddress;
+    (void) uiSize;
+    vDirectPrintMsg("free() called\r\n");
+#endif
+}
+#endif
+
+#if USE_NEWLIB == 1
+void __malloc_lock(struct _reent *r)
+{
+    (void) r;
+    vTaskSuspendAll();
+}
+
+void __malloc_unlock(struct _reent *r)
+{
+    (void) r;
+    xTaskResumeAll();
 }
 #endif
 

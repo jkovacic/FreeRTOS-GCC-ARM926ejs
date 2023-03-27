@@ -81,6 +81,10 @@ extern void vAssertCalled( const char *pcFile, uint32_t ulLine );
 #define configGENERATE_RUN_TIME_STATS     0
 #define configUSE_STATS_FORMATTING_FUNCTIONS 0
 #endif
+#define traceMALLOC( pvAddress, uiSize ) xtraceMALLOC(pvAddress, uiSize)
+#define traceFREE( pvAddress, uiSize )   xtraceFREE(pvAddress, uiSize)
+void xtraceMALLOC(void *pvAddress, unsigned int uiSize);
+void xtraceFREE(void *pvAddress, unsigned int uiSize);
 #else
 #define configUSE_MALLOC_FAILED_HOOK      0
 #endif
@@ -107,12 +111,10 @@ to exclude the API function. */
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY  191 /* equivalent to 0xb0, or priority 11. */
 
-
 /* This is the value being used as per the ST library which permits 16
 priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY     15
-
 
 #endif /* FREERTOS_CONFIG_H */
