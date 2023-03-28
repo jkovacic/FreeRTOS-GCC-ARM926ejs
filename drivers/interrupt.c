@@ -230,7 +230,7 @@ static void __irq_dummyISR(void)
 
 /*
  * Default handler of vectored IRQs. Typically the address of this function should be
- * set as a default value to pPicReg->VICDEFVECTADDR. It handles IRQs whose ISRs are note
+ * set as a default value to pPicReg->VICDEFVECTADDR. It handles IRQs whose ISRs are not
  * entered into vectored registers. It is very similar to non vectored handling of IRQs.
  */
 static void __defaultVectorIsr(void)
@@ -242,7 +242,7 @@ static void __defaultVectorIsr(void)
      * The current implementation assumes that the first 16 entries are properly serviced
      * and also enabled in their respective VICVECTCNTLn registers.
      */
-    for ( cntr=NR_VECTORS; cntr<NR_INTERRUPTS; ++cntr )
+    for ( cntr = NR_VECTORS; cntr < NR_INTERRUPTS; ++cntr )
     {
         if ( __irqVect[cntr].irq < NR_INTERRUPTS &&
              0U != HWREG_READ_SINGLE_BIT(vicintenable, __irqVect[cntr].irq ) )
