@@ -192,7 +192,7 @@ rebuild : clean all
 $(OBJDIR) :
 	mkdir -p $@
 
-$(OBJS) : | $(OBJDIR)
+$(OBJS) : Makefile | $(OBJDIR)
 
 $(TARGET) : $(ELF_IMAGE)
 	$(OBJCOPY) -O binary $^ $@
@@ -270,7 +270,7 @@ help :
 
 run : all
 	@echo "Please exit qemu by pressing \"Ctrl-A x\""
-	QEMU_AUDIO_DRV=none qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET)
+	QEMU_AUDIO_DRV=none qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET) -d guest_errors
 
 qemu: run
 
