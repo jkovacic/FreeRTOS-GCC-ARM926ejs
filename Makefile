@@ -185,6 +185,20 @@ INC_FLAG_DRIVERS = -I$(INC_DRIVERS)
 # Make rules:
 #
 
+# Detect Windows with two possible ways. On Linux start parallel builds:
+ifeq ($(OS),Windows_NT)
+else
+ifeq '$(findstring ;,$(PATH))' ';'
+else
+CORES?=$(shell (nproc --all || sysctl -n hw.ncpu) 2>/dev/null || echo 1)
+ifneq ($(CORES),1)
+.PHONY: _all
+_all:
+	$(MAKE) all -j$(CORES)
+endif
+endif
+endif
+
 all : $(TARGET) $(LISTING)
 
 rebuild : clean all
@@ -270,7 +284,8 @@ help :
 
 run : all
 	@echo "Please exit qemu by pressing \"Ctrl-A x\""
-	QEMU_AUDIO_DRV=none qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET) -d guest_errors
+	QEMU_AUDIO_DRV=none qemu-system-arm -M versatilepb -nographic -m 128 -kernel $(TARGET) -d guest_errors,unimp
+# -d int
 
 qemu: run
 
