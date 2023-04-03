@@ -94,6 +94,7 @@ See also [qemu.ld](Demo/qemu.ld) to check the RAM layout:
 - Small/fast timer interrupt handling.
 - Is it possible to write startup code as C with inline assembler?
 - Support using clang instead of gcc.
+- Can we run on Windows?
 
 ## License
 
