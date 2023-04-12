@@ -55,13 +55,13 @@ PORT_COMP_TARG = GCC/ARM926EJ-S/
 OBJDIR = obj/
 
 # FreeRTOS source base directory
-FREERTOS_SRC = FreeRTOS/Source/
+FREERTOS_SRC = FreeRTOS/FreeRTOS/Source/
 
 # Directory with memory management source files
 FREERTOS_MEMMANG_SRC = $(FREERTOS_SRC)portable/MemMang/
 
 # Directory with platform specific source files
-FREERTOS_PORT_SRC = $(FREERTOS_SRC)portable/$(PORT_COMP_TARG)
+FREERTOS_PORT_SRC = ./$(PORT_COMP_TARG)
 
 # Directory with HW drivers' source files
 DRIVERS_SRC = drivers/

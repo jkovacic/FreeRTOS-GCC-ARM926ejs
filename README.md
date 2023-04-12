@@ -8,6 +8,11 @@ updated with newer versions of FreeRTOS when they are released.
 The port is still at an early development stage and includes only very basic
 demo tasks. More complex tasks will be included in the future.
 
+## Cloning this repository
+
+```text
+$ git clone https://github.com/jkovacic/FreeRTOS-GCC-ARM926ejs --recurse-submodules
+```
 
 ## Prerequisites
 * _[GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)_,
