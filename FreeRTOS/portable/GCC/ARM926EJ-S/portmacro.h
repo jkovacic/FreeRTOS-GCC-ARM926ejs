@@ -78,7 +78,7 @@ typedef uint32_t UBaseType_t;
    not need to be guarded with a critical section. Different on 16-bit: */
 #define portTICK_TYPE_IS_ATOMIC 1
 
-#define portMEMORY_BARRIER() __asm volatile( "" ::: "memory" )
+#define portMEMORY_BARRIER() __asm volatile ( "" ::: "memory" )
 
 /*-----------------------------------------------------------*/
 
