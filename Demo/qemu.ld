@@ -63,7 +63,6 @@ SECTIONS
     __ld_Init_Addr = 0x10000;     /* Qemu starts execution at this address, 64 kB */
     __ld_Ram_size = 128M;         /* Total capacity of RAM */
 
-
     . = __ld_Vectors_Size;        /* Move the pointer after the "reserved" area for exception vectors */
 
     . = . + __ld_Svc_Stack_Size;  /* Allocate memory for Supervisor mode's stack */
@@ -77,34 +76,27 @@ SECTIONS
     stack_top = .;               /* It starts just in front of the startup address */
 
     . = __ld_Init_Addr;          /* Qemu will boot from this address */
-    .init :
-    {
+    .init : {
         *(.init)                 /* ARM exception vectors must be placed to startup address */
     }
-    .text :
-    {
+    .text : {
         *(.text)
     }
-    .rodata :
-    {
+    .rodata : {
         *(.rodata)
     }
-    .data :
-    {
+    .data : {
         *(.data)
     }
     . = ALIGN(4);
-    .bss :
-    {
+    .bss : {
         __bss_start = .;
         *(.bss)
     }
     . = ALIGN(4);
     end = .;
-
     /* The remainder of RAM is reserved for the heap (if malloc is ever used) */
-    .heap :
-    {
+    .heap : {
         *(.heap)
         . = __ld_Ram_size - end;
     }
