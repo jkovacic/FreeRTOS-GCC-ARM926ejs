@@ -273,7 +273,7 @@ void all_uart_init(void)
  * @param nr - number of the UART (between 0 and 2)
  * @param ch - character to be sent to the UART
  */
-static inline void __printCh(uint8_t nr, char ch)
+static inline __attribute__((always_inline)) void __printCh(uint8_t nr, char ch)
 {
    /*
     * Qemu ignores other UART's registers, anyway the Flag Register is checked
@@ -425,7 +425,7 @@ void uart_disableUart(uint8_t nr)
  * @param set - true: bitmask's bit(s) are set to 1;  false: bits are cleared to 0
  * @param bitmask - bitmask of 1-bits that will be set or cleared
  */
-static inline void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
+static inline __attribute__((always_inline)) void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
 {
     uint32_t enabled;
 
