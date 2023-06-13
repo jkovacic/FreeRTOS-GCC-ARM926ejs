@@ -88,7 +88,6 @@ typedef uint32_t UBaseType_t;
 #define portBYTE_ALIGNMENT          8
 #define portNOP()                   __asm volatile ( "NOP" );
 #define portINLINE __inline
-#define portNORETURN                __attribute__((noreturn))
 #define portDONT_DISCARD            __attribute__((used))
 /*-----------------------------------------------------------*/
 
