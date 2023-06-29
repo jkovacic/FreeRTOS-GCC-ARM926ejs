@@ -299,8 +299,9 @@ void recvTask(void* params)
                 /* Send the entire string to the print queue */
                 vPrintMsg(buf[bufCntr]);
                 /* And switch to the next line of the "circular" buffer */
-                ++bufCntr;
-                bufCntr %= RECV_BUFFER_SIZE;
+                if (++bufCntr >= RECV_BUFFER_SIZE) {
+                    bufCntr = 0U;
+		}
                 /* "Reset" the position index */
                 bufPos = 0U;
 
