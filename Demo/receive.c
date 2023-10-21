@@ -39,6 +39,7 @@
 #include "interrupt.h"
 
 #include "print.h"
+#include "receive.h"
 
 
 /* Numeric codes for special keys: */
@@ -52,24 +53,24 @@
 /* This string is displayed first when Enter is pressed: */
 #define MSG_TEXT            "You entered: \""
 /* Hardcoded strlen(MSG_TEXT): */
-#define MSG_OFFSET          ( 14 )
+#define MSG_OFFSET          ( 14U )
 /*
  * Total length of a string buffer:
  * MSG_OFFSET + RECV_BUFFER_SIZE + additional 4 characters for "\"\r\n\0"
  */
-#define RECV_TOTAL_BUFFER_LEN        ( MSG_OFFSET + RECV_BUFFER_LEN + 3 + 1 )
+#define RECV_TOTAL_BUFFER_LEN        ( MSG_OFFSET + RECV_BUFFER_LEN + 3U + 1U )
 
 /* Allocated "circular" buffer */
 static portCHAR buf[ RECV_BUFFER_SIZE ][ RECV_TOTAL_BUFFER_LEN ];
 
 /* Position of the currently available slot in the buffer */
-static uint16_t bufCntr = 0;
+static uint16_t bufCntr = 0U;
 
 /* Position of the current character within the buffer */
-static uint16_t bufPos = 0;
+static uint16_t bufPos = 0U;
 
 /* UART number: */
-static uint8_t recvUartNr = ( uint8_t ) -1;
+static uint8_t recvUartNr = MY_UINT8_MAX;
 
 /* A queue for received characters, not processed yet */
 static QueueHandle_t recvQueue;
@@ -87,23 +88,22 @@ static void recvIsrHandler(void);
  *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-int16_t recvInit(uint8_t uart_nr)
+int16_t recvInit(void)
 {
     /* Obtain the UART's IRQ from BSP */
+    const uint8_t uart_nr = RECV_UART_NR;
     const uint8_t uartIrqs[BSP_NR_UARTS] = BSP_UART_IRQS;
-    const uint8_t irq = ( uart_nr<BSP_NR_UARTS ?
-                             uartIrqs[uart_nr] :
-                             (uint8_t) -1 );
+    const uint8_t irq = (uart_nr < BSP_NR_UARTS)?  uartIrqs[uart_nr] : MY_UINT8_MAX;
     uint16_t i;
 
-    for ( i=0; i<RECV_BUFFER_SIZE; ++i )
+    for ( i = 0U; i < RECV_BUFFER_SIZE; ++i )
     {
         memset((void*) buf[i], '\0', RECV_TOTAL_BUFFER_LEN);
         strcpy(buf[i], MSG_TEXT);
     }
 
-    bufCntr = 0;
-    bufPos = 0;
+    bufCntr = 0U;
+    bufPos = 0U;
 
     /* Check if UART number is valid */
     if ( uart_nr >= BSP_NR_UARTS )
@@ -279,7 +279,7 @@ void recvTask(void* params)
                  * If the buffer is not empty, decrease the position index,
                  * i.e. "delete" the last character
                  */
-                if ( bufPos>0 )
+                if ( bufPos > 0U )
                 {
                     --bufPos;
                 }
@@ -299,11 +299,16 @@ void recvTask(void* params)
                 /* Send the entire string to the print queue */
                 vPrintMsg(buf[bufCntr]);
                 /* And switch to the next line of the "circular" buffer */
-                ++bufCntr;
-                bufCntr %= RECV_BUFFER_SIZE;
+                if (++bufCntr >= RECV_BUFFER_SIZE) {
+                    bufCntr = 0U;
+		}
                 /* "Reset" the position index */
-                bufPos = 0;
+                bufPos = 0U;
 
+                break;
+            }
+            default:
+            {
                 break;
             }
 

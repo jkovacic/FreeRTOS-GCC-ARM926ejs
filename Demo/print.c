@@ -34,6 +34,7 @@
 #include "app_config.h"
 #include "bsp.h"
 #include "uart.h"
+#include "print.h"
 
 
 
@@ -56,12 +57,12 @@
 static portCHAR printChBuf[ PRINT_CHR_BUF_SIZE ][ CHR_BUF_STRING_LEN ];
 
 /* Position of the currently available "slot" in the buffer */
-static uint16_t chBufCntr = 0;
+static uint16_t chBufCntr = 0U;
 
 
 
 /* UART number: */
-static uint8_t printUartNr = (uint8_t) -1;
+static uint8_t printUartNr = MY_UINT8_MAX;
 
 /* Messages to be printed will be pushed to this queue */
 static QueueHandle_t printQueue;
@@ -77,20 +78,21 @@ static QueueHandle_t printQueue;
  *
  * @return pdPASS if initialization is successful, pdFAIL otherwise
  */
-int16_t printInit(uint8_t uart_nr)
+int16_t printInit(void)
 {
+    uint8_t uart_nr = PRINT_UART_NR;
     uint16_t i;
 
     /*
      * Initialize the character print buffer.
      * It is sufficient to set each string's second character to '\0'.
      */
-    for ( i=0; i<PRINT_CHR_BUF_SIZE; ++i )
+    for ( i = 0U; i < PRINT_CHR_BUF_SIZE; ++i )
     {
         printChBuf[i][1] = '\0';
     }
 
-    chBufCntr = 0;
+    chBufCntr = 0U;
 
     /* Check if UART number is valid */
     if ( uart_nr >= BSP_NR_UARTS )
@@ -160,6 +162,7 @@ void vPrintMsg(const portCHAR* msg)
 }
 
 
+#if 0
 /**
  * Prints a character in a thread safe manner - even if the calling task preempts
  * another printing task, its message will not be corrupted. Additionally, if another
@@ -192,6 +195,7 @@ void vPrintChar(portCHAR ch)
     ++chBufCntr;
     chBufCntr %= PRINT_CHR_BUF_SIZE;
 }
+#endif
 
 
 /**
@@ -213,6 +217,7 @@ void vDirectPrintMsg(const portCHAR* msg)
 }
 
 
+#if 0
 /**
  * Prints a character directly to the UART. The function is not thread safe and
  * corruptions are possible when multiple tasks attempt to print "simultaneously".
@@ -225,3 +230,4 @@ void vDirectPrintCh(portCHAR ch)
 {
     uart_printChar(printUartNr, ch);
 }
+#endif

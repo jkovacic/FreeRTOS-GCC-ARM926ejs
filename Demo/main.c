@@ -30,47 +30,177 @@
 
 
 #include <stddef.h>
+#if USE_NEWLIB == 1
+#include <stdio.h>
+#include <malloc.h>
+#endif
 
 #include <FreeRTOS.h>
 #include <task.h>
 
 #include "app_config.h"
+#include "bsp.h"
 #include "print.h"
 #include "receive.h"
 
 
-/*
- * This diagnostic pragma will suppress the -Wmain warning,
- * raised when main() does not return an int
- * (which is perfectly OK in bare metal programming!).
- *
- * More details about the GCC diagnostic pragmas:
- * https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
- */
-#pragma GCC diagnostic ignored "-Wmain"
+#if USE_DEBUG_FLAGS == 1
+void vAssertCalled( const char *pcFile, uint32_t ulLine )
+{
+    volatile unsigned long looping = 0UL;
+#if 1
+    ( void ) pcFile;
+    ( void ) ulLine;
+#else
+    printf("Assertion failed at %s, line %d\n\r", pcFile, ulLine);
+#endif
+    taskENTER_CRITICAL();
+    {
+        /* Use the debugger to set ul to a non-zero value in order to step out
+           of this function to determine why it was called. */
+        while( looping == 0UL )
+        {
+            portNOP();
+        }
+    }
+    taskEXIT_CRITICAL();
+}
+
+void vApplicationMallocFailedHook( void )
+{
+    /* vApplicationMallocFailedHook() will only be called if
+     * configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
+     * function that will get called if a call to pvPortMalloc() fails.
+     * pvPortMalloc() is called internally by the kernel whenever a task, queue,
+     * timer or semaphore is created.  It is also called by various parts of the
+     * demo application.  If heap_1.c, heap_2.c or heap_4.c is being used, then the
+     * size of the    heap available to pvPortMalloc() is defined by
+     * configTOTAL_HEAP_SIZE in FreeRTOSConfig.h, and the xPortGetFreeHeapSize()
+     * API function can be used to query the size of free heap space that remains
+     * (although it does not provide information on how the remaining heap might be
+     * fragmented).  See http://www.freertos.org/a00111.html for more
+     * information. */
+
+#if 1
+    vAssertCalled( __FILE__, __LINE__ );
+#else
+    /* configPRINT_STRING(( "ERROR: Malloc failed to allocate memory\r\n" )); */
+    taskDISABLE_INTERRUPTS();
+    for(;;){}
+#endif
+}
+
+void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName)
+{
+    (void) xTask;
+    (void) pcTaskName;
+
+    /* Run time stack overflow checking is performed if
+     * configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
+     * function is called if a stack overflow is detected.  This function is
+     * provided as an example only as stack overflow checking does not function
+     * when running the FreeRTOS POSIX port. */
+    vAssertCalled( __FILE__, __LINE__ );
+}
+
+#if USE_NEWLIB == 0
+static char* itoa(int i, char b[])
+{
+    char *p = b;
+    int shifter;
+
+    if (i == 0) {
+        *p++ = '0';
+        *p = '\0';
+	return b;
+    }
+    if (i < 0) {
+        *p++ = '-';
+        i *= -1;
+    }
+    shifter = i;
+    do {
+        ++p;
+        shifter = shifter / 10;
+    } while (shifter);
+    *p = '\0';
+    do {
+        *--p = (char)('0' + (i % 10));
+        i = i / 10;
+    } while(i);
+    return b;
+}
+#endif
+
+void xtraceMALLOC(void *pvAddress, unsigned int uiSize)
+{
+#if USE_NEWLIB == 1
+    char buffer[50];
+
+    sprintf(buffer, "%d = malloc(%d)\r\n", (int)pvAddress, uiSize);
+    vDirectPrintMsg(buffer);
+#else
+    char buffer[12];
+
+    (void) pvAddress;
+    (void) itoa((int) uiSize, buffer);
+    vDirectPrintMsg("malloc(");
+    vDirectPrintMsg(buffer);
+    vDirectPrintMsg(") called\r\n");
+#endif
+}
+
+void xtraceFREE(void *pvAddress, unsigned int uiSize)
+{
+#if USE_NEWLIB == 1
+    char buffer[50];
+
+    sprintf(buffer, "free(%d, %d)\r\n", (int)pvAddress, uiSize);
+    vDirectPrintMsg(buffer);
+#else
+    (void) pvAddress;
+    (void) uiSize;
+    vDirectPrintMsg("free() called\r\n");
+#endif
+}
+#endif
+
+#if USE_NEWLIB == 1
+void __malloc_lock(struct _reent *r)
+{
+    (void) r;
+    vTaskSuspendAll();
+}
+
+void __malloc_unlock(struct _reent *r)
+{
+    (void) r;
+    xTaskResumeAll();
+}
+#endif
 
 
 /* Struct with settings for each task */
-typedef struct _paramStruct
+typedef struct
 {
-    portCHAR* text;                  /* text to be printed by the task */
-    UBaseType_t  delay;              /* delay in milliseconds */
+    const portCHAR* text;            /* text to be printed by the task */
+    UBaseType_t delay;               /* delay in milliseconds */
 } paramStruct;
 
 /* Default parameters if no parameter struct is available */
 static const portCHAR defaultText[] = "<NO TEXT>\r\n";
-static const UBaseType_t defaultDelay = 1000;
+static const UBaseType_t defaultDelay = 1000U;
 
 
 /* Task function - may be instantiated in multiple tasks */
-void vTaskFunction( void *pvParameters )
+static void vTaskFunction( void *pvParameters )
 {
     const portCHAR* taskName;
-    UBaseType_t  delay;
+    UBaseType_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
 
-    taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
-    delay = ( NULL==params ? defaultDelay : params->delay);
+    taskName = ( NULL==params || NULL==params->text ) ? defaultText : params->text;
+    delay = ( NULL==params ) ? defaultDelay : params->delay;
 
     for( ; ; )
     {
@@ -91,15 +221,15 @@ void vTaskFunction( void *pvParameters )
 
 
 /* Fixed frequency periodic task function - may be instantiated in multiple tasks */
-void vPeriodicTaskFunction(void* pvParameters)
+static void vPeriodicTaskFunction(void* pvParameters)
 {
     const portCHAR* taskName;
     UBaseType_t delay;
     paramStruct* params = (paramStruct*) pvParameters;
     TickType_t lastWakeTime;
 
-    taskName = ( NULL==params || NULL==params->text ? defaultText : params->text );
-    delay = ( NULL==params ? defaultDelay : params->delay);
+    taskName = ( NULL==params || NULL==params->text ) ? defaultText : params->text;
+    delay = ( NULL==params ) ? defaultDelay : params->delay;
 
     /*
      * This variable must be initialized once.
@@ -130,14 +260,6 @@ void vPeriodicTaskFunction(void* pvParameters)
 }
 
 
-/* Parameters for two tasks */
-static const paramStruct tParam[2] =
-{
-    (paramStruct) { .text="Task1\r\n", .delay=2000 },
-    (paramStruct) { .text="Periodic task\r\n", .delay=3000 }
-};
-
-
 /*
  * A convenience function that is called when a FreeRTOS API call fails
  * and a program cannot continue. It prints a message (if provided) and
@@ -153,11 +275,21 @@ static void FreeRTOS_Error(const portCHAR* msg)
     for ( ; ; );
 }
 
+
 /* Startup function that creates and runs two FreeRTOS tasks */
-void main(void)
+int main(void)
 {
+    /* Parameters for two tasks */
+    static paramStruct tParam[2] =
+    {
+        { "Task1\r\n", 2000U },
+        { "Periodic task\r\n", 3000U }
+    };
+
+    hw_init();
+
     /* Init of print related tasks: */
-    if ( pdFAIL == printInit(PRINT_UART_NR) )
+    if ( pdFAIL == printInit() )
     {
         FreeRTOS_Error("Initialization of print failed\r\n");
     }
@@ -171,7 +303,7 @@ void main(void)
     vDirectPrintMsg("= = = T E S T   S T A R T E D = = =\r\n\r\n");
 
     /* Init of receiver related tasks: */
-    if ( pdFAIL == recvInit(RECV_UART_NR) )
+    if ( pdFAIL == recvInit() )
     {
         FreeRTOS_Error("Initialization of receiver failed\r\n");
     }
@@ -189,13 +321,13 @@ void main(void)
     }
 
     /* And finally create two tasks: */
-    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void*) &tParam[0],
+    if ( pdPASS != xTaskCreate(vTaskFunction, "task1", 128, (void * const) &tParam[0],
                                PRIOR_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task1\r\n");
     }
 
-    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void*) &tParam[1],
+    if ( pdPASS != xTaskCreate(vPeriodicTaskFunction, "task2", 128, (void * const) &tParam[1],
                                PRIOR_FIX_FREQ_PERIODIC, NULL) )
     {
         FreeRTOS_Error("Could not create task2\r\n");
@@ -216,4 +348,5 @@ void main(void)
 
     /* just in case if an infinite loop is somehow omitted in FreeRTOS_Error */
     for ( ; ; );
+    return 0;
 }

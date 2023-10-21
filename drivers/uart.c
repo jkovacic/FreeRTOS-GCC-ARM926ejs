@@ -42,6 +42,7 @@
 
 #include "regutil.h"
 #include "bsp.h"
+#include "uart.h"
 
 
 /*
@@ -64,18 +65,18 @@
  *  15: CTSEn (CTS hardware flow control enable)
  *  16-31: reserved (do not modify)
  */
-#define CTL_UARTEN     ( 0x00000001 )
-#define CTL_SIREN      ( 0x00000002 )
-#define CTL_SIRLP      ( 0x00000004 )
-#define CTL_LBE        ( 0x00000080 )
-#define CTL_TXE        ( 0x00000100 )
-#define CTL_RXE        ( 0x00000200 )
-#define CTL_DTR        ( 0x00000400 )
-#define CTL_RTS        ( 0x00000800 )
-#define CTL_OUT1       ( 0x00001000 )
-#define CTL_OUT2       ( 0x00002000 )
-#define CTL_RTSEn      ( 0x00004000 )
-#define CTL_CTSEn      ( 0x00008000 )
+#define CTL_UARTEN     ( 0x00000001U )
+#define CTL_SIREN      ( 0x00000002U )
+#define CTL_SIRLP      ( 0x00000004U )
+#define CTL_LBE        ( 0x00000080U )
+#define CTL_TXE        ( 0x00000100U )
+#define CTL_RXE        ( 0x00000200U )
+#define CTL_DTR        ( 0x00000400U )
+#define CTL_RTS        ( 0x00000800U )
+#define CTL_OUT1       ( 0x00001000U )
+#define CTL_OUT2       ( 0x00002000U )
+#define CTL_RTSEn      ( 0x00004000U )
+#define CTL_CTSEn      ( 0x00008000U )
 
 
 /*
@@ -95,17 +96,17 @@
  *   10: Overrun error interrupt mask
  * 11-31: reserved, do not modify
  */
-#define INT_RIMIM      ( 0x00000001 )
-#define INT_CTSMIM     ( 0x00000002 )
-#define INT_DCDMIM     ( 0x00000004 )
-#define INT_DSRMIM     ( 0x00000008 )
-#define INT_RXIM       ( 0x00000010 )
-#define INT_TXIM       ( 0x00000020 )
-#define INT_RTIM       ( 0x00000040 )
-#define INT_FEIM       ( 0x00000080 )
-#define INT_PEIM       ( 0x00000100 )
-#define INT_BEIM       ( 0x00000200 )
-#define INT_OEIM       ( 0x00000400 )
+#define INT_RIMIM      ( 0x00000001U )
+#define INT_CTSMIM     ( 0x00000002U )
+#define INT_DCDMIM     ( 0x00000004U )
+#define INT_DSRMIM     ( 0x00000008U )
+#define INT_RXIM       ( 0x00000010U )
+#define INT_TXIM       ( 0x00000020U )
+#define INT_RTIM       ( 0x00000040U )
+#define INT_FEIM       ( 0x00000080U )
+#define INT_PEIM       ( 0x00000100U )
+#define INT_BEIM       ( 0x00000200U )
+#define INT_OEIM       ( 0x00000400U )
 
 
 /*
@@ -123,15 +124,15 @@
  *   8: Ring indicator. This bit is the complement of the UART ring indicator (nUARTRI) modem status input.
  * 9-31: reserved, do not modify
  */
-#define FR_CTS         ( 0x00000001 )
-#define FR_DSR         ( 0x00000002 )
-#define FR_DCD         ( 0x00000004 )
-#define FR_BUSY        ( 0x00000008 )
-#define FR_RXFE        ( 0x00000010 )
-#define FR_TXFF        ( 0x00000020 )
-#define FR_RXFF        ( 0x00000040 )
-#define FR_TXFE        ( 0x00000080 )
-#define FR_RI          ( 0x00000100 )
+#define FR_CTS         ( 0x00000001U )
+#define FR_DSR         ( 0x00000002U )
+#define FR_DCD         ( 0x00000004U )
+#define FR_BUSY        ( 0x00000008U )
+#define FR_RXFE        ( 0x00000010U )
+#define FR_TXFF        ( 0x00000020U )
+#define FR_RXFF        ( 0x00000040U )
+#define FR_TXFE        ( 0x00000080U )
+#define FR_RI          ( 0x00000100U )
 
 
 /*
@@ -144,13 +145,13 @@
  * the remaining bits should be handled, therefore they will be treated as
  * "should not be modified".
  */
-typedef struct _ARM926EJS_UART_REGS
+typedef volatile struct
 {
-    uint32_t UARTDR;                   /* UART Data Register, UARTDR */
+    uint8_t UARTDR[4];                 /* UART Data Register, UARTDR */
     uint32_t UARTRSR;                  /* Receive Status Register, Error Clear Register, UARTRSR/UARTECR */
-    const uint32_t Reserved1[4];       /* reserved, should not be modified */
-    const uint32_t UARTFR;             /* Flag Register, UARTFR, read only */
-    const uint32_t Reserved2;          /* reserved, should not be modified */
+    uint32_t Reserved1[4];             /* reserved, should not be modified */
+    uint32_t UARTFR;                   /* Flag Register, UARTFR, read only */
+    uint32_t Reserved2;                /* reserved, should not be modified */
     uint32_t UARTILPR;                 /* IrDA Low-Power Counter Register, UARTILPR */
     uint32_t UARTIBRD;                 /* Integer Baud Rate Register, UARTIBRD */
     uint32_t UARTFBRD;                 /* Fractional Baud Rate Register, UARTFBRD */
@@ -158,30 +159,35 @@ typedef struct _ARM926EJS_UART_REGS
     uint32_t UARTCR;                   /* Control Register, UARTCR */
     uint32_t UARTIFLS;                 /* Interrupt FIFO Level Select Register, UARTIFLS */
     uint32_t UARTIMSC;                 /* Interrupt Mask Set/Clear Register, UARTIMSC */
-    const uint32_t UARTRIS;            /* Raw Interrupt Status Register, UARTRIS, read only */
-    const uint32_t UARTMIS;            /* Mask Interrupt Status Register, UARTMIS, read only */
+    uint32_t UARTRIS;                  /* Raw Interrupt Status Register, UARTRIS, read only */
+    uint32_t UARTMIS;                  /* Mask Interrupt Status Register, UARTMIS, read only */
     uint32_t UARTICR;                  /* Interrupt Clear Register */
     uint32_t UARTDMACR;                /* DMA Control Register, UARTDMACR */
-    const uint32_t Reserved3[13];      /* reserved, should not be modified */
-    const uint32_t ReservedTest[4];    /* reserved for test purposes, should not be modified */
-    const uint32_t Reserved4[976];     /* reserved, should not be modified */
-    const uint32_t ReservedIdExp[4];   /* reserved for future ID expansion, should not be modified */
-    const uint32_t UARTPeriphID[4];    /* UART peripheral ID, read only */
-    const uint32_t UARTCellID[4];      /* UART Cell ID, read only */
+    uint32_t Reserved3[13];            /* reserved, should not be modified */
+    uint32_t ReservedTest[4];          /* reserved for test purposes, should not be modified */
+    uint32_t Reserved4[976];           /* reserved, should not be modified */
+    uint32_t ReservedIdExp[4];         /* reserved for future ID expansion, should not be modified */
+    uint32_t UARTPeriphID[4];          /* UART peripheral ID, read only */
+    uint32_t UARTCellID[4];            /* UART Cell ID, read only */
 } ARM926EJS_UART_REGS;
 
 /* Shared UART register: */
-#define UARTECR       UARTRSR
+/* #define UARTECR       UARTRSR */
 
 
 #define CAST_ADDR(ADDR)    (ARM926EJS_UART_REGS*) (ADDR),
 
-static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS] =
+static ARM926EJS_UART_REGS * const pReg[BSP_NR_UARTS] =
                          {
                              BSP_UART_BASE_ADDRESSES(CAST_ADDR)
                          };
 
 #undef CAST_ADDR
+
+
+#ifdef DEBUG
+#define CHECK_UART 1
+#endif
 
 
 /**
@@ -193,14 +199,8 @@ static volatile ARM926EJS_UART_REGS* const  pReg[BSP_NR_UARTS] =
  *
  * @param nr - number of the UART (between 0 and 2)
  */
-void uart_init(uint8_t nr)
+static void uart_init(uint8_t nr)
 {
-    /* Sanity check */
-    if ( nr >= BSP_NR_UARTS )
-    {
-        return;
-    }
-
     /*
      * Registers' reserved bits should not be modified.
      * For that reason, the registers are set in two steps:
@@ -248,6 +248,21 @@ void uart_init(uint8_t nr)
 }
 
 
+/**
+ * Initializes a UART controller.
+ */
+void all_uart_init(void)
+{
+    uint8_t i;
+
+    /* Init all available UARTs */
+    for ( i = 0U; i < BSP_NR_UARTS; ++i )
+    {
+        uart_init(i);
+    }
+}
+
+
 /*
  * Outputs a character to the specified UART. This short function is used by other functions,
  * that is why it is implemented as an inline function.
@@ -258,7 +273,7 @@ void uart_init(uint8_t nr)
  * @param nr - number of the UART (between 0 and 2)
  * @param ch - character to be sent to the UART
  */
-static inline void __printCh(uint8_t nr, char ch)
+static inline __attribute__((always_inline)) void __printCh(uint8_t nr, char ch)
 {
    /*
     * Qemu ignores other UART's registers, anyway the Flag Register is checked
@@ -272,8 +287,8 @@ static inline void __printCh(uint8_t nr, char ch)
     * In this case, wait until some "waiting" characters have been transmitted and
     * the TXFF is set to 0, indicating the Transmit FIFO can accept additional characters.
     */
-   while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_TXFF ) )
-   { 
+   while ( 0U != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_TXFF ) )
+   {
        /* an empty loop; prevents "-Werror=misleading-indentation" */
    }
 
@@ -287,10 +302,11 @@ static inline void __printCh(uint8_t nr, char ch)
     * only the desired character itself, not the whole word.
     */
 
-    *( (char*) &(pReg[nr]->UARTDR) ) = ch;
+    pReg[nr]->UARTDR[0] = ch;
 }
 
 
+#if 0
 /**
  * Outputs a character to the specified UART.
  *
@@ -301,15 +317,18 @@ static inline void __printCh(uint8_t nr, char ch)
  */
 void uart_printChar(uint8_t nr, char ch)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* just use the provided inline function: */
     __printCh(nr, ch);
 }
+#endif
 
 
 /**
@@ -331,14 +350,16 @@ void uart_print(uint8_t nr, const char* str)
     const char* null_str = "<NULL>\r\n";
     const char* cp;
 
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* handle possible NULL value of str: */
-    cp = ( NULL==str ? null_str : (char*) str );
+    cp = ( NULL==str ? null_str : str );
 
     /*
      * Just print each character until a zero terminator is detected
@@ -350,6 +371,7 @@ void uart_print(uint8_t nr, const char* str)
 }
 
 
+#if 0
 /**
  * Enables the specified UART controller.
  *
@@ -359,11 +381,13 @@ void uart_print(uint8_t nr, const char* str)
  */
 void uart_enableUart(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     HWREG_SET_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
@@ -378,14 +402,17 @@ void uart_enableUart(uint8_t nr)
  */
 void uart_disableUart(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     HWREG_CLEAR_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
 }
+#endif
 
 
 /*
@@ -398,15 +425,17 @@ void uart_disableUart(uint8_t nr)
  * @param set - true: bitmask's bit(s) are set to 1;  false: bits are cleared to 0
  * @param bitmask - bitmask of 1-bits that will be set or cleared
  */
-static inline void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
+static inline __attribute__((always_inline)) void __setCrBit(uint8_t nr, bool set, uint32_t bitmask)
 {
     uint32_t enabled;
 
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Store UART's enable status (UARTEN) */
     enabled = HWREG_READ_BITS( pReg[nr]->UARTCR, CTL_UARTEN );
@@ -451,6 +480,7 @@ void uart_enableTx(uint8_t nr)
 }
 
 
+#if 0
 /**
  * Disables specified UART's transmit (Tx) section.
  * UART's general enable status (UARTEN) remains unmodified.
@@ -463,6 +493,7 @@ void uart_disableTx(uint8_t nr)
 {
     __setCrBit(nr, false, CTL_TXE);
 }
+#endif
 
 
 /**
@@ -479,6 +510,7 @@ void uart_enableRx(uint8_t nr)
 }
 
 
+#if 0
 /**
  * Disables specified UART's transmit (Rx) section.
  * UART's general enable status (UARTEN) remains unmodified.
@@ -491,6 +523,7 @@ void uart_disableRx(uint8_t nr)
 {
     __setCrBit(nr, false, CTL_RXE);
 }
+#endif
 
 
 /**
@@ -502,17 +535,20 @@ void uart_disableRx(uint8_t nr)
  */
 void uart_enableRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Set bit 4 of the IMSC register: */
     HWREG_SET_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
 }
 
 
+#if 0
 /**
  * Disables the interrupt triggering by the specified UART when a character is received.
  *
@@ -522,15 +558,18 @@ void uart_enableRxInterrupt(uint8_t nr)
  */
 void uart_disableRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /* Clear bit 4 of the IMSC register: */
     HWREG_CLEAR_BITS( pReg[nr]->UARTIMSC, INT_RXIM );
 }
+#endif
 
 
 /**
@@ -542,11 +581,13 @@ void uart_disableRxInterrupt(uint8_t nr)
  */
 void uart_clearRxInterrupt(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return;
     }
+#endif
 
     /*
      * The register is write only, so usage of the |= operator is not permitted.
@@ -571,14 +612,16 @@ void uart_clearRxInterrupt(uint8_t nr)
  */
 char uart_readChar(uint8_t nr)
 {
+#ifdef CHECK_UART
     /* Sanity check */
     if ( nr >= BSP_NR_UARTS )
     {
         return (char) 0;
     }
+#endif
 
     /* Wait until the receiving FIFO is not empty */
-    while ( 0 != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_RXFE ) );
+    while ( 0U != HWREG_READ_BITS( pReg[nr]->UARTFR, FR_RXFE ) );
 
     /*
      * UART DR is a 32-bit register and only the least significant byte must be returned.
@@ -587,5 +630,5 @@ char uart_readChar(uint8_t nr)
      * only the desired character itself, not the whole word.
      */
 
-    return *( (char*) &(pReg[nr]->UARTDR) );
+    return pReg[nr]->UARTDR[0];
 }

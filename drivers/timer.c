@@ -47,10 +47,11 @@
 
 #include "regutil.h"
 #include "bsp.h"
+#include "timer.h"
 
 
 /* Number of counters per timer: */
-#define NR_COUNTERS      ( 2 )
+#define NR_COUNTERS      ( 2U )
 
 
 /*
@@ -68,29 +69,29 @@
  *   0: one shot enable bit (0: wrapping, 1: one shot)
  */
 
-#define CTL_ENABLE          ( 0x00000080 )
-#define CTL_MODE            ( 0x00000040 )
-#define CTL_INTR            ( 0x00000020 )
-#define CTL_PRESCALE_1      ( 0x00000008 )
-#define CTL_PRESCALE_2      ( 0x00000004 )
-#define CTL_CTRLEN          ( 0x00000002 )
-#define CTL_ONESHOT         ( 0x00000001 )
+#define CTL_ENABLE          ( 0x00000080U )
+#define CTL_MODE            ( 0x00000040U )
+#define CTL_INTR            ( 0x00000020U )
+#define CTL_PRESCALE_1      ( 0x00000008U )
+#define CTL_PRESCALE_2      ( 0x00000004U )
+#define CTL_CTRLEN          ( 0x00000002U )
+#define CTL_ONESHOT         ( 0x00000001U )
 
 
 /*
  * 32-bit registers of each counter within a timer controller.
  * See page 3-2 of DDI0271:
  */
-typedef struct _SP804_COUNTER_REGS
+typedef struct
 {
     uint32_t LOAD;                   /* Load Register, TimerXLoad */
-    const uint32_t VALUE;            /* Current Value Register, TimerXValue, read only */
+    uint32_t VALUE;                  /* Current Value Register, TimerXValue, read only */
     uint32_t CONTROL;                /* Control Register, TimerXControl */
     uint32_t INTCLR;                 /* Interrupt Clear Register, TimerXIntClr, write only */
     uint32_t RIS;                    /* Raw Interrupt Status Register, TimerXRIS, read only */
     uint32_t MIS;                    /* Masked Interrupt Status Register, TimerXMIS, read only */
     uint32_t BGLOAD;                 /* Background Load Register, TimerXBGLoad */
-    const uint32_t Unused;           /* Unused, should not be modified */
+    uint32_t Unused;                 /* Unused, should not be modified */
 } SP804_COUNTER_REGS;
 
 
@@ -99,15 +100,15 @@ typedef struct _SP804_COUNTER_REGS
  * relative to the controllers' base address:
  * See page 3-2 of DDI0271:
  */
-typedef struct _ARM926EJS_TIMER_REGS
+typedef volatile struct
 {
     SP804_COUNTER_REGS CNTR[NR_COUNTERS];     /* Registers for each of timer's two counters */
-    const uint32_t Reserved1[944];            /* Reserved for future expansion, should not be modified */
+    uint32_t Reserved1[944];                  /* Reserved for future expansion, should not be modified */
     uint32_t ITCR;                            /* Integration Test Control Register */
     uint32_t ITOP;                            /* Integration Test Output Set Register, write only */
-    const uint32_t Reserved2[54];             /* Reserved for future expansion, should not be modified */
-    const uint32_t PERIPHID[4];               /* Timer Peripheral ID, read only */
-    const uint32_t CELLID[4];                 /* PrimeCell ID, read only */
+    uint32_t Reserved2[54];                   /* Reserved for future expansion, should not be modified */
+    uint32_t PERIPHID[4];                     /* Timer Peripheral ID, read only */
+    uint32_t CELLID[4];                       /* PrimeCell ID, read only */
 } ARM926EJS_TIMER_REGS;
 
 
@@ -116,12 +117,35 @@ typedef struct _ARM926EJS_TIMER_REGS
  */
 #define CAST_ADDR(ADDR)    (ARM926EJS_TIMER_REGS*) (ADDR),
 
-static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS] =
+static ARM926EJS_TIMER_REGS * const pReg[BSP_NR_TIMERS] =
                          {
                              BSP_TIMER_BASE_ADDRESSES(CAST_ADDR)
                          };
 
 #undef CAST_ADDR
+
+
+/**
+ * Initializes all timer controller.
+ */
+void all_timer_init(void)
+{
+    uint8_t i, j;
+
+    /* Init all counters of all available timers */
+    for ( i = 0U; i < BSP_NR_TIMERS; ++i )
+    {
+        for ( j = 0U; j < NR_COUNTERS; ++j )
+        {
+            timer_init(i, j);
+        }
+    }
+}
+
+#ifdef DEBUG
+#define CHECK_TIMER 1
+#endif
+
 
 /**
  * Initializes the specified timer's counter controller.
@@ -139,12 +163,13 @@ static volatile ARM926EJS_TIMER_REGS* const  pReg[BSP_NR_TIMERS] =
  */
 void timer_init(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
 
     /*
@@ -164,7 +189,7 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, ( CTL_MODE | CTL_CTRLEN ) );
 
     /*
-     * The following bits are will be to 0:
+     * The following bits will be set to 0:
      * - enable bit (disabled, i.e. timer not running)
      * - interrupt bit (disabled)
      * - both prescale bits (00 = 1)
@@ -172,7 +197,7 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
      */
 
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL,
-    		( CTL_ENABLE | CTL_INTR | CTL_PRESCALE_1 | CTL_PRESCALE_2 | CTL_ONESHOT ) );
+                      ( CTL_ENABLE | CTL_INTR | CTL_PRESCALE_1 | CTL_PRESCALE_2 | CTL_ONESHOT ) );
 
     /* reserved bits remained unmodified */
 }
@@ -188,18 +213,20 @@ void timer_init(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_start(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 7 of the Control Register to 1, do not modify other bits */
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
 }
 
 
+#if 0
 /**
  * Stops the specified timer's counter.
  *
@@ -210,12 +237,13 @@ void timer_start(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_stop(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 7 of the Control Register to 0, do not modify other bits */
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE );
@@ -238,16 +266,18 @@ void timer_stop(uint8_t timerNr, uint8_t counterNr)
  */
 int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return 0;
     }
+#endif
 
     /* just check the enable bit of the timer's Control Register */
     return ( 0!=HWREG_READ_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_ENABLE ) );
 }
+#endif
 
 
 /**
@@ -260,18 +290,20 @@ int8_t timer_isEnabled(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 5 of the Control Register to 1, do not modify other bits */
     HWREG_SET_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
 }
 
 
+#if 0
 /**
  * Disables the timer's interrupt triggering (when the counter reaches 0).
  *
@@ -282,16 +314,18 @@ void timer_enableInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /* Set bit 5 of the Control Register to 0, do not modify other bits */
     HWREG_CLEAR_BITS( pReg[timerNr]->CNTR[counterNr].CONTROL, CTL_INTR );
 }
+#endif
 
 
 /**
@@ -304,19 +338,20 @@ void timer_disableInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     /*
      * Writing anything (e.g. 0xFFFFFFFF, i.e. all ones) into the
      * Interrupt Clear Register clears the timer's interrupt output.
      * See page 3-6 of DDI0271.
      */
-    pReg[timerNr]->CNTR[counterNr].INTCLR = 0xFFFFFFFF;
+    pReg[timerNr]->CNTR[counterNr].INTCLR = 0xFFFFFFFFU;
 }
 
 
@@ -336,17 +371,19 @@ void timer_clearInterrupt(uint8_t timerNr, uint8_t counterNr)
  */
 void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return;
     }
+#endif
 
     pReg[timerNr]->CNTR[counterNr].LOAD = value;
 }
 
 
+#if 0
 /**
  * Returns the value of the specified counter's Value Register,
  * i.e. the value of the counter at the moment of reading.
@@ -360,12 +397,13 @@ void timer_setLoad(uint8_t timerNr, uint8_t counterNr, uint32_t value)
  */
 uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return 0UL;
     }
+#endif
 
     return pReg[timerNr]->CNTR[counterNr].VALUE;
 }
@@ -385,16 +423,17 @@ uint32_t timer_getValue(uint8_t timerNr, uint8_t counterNr)
  *
  * @return read-only address of the timer's counter (i.e. the Value Register)
  */
-const volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
+volatile uint32_t* timer_getValueAddr(uint8_t timerNr, uint8_t counterNr)
 {
-
+#ifdef CHECK_TIMER
     /* sanity check: */
     if ( timerNr >= BSP_NR_TIMERS || counterNr >= NR_COUNTERS )
     {
         return NULL;
     }
+#endif
 
-    return (const volatile uint32_t*) &(pReg[timerNr]->CNTR[counterNr].VALUE);
+    return (volatile uint32_t*) &(pReg[timerNr]->CNTR[counterNr].VALUE);
 }
 
 
@@ -405,3 +444,4 @@ uint8_t timer_countersPerTimer(void)
 {
     return NR_COUNTERS;
 }
+#endif

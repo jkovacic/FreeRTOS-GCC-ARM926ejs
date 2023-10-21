@@ -42,23 +42,24 @@
  * A definition with a LSB set, it can be shifted left
  * to represent any single bit.
  */
-#define MASK_ONE           ( 0x00000001 )
+#define MASK_ONE           ( 0x00000001U )
 
 
 /**
  * All bits of "reg", whose equivalent "mask" bits equal 1,
  * are set to 1. All other "reg" bits remain unmodified.
  */
-#define HWREG_SET_BITS(reg, mask)        reg |= (mask);
+#define HWREG_SET_BITS(reg, mask)        reg |= (mask)
 
 
 /**
  * All bits of "reg", whose equivalent 'mask' bits equal 1,
  * are cleared to 0. All other "reg" bits remain unmodified.
  */
-#define HWREG_CLEAR_BITS(reg, mask)      reg &= ~(mask);
+#define HWREG_CLEAR_BITS(reg, mask)      reg &= ~(mask)
 
 
+#if 0
 /**
  * First all "reg" bits, whose equivalent "mask" bits equal 1,
  * are cleared to 0.
@@ -69,6 +70,7 @@
 #define HWREG_SET_CLEAR_BITS(reg, value, mask) \
         reg &= ~( mask );   \
         reg |= ( (value) & (mask) );
+#endif
 
 
 /**
@@ -81,7 +83,7 @@
 /**
  * Returns a mask with a "bit"'th least significant bit set.
  */
-#define HWREG_SINGLE_BIT_MASK(bit)       ( MASK_ONE << bit )
+#define HWREG_SINGLE_BIT_MASK(bit)       ( MASK_ONE << (bit) )
 
 
 /**

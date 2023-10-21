@@ -34,17 +34,16 @@
 #include <FreeRTOS.h>
 
 
-int16_t printInit(uint16_t uart_nr);
-
+int16_t printInit(void);
 void printGateKeeperTask(void* params);
-
 void vPrintMsg(const portCHAR* msg);
-
+#if 0
 void vPrintChar(portCHAR ch);
-
+#endif
 void vDirectPrintMsg(const portCHAR* msg);
-
+#if 0
 void vDirectPrintCh(portCHAR ch);
+#endif
 
 
 #endif  /* _PRINT_H_ */

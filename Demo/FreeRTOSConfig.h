@@ -22,8 +22,6 @@
  *
  * http://www.FreeRTOS.org
  * http://aws.amazon.com/freertos
- *
- * 1 tab == 4 spaces!
  */
 
 #ifndef FREERTOS_CONFIG_H
@@ -51,12 +49,45 @@
 #define configMINIMAL_STACK_SIZE          ( ( StackType_t ) 128 )
 #define configTOTAL_HEAP_SIZE             ( ( size_t ) ( 20480 ) )
 #define configMAX_TASK_NAME_LEN           ( 16 )
-#define configUSE_TRACE_FACILITY          0
 #define configUSE_16_BIT_TICKS            0
 #define configIDLE_SHOULD_YIELD           1
-#define configUSE_APPLICATION_TASK_TAG    1
 
+#if USE_NEWLIB == 1
+#define configUSE_NEWLIB_REENTRANT        1
+#endif
+
+#if USE_LARGE_DEMO == 0
+#define configUSE_APPLICATION_TASK_TAG    0
 #define configUSE_MUTEXES                 0
+#else
+#define configUSE_APPLICATION_TASK_TAG    1
+#define configUSE_MUTEXES                 1
+#define configUSE_RECURSIVE_MUTEXES       1
+#define configUSE_COUNTING_SEMAPHORES     1
+
+#define configUSE_TIMERS                  1
+#define configTIMER_TASK_PRIORITY         2
+#define configTIMER_QUEUE_LENGTH         20
+#define configTIMER_TASK_STACK_DEPTH    ( configMINIMAL_STACK_SIZE * 2 )
+#endif
+
+#if USE_DEBUG_FLAGS == 1
+#define configUSE_MALLOC_FAILED_HOOK      1
+#define configCHECK_FOR_STACK_OVERFLOW    2
+extern void vAssertCalled( const char *pcFile, uint32_t ulLine );
+#define configASSERT( x )  if ( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+#if 0
+#define configUSE_TRACE_FACILITY          1
+#define configGENERATE_RUN_TIME_STATS     0
+#define configUSE_STATS_FORMATTING_FUNCTIONS 0
+#endif
+#define traceMALLOC( pvAddress, uiSize ) xtraceMALLOC(pvAddress, uiSize)
+#define traceFREE( pvAddress, uiSize )   xtraceFREE(pvAddress, uiSize)
+void xtraceMALLOC(void *pvAddress, unsigned int uiSize);
+void xtraceFREE(void *pvAddress, unsigned int uiSize);
+#else
+#define configUSE_MALLOC_FAILED_HOOK      0
+#endif
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES             0
@@ -80,12 +111,10 @@ to exclude the API function. */
 See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY  191 /* equivalent to 0xb0, or priority 11. */
 
-
 /* This is the value being used as per the ST library which permits 16
 priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY     15
-
 
 #endif /* FREERTOS_CONFIG_H */
